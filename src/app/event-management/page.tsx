@@ -52,6 +52,7 @@ export default function EventManagementPage() {
   const supabase = createClient();
   const { role, profile } = useAuth();
   const isAdmin = role && role !== 'mahasiswa';
+  const canManage = ['super_admin', 'admin_lomba'].includes(role || '');
   const [data, setData] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(''); 
@@ -148,7 +149,7 @@ export default function EventManagementPage() {
             <h1 className="text-2xl font-bold text-slate-800 tracking-tight">{isAdmin ? 'Manajemen Event' : 'Event & Bootcamp'}</h1>
             <p className="text-slate-500 text-sm mt-1">{isAdmin ? 'Kelola workshop, seminar, dan pelatihan untuk mahasiswa.' : 'Daftar dan ikuti berbagai kegiatan pengembangan diri.'}</p>
           </div>
-          {isAdmin && (
+          {canManage && (
             <button onClick={() => { setEditItem(null); setFormOpen(true); }} className="btn-primary">
               <Plus size={16} />
               Tambah Event
@@ -300,7 +301,7 @@ export default function EventManagementPage() {
                     >
                       <Eye size={13} /> Lihat Detail
                     </button>
-                    {isAdmin ? (
+                    {canManage ? (
                       <>
                         <button onClick={() => { setEditItem(evt); setFormOpen(true); }} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors" title="Edit"><Pencil size={14} /></button>
                         <button onClick={() => setDeleteTarget(evt.id)} className="p-2 rounded-xl hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Hapus"><Trash2 size={14} /></button>
@@ -378,7 +379,7 @@ export default function EventManagementPage() {
         )}
       </div>
 
-      {isAdmin && (
+      {canManage && (
         <>
           <EventFormModal open={formOpen} onClose={() => { setFormOpen(false); setEditItem(null); }} onSave={handleSave} editItem={editItem} />
           <ConfirmDialog open={!!deleteTarget} title="Hapus Event" description="Apakah Anda yakin ingin menghapus event ini?" confirmLabel="Hapus" variant="danger" loading={deleteLoading} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />

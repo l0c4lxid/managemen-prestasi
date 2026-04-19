@@ -2,14 +2,48 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Star, Users, Trophy, Swords } from 'lucide-react';
 
-const stats = [
-  { label: 'Prestasi Terverifikasi', value: '2.847', icon: <Trophy size={16} />, color: 'text-indigo-600 bg-indigo-50' },
-  { label: 'Mahasiswa Aktif', value: '1.293', icon: <Users size={16} />, color: 'text-cyan-600 bg-cyan-50' },
-  { label: 'Lomba Tersedia', value: '148', icon: <Swords size={16} />, color: 'text-emerald-600 bg-emerald-50' },
-  { label: 'Rata-rata Bintang', value: '4.9', icon: <Star size={16} />, color: 'text-amber-600 bg-amber-50' },
-];
+interface StatItem {
+  label: string;
+  value: string;
+  icon: string;
+}
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  stats?: StatItem[];
+}
+
+export default function HeroSection({ stats: dynamicStats }: HeroSectionProps) {
+  // Map icon strings to components
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case 'trophy': return <Trophy size={16} />;
+      case 'users': return <Users size={16} />;
+      case 'swords': return <Swords size={16} />;
+      case 'star': return <Star size={16} />;
+      default: return <Trophy size={16} />;
+    }
+  };
+
+  const getColors = (iconName: string) => {
+    switch (iconName) {
+      case 'trophy': return 'text-indigo-600 bg-indigo-50';
+      case 'users': return 'text-cyan-600 bg-cyan-50';
+      case 'swords': return 'text-emerald-600 bg-emerald-50';
+      case 'star': return 'text-amber-600 bg-amber-50';
+      default: return 'text-indigo-600 bg-indigo-50';
+    }
+  };
+
+  // Fallback stats if none provided
+  const defaultStats = [
+    { label: 'Prestasi Terverifikasi', value: '2.847', icon: 'trophy' },
+    { label: 'Mahasiswa Aktif', value: '1.293', icon: 'users' },
+    { label: 'Lomba Tersedia', value: '148', icon: 'swords' },
+    { label: 'Rating Platform', value: '4.9', icon: 'star' },
+  ];
+
+  const displayStats = dynamicStats || defaultStats;
+
   return (
     <section className="relative overflow-hidden pt-24 pb-20 lg:pt-32 lg:pb-28">
       {/* Background gradient */}
@@ -37,19 +71,19 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Link href="/sign-up-login" className="btn-primary text-base px-7 py-3.5 shadow-brand">
+              <Link href="/login" className="btn-primary text-base px-7 py-3.5 shadow-brand">
                 Mulai Sekarang
                 <ArrowRight size={18} />
               </Link>
-              <a href="#wall-of-fame" className="btn-outline text-base px-7 py-3.5">
-                Lihat Prestasi
+              <a href="#faq" className="btn-outline text-base px-7 py-3.5">
+                Pusat Bantuan
               </a>
             </div>
 
             {/* Trust indicators */}
             <div className="mt-10 flex items-center gap-4">
               <div className="flex -space-x-2">
-                {['MR', 'DS', 'AF', 'NP', 'YK']?.map((initials, i) => (
+                {['MR', 'DS', 'AF', 'NP', 'YK'].map((initials, i) => (
                   <div
                     key={`avatar-${initials}`}
                     className="w-8 h-8 rounded-full border-2 border-white flex items-center justify-center text-white text-[10px] font-bold"
@@ -61,11 +95,11 @@ export default function HeroSection() {
               </div>
               <div>
                 <div className="flex items-center gap-1">
-                  {[1, 2, 3, 4, 5]?.map((s) => (
+                  {[1, 2, 3, 4, 5].map((s) => (
                     <Star key={`star-${s}`} size={12} className="fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <p className="text-xs text-slate-500 mt-0.5">Dipercaya 1.200+ mahasiswa aktif</p>
+                <p className="text-xs text-slate-500 mt-0.5">Dipercaya {displayStats[1]?.value}+ mahasiswa aktif</p>
               </div>
             </div>
           </div>
@@ -88,14 +122,14 @@ export default function HeroSection() {
                     { name: 'Aninda Putri Rahayu', lomba: 'PKM-K Nasional 2025', juara: '1', color: 'from-amber-400 to-orange-500', nim: '2021310045' },
                     { name: 'Fadhil Zulkarnain', lomba: 'GEMASTIK Animasi', juara: '2', color: 'from-slate-300 to-slate-500', nim: '2022140023' },
                     { name: 'Renata Kusuma Dewi', lomba: 'Olimpiade Akuntansi', juara: '1', color: 'from-amber-400 to-orange-500', nim: '2020250067' },
-                  ]?.map((item) => (
-                    <div key={`hero-item-${item?.nim}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                      <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${item?.color} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
-                        #{item?.juara}
+                  ].map((item) => (
+                    <div key={`hero-item-${item.nim}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
+                      <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
+                        #{item.juara}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-800 truncate">{item?.name}</p>
-                        <p className="text-xs text-slate-500 truncate">{item?.lomba}</p>
+                        <p className="text-sm font-semibold text-slate-800 truncate">{item.name}</p>
+                        <p className="text-xs text-slate-500 truncate">{item.lomba}</p>
                       </div>
                       <Trophy size={14} className="text-amber-500 flex-shrink-0" />
                     </div>
@@ -106,13 +140,13 @@ export default function HeroSection() {
               {/* Floating stat cards */}
               <div className="absolute -bottom-6 -left-8 bg-white rounded-2xl shadow-soft border border-slate-100 p-4 animate-slide-up">
                 <p className="text-xs text-slate-500 font-medium">Prestasi Bulan Ini</p>
-                <p className="text-2xl font-extrabold text-indigo-700 tabular-nums mt-0.5">+127</p>
-                <p className="text-xs text-emerald-600 font-semibold mt-0.5">↑ 23% dari bulan lalu</p>
+                <p className="text-2xl font-extrabold text-indigo-700 tabular-nums mt-0.5">+{displayStats[0]?.value}</p>
+                <p className="text-xs text-emerald-600 font-semibold mt-0.5">↑ Update Realtime</p>
               </div>
 
               <div className="absolute -top-6 -right-6 bg-white rounded-2xl shadow-soft border border-slate-100 p-4 animate-slide-up">
                 <p className="text-xs text-slate-500 font-medium">Tingkat Verifikasi</p>
-                <p className="text-2xl font-extrabold text-emerald-600 tabular-nums mt-0.5">94.2%</p>
+                <p className="text-2xl font-extrabold text-emerald-600 tabular-nums mt-0.5">99.2%</p>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">dalam 48 jam</p>
               </div>
             </div>
@@ -121,14 +155,14 @@ export default function HeroSection() {
 
         {/* Stats row */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-16">
-          {stats?.map((stat) => (
-            <div key={`stat-${stat?.label}`} className="glass-card p-5 flex items-center gap-4">
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${stat?.color}`}>
-                {stat?.icon}
+          {displayStats.map((stat) => (
+            <div key={`stat-${stat.label}`} className="glass-card p-5 flex items-center gap-4">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${getColors(stat.icon)}`}>
+                {getIcon(stat.icon)}
               </div>
               <div>
-                <p className="text-xl font-extrabold text-slate-800 tabular-nums">{stat?.value}</p>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">{stat?.label}</p>
+                <p className="text-xl font-extrabold text-slate-800 tabular-nums">{stat.value}</p>
+                <p className="text-xs text-slate-500 font-medium mt-0.5">{stat.label}</p>
               </div>
             </div>
           ))}

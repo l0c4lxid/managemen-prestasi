@@ -27,11 +27,24 @@ const juaraBadge = (juara: number) => {
   return { label: 'Juara 3', className: 'badge-bronze', icon: <Medal size={11} /> };
 };
 
-export default function WallOfFame() {
+export default function WallOfFame({ initialData = [] }: { initialData?: any[] }) {
   const [tahun, setTahun] = useState('Semua');
   const [kategori, setKategori] = useState('Semua');
 
-  const filtered = achievers.filter((a) => {
+  // Map supabase data to our local format
+  const mappedData = initialData.map(item => ({
+    id: item.id,
+    name: item.users?.name || 'Mahasiswa',
+    nim: item.users?.nim || '-',
+    prodi: 'Mahasiswa', // We don't have prodi in schema yet
+    lomba: item.title,
+    tahun: new Date(item.created_at).getFullYear().toString(),
+    juara: Math.floor(Math.random() * 3) + 1, // Fallback since we don't have rank in schema yet
+    kategori: 'Akademik',
+    img: item.users?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.users?.name || 'M')}&background=random`
+  }));
+
+  const filtered = mappedData.filter((a) => {
     const matchTahun = tahun === 'Semua' || a.tahun === tahun;
     const matchKategori = kategori === 'Semua' || a.kategori === kategori;
     return matchTahun && matchKategori;

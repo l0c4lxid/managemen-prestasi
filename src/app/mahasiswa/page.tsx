@@ -9,12 +9,15 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import UserFormModal from './components/UserFormModal';
 
 interface MahasiswaStats {
   id: string;
   name: string;
   email: string;
   nim?: string;
+  role: string;
   created_at: string;
   total_prestasi: number;
 }
@@ -33,6 +36,12 @@ export default function MahasiswaPage() {
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editTarget, setEditTarget] = useState<MahasiswaStats | null>(null);
+
+  const { role } = useAuth();
+  const isAdmin = role && role !== 'mahasiswa';
+  const isSuperAdmin = role === 'super_admin';
 
   useEffect(() => {
     fetchMahasiswa();
@@ -41,10 +50,11 @@ export default function MahasiswaPage() {
   const fetchMahasiswa = async () => {
     setLoading(true);
     // Fetch users with role mahasiswa
-    const { data: users, error: usersError } = await supabase
-      .from('users')
-      .select('id, name, email, nim, created_at')
-      .eq('role', 'mahasiswa');
+    let query = supabase.from('users').select('id, name, email, nim, role, created_at');
+    if (!isSuperAdmin) {
+      query = query.eq('role', 'mahasiswa');
+    }
+    const { data: users, error: usersError } = await query;
 
     if (usersError) {
       toast.error('Gagal mengambil data mahasiswa');
@@ -136,9 +146,21 @@ export default function MahasiswaPage() {
       <div className="space-y-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Manajemen Mahasiswa</h1>
-            <p className="text-slate-500 text-sm mt-1">Kelola data mahasiswa dan rekam jejak prestasinya.</p>
+            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
+              {isSuperAdmin ? 'Manajemen User' : 'Data Mahasiswa'}
+            </h1>
+            <p className="text-slate-500 text-sm mt-1">
+              {isSuperAdmin ? 'Kelola data seluruh pengguna sistem.' : 'Lihat data mahasiswa terdaftar.'}
+            </p>
           </div>
+          {isSuperAdmin && (
+            <button
+              onClick={() => { setEditTarget(null); setIsModalOpen(true); }}
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition-colors"
+            >
+              + Tambah Pengguna
+            </button>
+          )}
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 gap-4 max-w-2xl">
@@ -177,18 +199,18 @@ export default function MahasiswaPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-100">
-                  {([['nim', 'NIM'], ['name', 'Nama'], ['email', 'Email'], ['created_at', 'Terdaftar Pada'], ['total_prestasi', 'Total Prestasi']] as [SortField, string][]).map(([field, label]) => (
+                  {([['nim', 'NIM'], ['name', 'Nama'], ['role', 'Role'], ['email', 'Email'], ['created_at', 'Terdaftar Pada'], ['total_prestasi', 'Total Prestasi']] as [SortField, string][]).map(([field, label]) => (
                     <th key={field} className="px-4 py-3 text-left font-semibold text-slate-600 whitespace-nowrap cursor-pointer hover:text-slate-800 transition-colors" onClick={() => handleSort(field)}>
                       <div className="flex items-center gap-1.5">{label}<SortIcon field={field} /></div>
                     </th>
                   ))}
-                  <th className="px-4 py-3 text-right font-semibold text-slate-600">Aksi</th>
+                  {isSuperAdmin && <th className="px-4 py-3 text-right font-semibold text-slate-600">Aksi</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {loading ? (
                   <tr>
-                    <td colSpan={6} className="py-12 text-center text-slate-500">
+                    <td colSpan={isSuperAdmin ? 7 : 6} className="py-12 text-center text-slate-500">
                       <div className="flex flex-col items-center justify-center">
                         <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3"></div>
                         <p>Memuat data mahasiswa...</p>
@@ -196,7 +218,7 @@ export default function MahasiswaPage() {
                     </td>
                   </tr>
                 ) : paginated.length === 0 ? (
-                  <tr><td colSpan={6} className="py-16"><EmptyState title="Tidak ada mahasiswa" description="Belum ada data mahasiswa yang sesuai filter." /></td></tr>
+                  <tr><td colSpan={isSuperAdmin ? 7 : 6} className="py-16"><EmptyState title="Tidak ada mahasiswa" description="Belum ada data mahasiswa yang sesuai filter." /></td></tr>
                 ) : paginated.map(row => (
                   <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-4 py-3 font-mono text-xs text-slate-500">{row.nim || '-'}</td>
@@ -209,6 +231,11 @@ export default function MahasiswaPage() {
                       </div>
                     </td>
                     <td className="px-4 py-3">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-medium">
+                        {row.role.replace('_', ' ')}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
                       <span className="flex items-center gap-1.5 text-slate-500"><Mail size={14} className="text-slate-400" />{row.email}</span>
                     </td>
                     <td className="px-4 py-3">
@@ -219,11 +246,14 @@ export default function MahasiswaPage() {
                         <BookOpen size={12} />{row.total_prestasi} Prestasi
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-1">
-                        <button onClick={() => setDeleteTarget(row.id)} className="p-2 rounded-xl border border-red-100 text-red-500 hover:bg-red-50 transition-colors" title="Hapus"><Trash2 size={15} /></button>
-                      </div>
-                    </td>
+                    {isSuperAdmin && (
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-1">
+                          <button onClick={() => { setEditTarget(row); setIsModalOpen(true); }} className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors" title="Edit">Edit</button>
+                          <button onClick={() => setDeleteTarget(row.id)} className="p-2 rounded-xl border border-red-100 text-red-500 hover:bg-red-50 transition-colors" title="Hapus"><Trash2 size={15} /></button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -250,11 +280,17 @@ export default function MahasiswaPage() {
 
       <ConfirmDialog
         open={!!deleteTarget}
-        title="Hapus Mahasiswa"
-        message="Data mahasiswa ini akan dihapus secara permanen beserta semua datanya. Lanjutkan?"
+        title="Hapus Pengguna"
+        message="Data pengguna ini akan dihapus secara permanen beserta semua datanya. Lanjutkan?"
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
         loading={deleteLoading}
+      />
+      <UserFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchMahasiswa}
+        editData={editTarget}
       />
     </AppLayout>
   );

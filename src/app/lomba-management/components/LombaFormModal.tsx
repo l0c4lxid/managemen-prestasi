@@ -29,7 +29,7 @@ interface Props {
   editItem: Lomba | null;
 }
 
-const kategoriOptions = ['Teknologi', 'Akademik', 'Kewirausahaan', 'Sains', 'Seni & Budaya', 'Olahraga'];
+const kategoriOptions = ['Akademik', 'Non-Akademik'];
 const tingkatOptions = ['Kampus', 'Regional', 'Nasional', 'Internasional'];
 
 export default function LombaFormModal({ open, onClose, onSave, editItem }: Props) {

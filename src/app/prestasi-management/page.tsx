@@ -4,6 +4,7 @@ import { Search, Filter, CheckCircle, XCircle, Clock, Eye, ExternalLink, Refresh
 import AppLayout from '@/components/AppLayout';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 import type { Achievement } from '@/types';
 
 type StatusFilter = 'all' | 'pending' | 'verified' | 'rejected';
@@ -16,6 +17,8 @@ const statusCfg = {
 
 export default function PrestasiManagementPage() {
   const supabase = createClient();
+  const { role } = useAuth();
+  const canVerify = ['super_admin', 'admin_prestasi'].includes(role || '');
   const [data, setData] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
@@ -182,21 +185,25 @@ export default function PrestasiManagementPage() {
                           {item.proof_url && (
                             <a href={item.proof_url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors" title="Lihat Bukti"><ExternalLink size={14} /></a>
                           )}
-                          {item.status === 'pending' && (
+                          {canVerify && (
                             <>
-                              <button onClick={() => handleVerify(item.id, 'verified')} disabled={processing === item.id} className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors disabled:opacity-50" title="Setujui"><CheckCircle size={14} /></button>
-                              <button onClick={() => handleVerify(item.id, 'rejected')} disabled={processing === item.id} className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors disabled:opacity-50" title="Tolak"><XCircle size={14} /></button>
+                              {item.status === 'pending' && (
+                                <>
+                                  <button onClick={() => handleVerify(item.id, 'verified')} disabled={processing === item.id} className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors disabled:opacity-50" title="Setujui"><CheckCircle size={14} /></button>
+                                  <button onClick={() => handleVerify(item.id, 'rejected')} disabled={processing === item.id} className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors disabled:opacity-50" title="Tolak"><XCircle size={14} /></button>
+                                </>
+                              )}
+                              {item.status === 'verified' && (
+                                <button onClick={() => handleVerify(item.id, 'rejected')} disabled={processing === item.id} className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors disabled:opacity-50" title="Batalkan">
+                                  <XCircle size={14} />
+                                </button>
+                              )}
+                              {item.status === 'rejected' && (
+                                <button onClick={() => handleVerify(item.id, 'verified')} disabled={processing === item.id} className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors disabled:opacity-50" title="Setujui">
+                                  <CheckCircle size={14} />
+                                </button>
+                              )}
                             </>
-                          )}
-                          {item.status === 'verified' && (
-                            <button onClick={() => handleVerify(item.id, 'rejected')} disabled={processing === item.id} className="p-1.5 rounded-lg bg-red-50 text-red-500 hover:bg-red-100 transition-colors disabled:opacity-50" title="Batalkan">
-                              <XCircle size={14} />
-                            </button>
-                          )}
-                          {item.status === 'rejected' && (
-                            <button onClick={() => handleVerify(item.id, 'verified')} disabled={processing === item.id} className="p-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 transition-colors disabled:opacity-50" title="Setujui">
-                              <CheckCircle size={14} />
-                            </button>
                           )}
                         </div>
                       </td>
@@ -239,7 +246,7 @@ export default function PrestasiManagementPage() {
                   </span>
                 </div>
               </div>
-              {detailItem.status === 'pending' && (
+              {canVerify && detailItem.status === 'pending' && (
                 <div className="flex gap-3 mt-6 pt-5 border-t border-slate-100">
                   <button onClick={() => handleVerify(detailItem.id, 'rejected')} disabled={processing === detailItem.id} className="btn-danger flex-1 justify-center">
                     <XCircle size={15} /> Tolak

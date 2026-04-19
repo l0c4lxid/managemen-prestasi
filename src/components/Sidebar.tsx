@@ -119,16 +119,17 @@ function SidebarContent({ collapsed, onToggleCollapse, activePath, isMobile }: {
               )}
               {items.map((item) => {
                 const isActive = activePath === item.href;
+                const displayLabel = (item.href === '/mahasiswa' && role !== 'super_admin') ? 'Data Mahasiswa' : item.label;
                 return (
                   <Link key={`${item.href}-${item.label}`} href={item.href}
                     className={`relative flex items-center gap-3 px-3 py-2.5 rounded-xl mb-0.5 transition-all duration-150 group
                       ${isActive ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
-                    title={collapsed ? item.label : undefined}
+                    title={collapsed ? displayLabel : undefined}
                   >
                     <span className={`flex-shrink-0 ${isActive ? 'text-indigo-600' : 'text-slate-500 group-hover:text-slate-700'}`}>
                       {item.icon}
                     </span>
-                    {!collapsed && <span className="text-sm flex-1 truncate">{item.label}</span>}
+                    {!collapsed && <span className="text-sm flex-1 truncate">{displayLabel}</span>}
                     {!collapsed && item.badge && (
                       <span className="flex-shrink-0 px-1.5 py-0.5 rounded-full bg-indigo-600 text-white text-[10px] font-bold tabular-nums">{item.badge}</span>
                     )}
@@ -137,7 +138,7 @@ function SidebarContent({ collapsed, onToggleCollapse, activePath, isMobile }: {
                     )}
                     {collapsed && (
                       <span className="absolute left-full ml-3 px-2.5 py-1.5 rounded-lg bg-slate-800 text-white text-xs font-medium opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
-                        {item.label}
+                        {displayLabel}
                       </span>
                     )}
                   </Link>

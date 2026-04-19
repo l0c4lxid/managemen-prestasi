@@ -18,8 +18,20 @@ function daysLeft(deadline: string): number {
   return Math.max(0, Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
 }
 
-export default function LombaSection() {
+export default function LombaSection({ initialData = [] }: { initialData?: any[] }) {
   const [bookmarked, setBookmarked] = useState<Set<string>>(new Set());
+
+  const mappedData = initialData.map(item => ({
+    id: item.id,
+    nama: item.title,
+    penyelenggara: item.organizer || 'Kampus',
+    kategori: item.category || 'Akademik',
+    tingkat: item.level || 'Nasional',
+    deadline: item.deadline,
+    hadiah: item.prize || 'Sertifikat',
+    peserta: Math.floor(Math.random() * 100), // Random placeholder for participants
+    color: item.category === 'Non-Akademik' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-indigo-50 text-indigo-700 border-indigo-100'
+  }));
 
   const toggleBookmark = (id: string) => {
     setBookmarked((prev) => {
@@ -49,7 +61,7 @@ export default function LombaSection() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {lombaData.map((lomba) => {
+          {mappedData.map((lomba) => {
             const days = daysLeft(lomba.deadline);
             const isBookmarked = bookmarked.has(lomba.id);
             const isUrgent = days <= 14;
@@ -120,6 +132,14 @@ export default function LombaSection() {
             );
           })}
         </div>
+
+        {mappedData.length === 0 && (
+          <div className="text-center py-20 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200">
+            <Swords size={40} className="mx-auto text-slate-300 mb-4" />
+            <h3 className="text-slate-600 font-bold">Belum Ada Lomba Aktif</h3>
+            <p className="text-slate-400 text-sm mt-1">Cek kembali nanti untuk kompetisi terbaru.</p>
+          </div>
+        )}
       </div>
     </section>
   );

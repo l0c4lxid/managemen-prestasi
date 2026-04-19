@@ -28,9 +28,8 @@ const statusConfig: Record<string, { label: string; color: string; dot: string }
 };
 
 const kategoriColors: Record<string, string> = {
-  Teknologi: 'bg-indigo-100 text-indigo-700', Akademik: 'bg-blue-100 text-blue-700',
-  Kewirausahaan: 'bg-amber-100 text-amber-700', Sains: 'bg-cyan-100 text-cyan-700',
-  'Seni & Budaya': 'bg-purple-100 text-purple-700', Olahraga: 'bg-rose-100 text-rose-700',
+  Akademik: 'bg-blue-100 text-blue-700',
+  'Non-Akademik': 'bg-amber-100 text-amber-700',
 };
 
 const tingkatColors: Record<string, string> = {
@@ -43,6 +42,7 @@ export default function LombaManagementPage() {
   const supabase = createClient();
   const { role, profile } = useAuth();
   const isAdmin = role && role !== 'mahasiswa';
+  const canManage = ['super_admin', 'admin_lomba'].includes(role || '');
   const [data, setData] = useState<Lomba[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -224,7 +224,7 @@ export default function LombaManagementPage() {
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <EmptyState icon={<Swords size={40} className="text-slate-300" />} title="Belum ada lomba" description="Belum ada lomba yang sesuai filter." action={isAdmin ? <button onClick={() => { setEditItem(null); setFormOpen(true); }} className="btn-primary">Tambah Lomba</button> : undefined} />
+          <EmptyState icon={<Swords size={40} className="text-slate-300" />} title="Belum ada lomba" description="Belum ada lomba yang sesuai filter." action={canManage ? <button onClick={() => { setEditItem(null); setFormOpen(true); }} className="btn-primary">Tambah Lomba</button> : undefined} />
         ) : viewMode === 'card' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {filtered.map(lomba => {
@@ -265,7 +265,7 @@ export default function LombaManagementPage() {
                     {lomba.deadline && <span className="flex items-center gap-1"><Clock size={12} className="text-orange-500" />Deadline: {new Date(lomba.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>}
                     {lomba.prize && <span className="flex items-center gap-1 ml-auto"><Trophy size={12} className="text-amber-500" /><span className="truncate max-w-[100px]">{lomba.prize}</span></span>}
                   </div>
-                  {isAdmin && (
+                  {canManage && (
                     <div className="flex items-center gap-2 pt-1">
                       <button onClick={() => router.push(`/lomba-management/${lomba.id}`)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-indigo-50 text-indigo-700 text-xs font-semibold hover:bg-indigo-100 transition-colors"><Eye size={13} /> Lihat</button>
                       <button onClick={() => { setEditItem(lomba); setFormOpen(true); }} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors" title="Edit"><Pencil size={14} /></button>
@@ -309,7 +309,7 @@ export default function LombaManagementPage() {
                       {isAdmin && <td className="px-4 py-3 text-sm text-slate-700 font-semibold">{participationCounts[lomba.id] || 0}</td>}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          {isAdmin ? (
+                          {canManage ? (
                             <>
                               <button onClick={() => router.push(`/lomba-management/${lomba.id}`)} className="p-1.5 rounded-lg hover:bg-indigo-50 text-indigo-600 transition-colors" title="Detail"><Eye size={14} /></button>
                               <button onClick={() => { setEditItem(lomba); setFormOpen(true); }} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors" title="Edit"><Pencil size={14} /></button>
@@ -331,7 +331,7 @@ export default function LombaManagementPage() {
         )}
       </div>
 
-      {isAdmin && (
+      {canManage && (
         <>
           <LombaFormModal open={formOpen} onClose={() => { setFormOpen(false); setEditItem(null); }} onSave={handleSave} editItem={editItem} />
           <ConfirmDialog open={!!deleteTarget} title="Hapus Lomba" description="Apakah Anda yakin ingin menghapus lomba ini?" confirmLabel="Hapus" variant="danger" loading={deleteLoading} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />
