@@ -5,19 +5,27 @@ import { ChevronDown, HelpCircle, ShieldCheck, Zap, Globe } from 'lucide-react';
 const faqs = [
   {
     question: "Apa itu PrestasiSolo?",
-    answer: "PrestasiSolo adalah platform resmi pendataan dan manajemen prestasi mahasiswa. Di sini kamu bisa menemukan informasi lomba, mendaftar event pengembangan diri, hingga memverifikasi sertifikat prestasimu secara digital."
+    answer: "PrestasiSolo adalah platform resmi pendataan dan manajemen prestasi mahasiswa. Di sini kamu bisa menemukan informasi lomba terbaru, mendaftar event pengembangan diri, hingga memverifikasi sertifikat prestasimu secara digital untuk keperluan SKPI."
   },
   {
-    question: "Bagaimana cara mendaftarkan prestasi?",
-    answer: "Setelah login, buka menu 'Submit Prestasi', isi detail kompetisi yang kamu ikuti, dan unggah bukti sertifikat atau foto podium. Admin akan memverifikasi datamu dalam waktu maksimal 2x24 jam."
+    question: "Bagaimana cara mendaftarkan prestasi saya?",
+    answer: "1. Login ke akun mahasiswa Anda.\n2. Buka menu 'Prestasi Saya'.\n3. Klik 'Tambah Prestasi'.\n4. Isi detail kompetisi (nama, tingkat, kategori) dan unggah bukti sertifikat/foto.\n5. Tunggu verifikasi admin (maksimal 3 hari kerja)."
   },
   {
-    question: "Apakah platform ini bisa diakses alumni?",
-    answer: "Saat ini PrestasiSolo diprioritaskan untuk mahasiswa aktif guna pendataan poin prestasi (SKPI). Namun, informasi lomba tetap bisa diakses secara publik."
+    question: "Apa keuntungan verifikasi prestasi di sini?",
+    answer: "Prestasi yang terverifikasi akan otomatis tercatat dalam Sistem Kredit Poin Mahasiswa dan akan muncul di Surat Keterangan Pendamping Ijazah (SKPI) saat Anda lulus nanti."
   },
   {
-    question: "Bagaimana jika sertifikat saya belum diverifikasi?",
-    answer: "Pastikan bukti yang diunggah jelas dan sesuai. Jika sudah lebih dari 3 hari kerja belum ada perubahan status, silakan hubungi admin melalui menu bantuan di dashboard."
+    question: "Siapa yang bisa mengakses platform ini?",
+    answer: "Seluruh mahasiswa aktif di lingkungan kampus dapat login menggunakan akun portal akademik masing-masing. Informasi lomba dan event dapat diakses secara publik."
+  },
+  {
+    question: "Bagaimana jika data lomba belum ada?",
+    answer: "Jika Anda mengikuti lomba yang belum terdaftar di sistem, Anda tetap bisa mengajukan 'Prestasi Mandiri' dengan mengunggah bukti surat tugas atau undangan lomba tersebut."
+  },
+  {
+    question: "Pusat Bantuan & Kendala Teknis?",
+    answer: "Jika mengalami kendala login atau verifikasi yang tertunda lama, silakan hubungi Biro Kemahasiswaan di Gedung Rektorat Lt. 2 atau kirim pesan melalui fitur 'Bantuan' di dashboard."
   }
 ];
 

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
   Search, Plus, Filter, RefreshCw, CalendarDays, MapPin, Users,
-  Clock, Pencil, Trash2, Eye, LayoutGrid, List, Mic2
+  Clock, Pencil, Trash2, Eye, LayoutGrid, List, Mic2, CheckCircle2
 } from 'lucide-react';
 import AppLayout from '@/components/AppLayout';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';

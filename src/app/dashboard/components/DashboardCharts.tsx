@@ -1,29 +1,24 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, Legend, defs, linearGradient, stop,
+  ResponsiveContainer, Legend
 } from 'recharts';
+import { createClient } from '@/lib/supabase/client';
 
-const prestasiTrend = [
-  { bulan: 'Nov\'25', diverifikasi: 89, ditolak: 8, draf: 12 },
-  { bulan: 'Des \'25', diverifikasi: 134, ditolak: 11, draf: 18 },
-  { bulan: 'Jan \'26', diverifikasi: 98, ditolak: 6, draf: 9 },
-  { bulan: 'Feb \'26', diverifikasi: 156, ditolak: 14, draf: 22 },
-  { bulan: 'Mar \'26', diverifikasi: 187, ditolak: 9, draf: 15 },
-  { bulan: 'Apr \'26', diverifikasi: 127, ditolak: 7, draf: 11 },
-];
+interface TrendData {
+  bulan: string;
+  diverifikasi: number;
+  ditolak: number;
+  draf: number;
+}
 
-const kategoriData = [
-  { kategori: 'Teknologi', count: 412 },
-  { kategori: 'Akademik', count: 387 },
-  { kategori: 'Kewirausahaan', count: 298 },
-  { kategori: 'Sains', count: 234 },
-  { kategori: 'Seni & Budaya', count: 189 },
-  { kategori: 'Olahraga', count: 143 },
-];
+interface KategoriData {
+  kategori: string;
+  count: number;
+}
 
-const CustomTooltipArea = ({ active, payload, label }: { active?: boolean; payload?: { value: number; name: string; color: string }[]; label?: string }) => {
+const CustomTooltipArea = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) => {
   if (!active || !payload) return null;
   return (
     <div className="bg-white rounded-xl border border-slate-100 shadow-soft p-3 text-xs">
@@ -39,7 +34,7 @@ const CustomTooltipArea = ({ active, payload, label }: { active?: boolean; paylo
   );
 };
 
-const CustomTooltipBar = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string }) => {
+const CustomTooltipBar = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) => {
   if (!active || !payload) return null;
   return (
     <div className="bg-white rounded-xl border border-slate-100 shadow-soft p-3 text-xs">
@@ -50,19 +45,87 @@ const CustomTooltipBar = ({ active, payload, label }: { active?: boolean; payloa
 };
 
 export default function DashboardCharts() {
+  const [trendData, setTrendData] = useState<TrendData[]>([]);
+  const [kategoriData, setKategoriData] = useState<KategoriData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const supabase = createClient();
+
+      // Generate last 6 months labels
+      const months = [];
+      for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        months.push({
+          full: d.toISOString().substring(0, 7), // YYYY-MM
+          label: d.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }).replace('.', '')
+        });
+      }
+
+      // Fetch Trend Data
+      const { data: achievements } = await supabase
+        .from('achievements')
+        .select('status, created_at');
+
+      const trendMap: Record<string, TrendData> = {};
+      months.forEach(m => {
+        trendMap[m.full] = { bulan: m.label, diverifikasi: 0, ditolak: 0, draf: 0 };
+      });
+
+      achievements?.forEach(a => {
+        const monthKey = a.created_at.substring(0, 7);
+        if (trendMap[monthKey]) {
+          if (a.status === 'verified') trendMap[monthKey].diverifikasi++;
+          else if (a.status === 'rejected') trendMap[monthKey].ditolak++;
+          else if (a.status === 'draft') trendMap[monthKey].draf++;
+        }
+      });
+
+      setTrendData(Object.values(trendMap));
+
+      // Fetch Category Data
+      const { data: catCounts } = await supabase
+        .from('achievements')
+        .select('kategori')
+        .eq('status', 'verified');
+      
+      const catMap: Record<string, number> = {};
+      catCounts?.forEach(c => {
+        if (c.kategori) catMap[c.kategori] = (catMap[c.kategori] || 0) + 1;
+      });
+
+      const formattedCat = Object.entries(catMap)
+        .map(([kategori, count]) => ({ kategori, count }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 6);
+
+      setKategoriData(formattedCat.length > 0 ? formattedCat : [
+        { kategori: 'Belum ada data', count: 0 }
+      ]);
+
+      setLoading(false);
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      {/* Prestasi trend — spans 2 cols */}
       <div className="xl:col-span-2 card p-6">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-base font-bold text-slate-800">Tren Submisi Prestasi</h3>
             <p className="text-xs text-slate-500 mt-0.5">6 bulan terakhir — diverifikasi, ditolak, draf</p>
           </div>
-          <span className="text-[11px] text-slate-400 font-medium">Nov 2025 – Apr 2026</span>
+          <span className="text-[11px] text-slate-400 font-medium">
+            {trendData[0]?.bulan} – {trendData[trendData.length - 1]?.bulan}
+          </span>
         </div>
         <ResponsiveContainer width="100%" height={240}>
-          <AreaChart data={prestasiTrend} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+          <AreaChart data={trendData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
             <defs>
               <linearGradient id="gradVerified" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.25} />
@@ -88,7 +151,6 @@ export default function DashboardCharts() {
         </ResponsiveContainer>
       </div>
 
-      {/* Prestasi by kategori */}
       <div className="card p-6">
         <div className="mb-6">
           <h3 className="text-base font-bold text-slate-800">Prestasi per Kategori</h3>

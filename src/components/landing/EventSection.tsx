@@ -2,11 +2,7 @@ import React from 'react';
 import { CalendarDays, MapPin, Users, ArrowRight } from 'lucide-react';
 import AppImage from '@/components/ui/AppImage';
 
-const events = [
-{ id: 'event-001', nama: 'Workshop Penulisan Proposal PKM', tipe: 'Workshop', tanggal: '26 Apr 2026', lokasi: 'Aula Rektorat Lt. 3', mentor: 'Dr. Haris Setiawan, M.Pd.', peserta: 45, kapasitas: 60, img: "https://img.rocket.new/generatedImages/rocket_gen_img_14a5ca983-1763300171126.png", color: 'bg-indigo-600' },
-{ id: 'event-002', nama: 'Seminar Kewirausahaan Digital 2026', tipe: 'Seminar', tanggal: '3 Mei 2026', lokasi: 'Gedung Serbaguna Kampus A', mentor: 'Budi Santoso (CEO Tokopangan)', peserta: 112, kapasitas: 150, img: "https://img.rocket.new/generatedImages/rocket_gen_img_14a5ca983-1763300171126.png", color: 'bg-emerald-600' },
-{ id: 'event-003', nama: 'Pelatihan Desain UI/UX Figma Advanced', tipe: 'Pelatihan', tanggal: '10 Mei 2026', lokasi: 'Lab Komputer Teknik', mentor: 'Anisa Rahmawati (Lead Designer)', peserta: 28, kapasitas: 30, img: "https://img.rocket.new/generatedImages/rocket_gen_img_121098063-1772349218498.png", color: 'bg-cyan-600' },
-{ id: 'event-004', nama: 'Coaching Clinic Lomba Nasional', tipe: 'Coaching', tanggal: '17 Mei 2026', lokasi: 'Online via Zoom', mentor: 'Tim Kemahasiswaan', peserta: 67, kapasitas: 100, img: "https://img.rocket.new/generatedImages/rocket_gen_img_14bc62962-1776598832013.png", color: 'bg-purple-600' }];
+const events: any[] = [];
 
 
 export default function EventSection({ initialData = [] }: { initialData?: any[] }) {

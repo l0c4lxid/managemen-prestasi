@@ -36,15 +36,15 @@ export default function HeroSection({ stats: dynamicStats, recentAchievements = 
 
   // Fallback stats if none provided
   const defaultStats = [
-    { label: 'Prestasi Terverifikasi', value: '2.847', icon: 'trophy' },
-    { label: 'Mahasiswa Aktif', value: '1.293', icon: 'users' },
-    { label: 'Lomba Tersedia', value: '148', icon: 'swords' },
-    { label: 'Rating Platform', value: '4.9', icon: 'star' },
+    { label: 'Prestasi Terverifikasi', value: '0', icon: 'trophy' },
+    { label: 'Mahasiswa Aktif', value: '0', icon: 'users' },
+    { label: 'Lomba Tersedia', value: '0', icon: 'swords' },
+    { label: 'Rating Platform', value: '5.0', icon: 'star' },
   ];
 
   const displayStats = dynamicStats || defaultStats;
 
-  // Use real data for visual card or fallback
+  // Use real data for visual card or empty state
   const visualItems = recentAchievements.length > 0 
     ? recentAchievements.slice(0, 3).map((item, i) => ({
         name: item.users?.name || 'Mahasiswa',
@@ -54,9 +54,7 @@ export default function HeroSection({ stats: dynamicStats, recentAchievements = 
         nim: item.users?.nim || i.toString()
       }))
     : [
-        { name: 'Aninda Putri Rahayu', lomba: 'PKM-K Nasional 2025', juara: '1', color: 'from-amber-400 to-orange-500', nim: '2021310045' },
-        { name: 'Fadhil Zulkarnain', lomba: 'GEMASTIK Animasi', juara: '2', color: 'from-slate-300 to-slate-500', nim: '2022140023' },
-        { name: 'Renata Kusuma Dewi', lomba: 'Olimpiade Akuntansi', juara: '1', color: 'from-amber-400 to-orange-500', nim: '2020250067' },
+        { name: 'Belum Ada Data', lomba: 'Mari mulai berkompetisi!', juara: '—', color: 'from-slate-100 to-slate-200', nim: '0' },
       ];
 
   return (

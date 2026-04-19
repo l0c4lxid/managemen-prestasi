@@ -3,23 +3,10 @@ import React, { useState } from 'react';
 import { Trophy, Medal, Filter } from 'lucide-react';
 import AppImage from '@/components/ui/AppImage';
 
-const achievers = [
-  { id: 'wof-001', name: 'Aninda Putri Rahayu', nim: '2021310045', prodi: 'Manajemen', lomba: 'PKM-K Nasional', tahun: '2025', juara: 1, kategori: 'Kewirausahaan', img: 'https://i.pravatar.cc/300?img=47' },
-  { id: 'wof-002', name: 'Fadhil Zulkarnain', nim: '2022140023', prodi: 'Teknik Informatika', lomba: 'GEMASTIK Animasi', tahun: '2025', juara: 2, kategori: 'Teknologi', img: 'https://i.pravatar.cc/300?img=12' },
-  { id: 'wof-003', name: 'Renata Kusuma Dewi', nim: '2020250067', prodi: 'Akuntansi', lomba: 'Olimpiade Akuntansi', tahun: '2025', juara: 1, kategori: 'Akademik', img: 'https://i.pravatar.cc/300?img=32' },
-  { id: 'wof-004', name: 'Bagas Suryo Pratama', nim: '2021180034', prodi: 'Hukum', lomba: 'Moot Court Nasional', tahun: '2025', juara: 3, kategori: 'Akademik', img: 'https://i.pravatar.cc/300?img=15' },
-  { id: 'wof-005', name: 'Nabilah Azzahra', nim: '2022330011', prodi: 'Psikologi', lomba: 'Debat Bahasa Inggris', tahun: '2024', juara: 1, kategori: 'Seni & Budaya', img: 'https://i.pravatar.cc/300?img=44' },
-  { id: 'wof-006', name: 'Dimas Eka Nugraha', nim: '2020090056', prodi: 'Teknik Sipil', lomba: 'Civil Engineering Expo', tahun: '2024', juara: 2, kategori: 'Teknologi', img: 'https://i.pravatar.cc/300?img=18' },
-  { id: 'wof-007', name: 'Shinta Maharani', nim: '2021270029', prodi: 'Desain Komunikasi Visual', lomba: 'Lomba Poster Nasional', tahun: '2024', juara: 1, kategori: 'Seni & Budaya', img: 'https://i.pravatar.cc/300?img=49' },
-  { id: 'wof-008', name: 'Rizal Maulana Akbar', nim: '2022110078', prodi: 'Ekonomi Pembangunan', lomba: 'Olimpiade Ekonomi', tahun: '2024', juara: 2, kategori: 'Akademik', img: 'https://i.pravatar.cc/300?img=22' },
-  { id: 'wof-009', name: 'Tantri Wulandari', nim: '2021400041', prodi: 'Ilmu Komunikasi', lomba: 'Jurnalis Muda Indonesia', tahun: '2025', juara: 3, kategori: 'Seni & Budaya', img: 'https://i.pravatar.cc/300?img=36' },
-  { id: 'wof-010', name: 'Hendra Wijaksana', nim: '2020150063', prodi: 'Teknik Elektro', lomba: 'Robotics Championship', tahun: '2025', juara: 1, kategori: 'Teknologi', img: 'https://i.pravatar.cc/300?img=8' },
-  { id: 'wof-011', name: 'Putri Amalia Sari', nim: '2022360022', prodi: 'Farmasi', lomba: 'Pharmacy Science Expo', tahun: '2024', juara: 2, kategori: 'Sains', img: 'https://i.pravatar.cc/300?img=39' },
-  { id: 'wof-012', name: 'Yusuf Hadiyanto', nim: '2021050087', prodi: 'Kedokteran', lomba: 'Medical Olympiad', tahun: '2025', juara: 1, kategori: 'Sains', img: 'https://i.pravatar.cc/300?img=3' },
-];
+const achievers: any[] = [];
 
-const tahunOptions = ['Semua', '2025', '2024'];
-const kategoriOptions = ['Semua', 'Teknologi', 'Akademik', 'Kewirausahaan', 'Sains', 'Seni & Budaya'];
+const tahunOptions = ['Semua', '2026', '2025'];
+const kategoriOptions = ['Semua', 'Akademik', 'Non-Akademik', 'Teknologi', 'Sains', 'Seni & Budaya'];
 
 const juaraBadge = (juara: number) => {
   if (juara === 1) return { label: 'Juara 1', className: 'badge-gold', icon: <Trophy size={11} /> };
