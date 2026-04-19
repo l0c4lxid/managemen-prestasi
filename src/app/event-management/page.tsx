@@ -9,6 +9,7 @@ import {
 import AppLayout from '@/components/AppLayout';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import EventFormModal from './components/EventFormModal';
+import EventDetailModal from './components/EventDetailModal';
 import EmptyState from '@/components/ui/EmptyState';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
@@ -31,6 +32,7 @@ export interface EventItem {
   syarat_ketentuan: string | null;
   cara_pendaftaran: string | null;
   created_at: string;
+  poster_url?: string | null;
 }
 
 const statusConfig: Record<string, { label: string; color: string; dot: string }> = {
@@ -63,6 +65,7 @@ export default function EventManagementPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editItem, setEditItem] = useState<EventItem | null>(null);
+  const [detailItem, setDetailItem] = useState<EventItem | null>(null);
   const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
   const [regLoading, setRegLoading] = useState<string | null>(null);
 
@@ -248,73 +251,78 @@ export default function EventManagementPage() {
               const sc = statusConfig[evt.status || 'upcoming'] || statusConfig.upcoming;
               const tColor = tipeColors[evt.type || ''] || 'bg-slate-100 text-slate-600';
               return (
-                <div key={evt.id} className="card p-5 flex flex-col gap-3 hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 group">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="w-10 h-10 rounded-xl bg-cyan-100 flex items-center justify-center text-cyan-600 shrink-0">
-                      <CalendarDays size={18} />
-                    </div>
-                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1.5 ${sc.color}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />
-                      {sc.label}
-                    </span>
-                  </div>
-
-                  <div>
-                    <h3 className="font-bold text-slate-800 text-sm leading-snug line-clamp-2 group-hover:text-cyan-700 transition-colors">
-                      {evt.title}
-                    </h3>
-                    {evt.type && (
-                      <span className={`inline-block mt-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${tColor}`}>
-                        {evt.type}
-                      </span>
-                    )}
-                  </div>
-
-                  {evt.description && (
-                    <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed">{evt.description}</p>
-                  )}
-
-                  <div className="space-y-1.5 text-xs text-slate-500">
-                    <div className="flex items-center gap-1.5">
-                      <Clock size={12} className="text-cyan-500 shrink-0" />
-                      {evt.date ? new Date(evt.date).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
-                      {evt.time && <span className="text-slate-400">• {evt.time}</span>}
-                    </div>
-                    {evt.location && (
-                      <div className="flex items-center gap-1.5">
-                        <MapPin size={12} className="text-rose-400 shrink-0" />
-                        <span className="truncate">{evt.location}</span>
-                      </div>
-                    )}
-                    {evt.mentor && (
-                      <div className="flex items-center gap-1.5">
-                        <Mic2 size={12} className="text-purple-400 shrink-0" />
-                        <span className="truncate">{evt.mentor}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2 pt-2 border-t border-slate-100">
-                    <button
-                      onClick={() => router.push(`/event-management/${evt.id}`)}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-cyan-50 text-cyan-700 text-xs font-semibold hover:bg-cyan-100 transition-colors"
-                    >
-                      <Eye size={13} /> Lihat Detail
-                    </button>
-                    {canManage ? (
-                      <>
-                        <button onClick={() => { setEditItem(evt); setFormOpen(true); }} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors" title="Edit"><Pencil size={14} /></button>
-                        <button onClick={() => setDeleteTarget(evt.id)} className="p-2 rounded-xl hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Hapus"><Trash2 size={14} /></button>
-                      </>
+                <div key={evt.id} className="card overflow-hidden flex flex-col hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group border-none bg-white">
+                  {/* Top Image/Icon */}
+                  <div className="relative h-44 bg-slate-100 overflow-hidden">
+                    {evt.poster_url ? (
+                      <img 
+                        src={evt.poster_url} 
+                        alt={evt.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      />
                     ) : (
-                      <button
-                        onClick={() => handleRegister(evt.id)}
-                        disabled={regLoading === evt.id}
-                        className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${registeredIds.has(evt.id) ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
-                      >
-                        {registeredIds.has(evt.id) ? 'Terdaftar ✓' : 'Daftar'}
-                      </button>
+                      <div className="w-full h-full flex items-center justify-center text-cyan-200 bg-gradient-to-br from-cyan-50 to-white">
+                        <CalendarDays size={64} strokeWidth={1} />
+                      </div>
                     )}
+                    
+                    {/* Floating Badges */}
+                    <div className="absolute top-3 left-3 flex flex-col gap-2">
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-lg shadow-sm flex items-center gap-1.5 ${sc.color} backdrop-blur-md border-none`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${sc.dot}`} />{sc.label}
+                      </span>
+                    </div>
+
+                    {!isAdmin && (
+                      <div className="absolute top-3 right-3">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleRegister(evt.id); }}
+                          disabled={regLoading === evt.id}
+                          className={`p-2 rounded-xl backdrop-blur-md shadow-sm transition-all duration-200 
+                            ${registeredIds.has(evt.id) ? 'bg-indigo-600 text-white' : 'bg-white/80 text-slate-500 hover:bg-white hover:text-indigo-600'}`}
+                          title={registeredIds.has(evt.id) ? 'Batal Daftar' : 'Daftar Event'}
+                        >
+                          {registeredIds.has(evt.id) ? <CheckCircle2 size={18} className="text-white" /> : <Plus size={18} />}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="p-5 flex flex-col flex-1">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {evt.type && <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md ${tColor}`}>{evt.type}</span>}
+                      </div>
+                      
+                      <h3 className="font-bold text-slate-800 text-base leading-snug line-clamp-2 group-hover:text-cyan-600 transition-colors mb-1">{evt.title}</h3>
+                      
+                      <div className="flex items-center gap-3 text-xs text-slate-500 mb-4 font-medium">
+                        <div className="flex items-center gap-1">
+                          <Clock size={12} className="text-cyan-500" />
+                          {evt.date ? new Date(evt.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }) : '—'}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <MapPin size={12} className="text-rose-400" />
+                          <span className="truncate max-w-[100px]">{evt.location || 'Online'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 pt-4 border-t border-slate-50">
+                      <button 
+                        onClick={() => setDetailItem(evt)} 
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-cyan-600 transition-all duration-200 shadow-sm"
+                      >
+                        <Eye size={14} /> Detail Event
+                      </button>
+                      
+                      {canManage && (
+                        <>
+                          <button onClick={(e) => { e.stopPropagation(); setEditItem(evt); setFormOpen(true); }} className="p-2.5 rounded-xl bg-slate-100 text-slate-600 hover:bg-cyan-50 hover:text-cyan-600 transition-colors" title="Edit"><Pencil size={15} /></button>
+                          <button onClick={(e) => { e.stopPropagation(); setDeleteTarget(evt.id); }} className="p-2.5 rounded-xl bg-slate-100 text-slate-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Hapus"><Trash2 size={15} /></button>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -378,6 +386,14 @@ export default function EventManagementPage() {
           </div>
         )}
       </div>
+
+      <EventDetailModal
+        isOpen={!!detailItem}
+        onClose={() => setDetailItem(null)}
+        event={detailItem}
+        onRegister={handleRegister}
+        isRegistered={detailItem ? registeredIds.has(detailItem.id) : false}
+      />
 
       {canManage && (
         <>
