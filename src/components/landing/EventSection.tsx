@@ -16,10 +16,10 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
     tipe: item.type || 'Event',
     tanggal: new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
     lokasi: item.location || 'Online',
-    mentor: item.organizer || 'Kampus',
+    mentor: item.mentor || 'Kampus',
     peserta: 0,
-    kapasitas: item.capacity || 100,
-    img: item.banner_url || "https://img.rocket.new/generatedImages/rocket_gen_img_14a5ca983-1763300171126.png",
+    kapasitas: item.quota || 100,
+    img: item.poster_url || "https://img.rocket.new/generatedImages/rocket_gen_img_14a5ca983-1763300171126.png",
     color: 'bg-indigo-600'
   }));
 

@@ -80,7 +80,7 @@ export default async function RootPage() {
   return (
     <div className="min-h-screen bg-white font-sans">
       <LandingNav />
-      <HeroSection stats={stats} />
+      <HeroSection stats={stats} recentAchievements={achievements} />
       <WallOfFame initialData={achievements} />
       <LombaSection initialData={competitions} />
       <EventSection initialData={events} />

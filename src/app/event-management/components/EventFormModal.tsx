@@ -188,7 +188,7 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
                     
                     {preview ? (
                       <>
-                        <Image src={preview} alt="Banner Preview" fill className="object-cover z-0" />
+                        <Image src={preview} alt="Banner Preview" fill className="object-cover z-0" unoptimized />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center justify-center">
                           <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                             <UploadCloud size={14} /> Ganti Banner

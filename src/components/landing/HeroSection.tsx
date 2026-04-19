@@ -12,7 +12,7 @@ interface HeroSectionProps {
   stats?: StatItem[];
 }
 
-export default function HeroSection({ stats: dynamicStats }: HeroSectionProps) {
+export default function HeroSection({ stats: dynamicStats, recentAchievements = [] }: HeroSectionProps & { recentAchievements?: any[] }) {
   // Map icon strings to components
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -43,6 +43,21 @@ export default function HeroSection({ stats: dynamicStats }: HeroSectionProps) {
   ];
 
   const displayStats = dynamicStats || defaultStats;
+
+  // Use real data for visual card or fallback
+  const visualItems = recentAchievements.length > 0 
+    ? recentAchievements.slice(0, 3).map((item, i) => ({
+        name: item.users?.name || 'Mahasiswa',
+        lomba: item.title,
+        juara: (i + 1).toString(),
+        color: i === 0 ? 'from-amber-400 to-orange-500' : (i === 1 ? 'from-slate-300 to-slate-500' : 'from-emerald-400 to-emerald-600'),
+        nim: item.users?.nim || i.toString()
+      }))
+    : [
+        { name: 'Aninda Putri Rahayu', lomba: 'PKM-K Nasional 2025', juara: '1', color: 'from-amber-400 to-orange-500', nim: '2021310045' },
+        { name: 'Fadhil Zulkarnain', lomba: 'GEMASTIK Animasi', juara: '2', color: 'from-slate-300 to-slate-500', nim: '2022140023' },
+        { name: 'Renata Kusuma Dewi', lomba: 'Olimpiade Akuntansi', juara: '1', color: 'from-amber-400 to-orange-500', nim: '2020250067' },
+      ];
 
   return (
     <section className="relative overflow-hidden pt-24 pb-20 lg:pt-32 lg:pb-28">
@@ -118,11 +133,7 @@ export default function HeroSection({ stats: dynamicStats }: HeroSectionProps) {
                 </div>
 
                 <div className="space-y-3">
-                  {[
-                    { name: 'Aninda Putri Rahayu', lomba: 'PKM-K Nasional 2025', juara: '1', color: 'from-amber-400 to-orange-500', nim: '2021310045' },
-                    { name: 'Fadhil Zulkarnain', lomba: 'GEMASTIK Animasi', juara: '2', color: 'from-slate-300 to-slate-500', nim: '2022140023' },
-                    { name: 'Renata Kusuma Dewi', lomba: 'Olimpiade Akuntansi', juara: '1', color: 'from-amber-400 to-orange-500', nim: '2020250067' },
-                  ].map((item) => (
+                  {visualItems.map((item) => (
                     <div key={`hero-item-${item.nim}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
                       <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
                         #{item.juara}

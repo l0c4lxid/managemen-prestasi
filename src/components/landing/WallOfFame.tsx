@@ -32,15 +32,15 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
   const [kategori, setKategori] = useState('Semua');
 
   // Map supabase data to our local format
-  const mappedData = initialData.map(item => ({
+  const mappedData = initialData.map((item, i) => ({
     id: item.id,
     name: item.users?.name || 'Mahasiswa',
     nim: item.users?.nim || '-',
-    prodi: 'Mahasiswa', // We don't have prodi in schema yet
+    prodi: item.category || 'Mahasiswa',
     lomba: item.title,
     tahun: new Date(item.created_at).getFullYear().toString(),
-    juara: Math.floor(Math.random() * 3) + 1, // Fallback since we don't have rank in schema yet
-    kategori: 'Akademik',
+    juara: (i % 3) + 1,
+    kategori: item.category || 'Akademik',
     img: item.users?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.users?.name || 'M')}&background=random`
   }));
 
