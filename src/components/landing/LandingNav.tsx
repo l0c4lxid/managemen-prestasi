@@ -47,10 +47,10 @@ export default function LandingNav() {
 
           {/* CTA buttons */}
           <div className="hidden md:flex items-center gap-3">
-            <Link href="/sign-up-login" className="px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 rounded-xl transition-colors">
+            <Link href="/login" className="px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50 rounded-xl transition-colors">
               Masuk
             </Link>
-            <Link href="/sign-up-login" className="btn-primary text-sm py-2">
+            <Link href="/register" className="btn-primary text-sm py-2">
               Daftar Sekarang
             </Link>
           </div>
@@ -78,10 +78,10 @@ export default function LandingNav() {
             </a>
           ))}
           <div className="pt-3 border-t border-slate-100 flex gap-2">
-            <Link href="/sign-up-login" className="flex-1 text-center py-2.5 text-sm font-semibold text-indigo-700 border border-indigo-200 rounded-xl hover:bg-indigo-50 transition-colors">
+            <Link href="/login" className="flex-1 text-center py-2.5 text-sm font-semibold text-indigo-700 border border-indigo-200 rounded-xl hover:bg-indigo-50 transition-colors">
               Masuk
             </Link>
-            <Link href="/sign-up-login" className="flex-1 btn-primary justify-center text-sm">
+            <Link href="/register" className="flex-1 btn-primary justify-center text-sm">
               Daftar
             </Link>
           </div>

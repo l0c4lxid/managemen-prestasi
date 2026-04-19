@@ -11,6 +11,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import EventFormModal from './components/EventFormModal';
 import EmptyState from '@/components/ui/EmptyState';
 import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface EventItem {
   id: string;
@@ -49,9 +50,11 @@ const tipeColors: Record<string, string> = {
 export default function EventManagementPage() {
   const router = useRouter();
   const supabase = createClient();
+  const { role, profile } = useAuth();
+  const isAdmin = role && role !== 'mahasiswa';
   const [data, setData] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(''); 
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterTipe, setFilterTipe] = useState('all');
   const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
@@ -59,6 +62,8 @@ export default function EventManagementPage() {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   const [editItem, setEditItem] = useState<EventItem | null>(null);
+  const [registeredIds, setRegisteredIds] = useState<Set<string>>(new Set());
+  const [regLoading, setRegLoading] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -74,7 +79,26 @@ export default function EventManagementPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchData(); }, []);
+  const fetchRegistrations = async () => {
+    if (!profile?.id || isAdmin) return;
+    const { data: regs } = await supabase.from('registrations').select('event_id').eq('user_id', profile.id);
+    setRegisteredIds(new Set((regs || []).map(r => r.event_id!).filter(Boolean)));
+  };
+
+  const handleRegister = async (eventId: string) => {
+    if (!profile?.id) return;
+    setRegLoading(eventId);
+    if (registeredIds.has(eventId)) {
+      const { error } = await supabase.from('registrations').delete().eq('user_id', profile.id).eq('event_id', eventId);
+      if (!error) { setRegisteredIds(prev => { const s = new Set(prev); s.delete(eventId); return s; }); toast.success('Pendaftaran dibatalkan'); }
+    } else {
+      const { error } = await supabase.from('registrations').insert({ user_id: profile.id, event_id: eventId, status: 'registered' });
+      if (!error) { setRegisteredIds(prev => new Set([...prev, eventId])); toast.success('Berhasil mendaftar event!'); }
+    }
+    setRegLoading(null);
+  };
+
+  useEffect(() => { fetchData(); fetchRegistrations(); }, [profile?.id, role]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = useMemo(() => {
     let result = [...data];
@@ -121,13 +145,15 @@ export default function EventManagementPage() {
         {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Manajemen Event</h1>
-            <p className="text-slate-500 text-sm mt-1">Kelola workshop, seminar, dan pelatihan untuk mahasiswa.</p>
+            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">{isAdmin ? 'Manajemen Event' : 'Event & Bootcamp'}</h1>
+            <p className="text-slate-500 text-sm mt-1">{isAdmin ? 'Kelola workshop, seminar, dan pelatihan untuk mahasiswa.' : 'Daftar dan ikuti berbagai kegiatan pengembangan diri.'}</p>
           </div>
-          <button onClick={() => { setEditItem(null); setFormOpen(true); }} className="btn-primary">
-            <Plus size={16} />
-            Tambah Event
-          </button>
+          {isAdmin && (
+            <button onClick={() => { setEditItem(null); setFormOpen(true); }} className="btn-primary">
+              <Plus size={16} />
+              Tambah Event
+            </button>
+          )}
         </div>
 
         {/* Stats */}
@@ -274,12 +300,20 @@ export default function EventManagementPage() {
                     >
                       <Eye size={13} /> Lihat Detail
                     </button>
-                    <button onClick={() => { setEditItem(evt); setFormOpen(true); }} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors" title="Edit">
-                      <Pencil size={14} />
-                    </button>
-                    <button onClick={() => setDeleteTarget(evt.id)} className="p-2 rounded-xl hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Hapus">
-                      <Trash2 size={14} />
-                    </button>
+                    {isAdmin ? (
+                      <>
+                        <button onClick={() => { setEditItem(evt); setFormOpen(true); }} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors" title="Edit"><Pencil size={14} /></button>
+                        <button onClick={() => setDeleteTarget(evt.id)} className="p-2 rounded-xl hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Hapus"><Trash2 size={14} /></button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => handleRegister(evt.id)}
+                        disabled={regLoading === evt.id}
+                        className={`px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${registeredIds.has(evt.id) ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}
+                      >
+                        {registeredIds.has(evt.id) ? 'Terdaftar ✓' : 'Daftar'}
+                      </button>
+                    )}
                   </div>
                 </div>
               );
@@ -344,23 +378,12 @@ export default function EventManagementPage() {
         )}
       </div>
 
-      <EventFormModal
-        open={formOpen}
-        onClose={() => { setFormOpen(false); setEditItem(null); }}
-        onSave={handleSave}
-        editItem={editItem}
-      />
-
-      <ConfirmDialog
-        open={!!deleteTarget}
-        title="Hapus Event"
-        description="Apakah Anda yakin ingin menghapus event ini? Semua data pendaftaran terkait juga akan dihapus."
-        confirmLabel="Hapus"
-        variant="danger"
-        loading={deleteLoading}
-        onConfirm={handleDelete}
-        onCancel={() => setDeleteTarget(null)}
-      />
+      {isAdmin && (
+        <>
+          <EventFormModal open={formOpen} onClose={() => { setFormOpen(false); setEditItem(null); }} onSave={handleSave} editItem={editItem} />
+          <ConfirmDialog open={!!deleteTarget} title="Hapus Event" description="Apakah Anda yakin ingin menghapus event ini?" confirmLabel="Hapus" variant="danger" loading={deleteLoading} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />
+        </>
+      )}
     </AppLayout>
   );
 }
