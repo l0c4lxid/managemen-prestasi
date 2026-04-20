@@ -1,9 +1,10 @@
 'use client';
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import AppLayout from '@/components/AppLayout';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { Trophy, Clock, CheckCircle, XCircle, ExternalLink, Star } from 'lucide-react';
+import { Trophy, Clock, CheckCircle, XCircle, ExternalLink, Star, Plus } from 'lucide-react';
 import type { Achievement } from '@/types';
 
 const statusCfg = {
@@ -40,9 +41,18 @@ export default function RiwayatPrestasiPage() {
   return (
     <AppLayout activePath="/mahasiswa/riwayat">
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Riwayat Prestasi Saya</h1>
-          <p className="text-slate-500 text-sm mt-1">Semua submisi prestasi yang pernah Anda kirimkan beserta statusnya.</p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Riwayat Prestasi Saya</h1>
+            <p className="text-slate-500 text-sm mt-1">Semua submisi prestasi yang pernah Anda kirimkan beserta statusnya.</p>
+          </div>
+          <Link
+            href="/mahasiswa/submit-prestasi"
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100 whitespace-nowrap"
+          >
+            <Plus size={18} />
+            Tambah Prestasi
+          </Link>
         </div>
 
         {/* Stats */}

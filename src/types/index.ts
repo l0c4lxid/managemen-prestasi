@@ -13,6 +13,14 @@ export interface AppUser {
   role: UserRole;
   nim?: string | null;
   avatar_url?: string | null;
+  phone?: string | null;
+  position?: string | null;
+  unit?: string | null;
+  location?: string | null;
+  bio?: string | null;
+  faculty?: string | null;
+  major?: string | null;
+  year?: string | null;
   created_at: string;
 }
 

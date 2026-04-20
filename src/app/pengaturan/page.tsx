@@ -39,7 +39,7 @@ function SaveButton({ loading, saved }: { loading: boolean; saved: boolean }) {
 }
 
 function ProfilTab() {
-  const { profile, setProfile } = useAuth();
+  const { profile, refreshProfile } = useAuth();
   const supabase = createClient();
   const [form, setForm] = useState({ 
     nama: profile?.name || '', 
@@ -73,7 +73,7 @@ function ProfilTab() {
         toast.error('Gagal menyimpan profil');
       } else {
         toast.success('Profil berhasil diperbarui');
-        if (setProfile) setProfile({ ...profile, name: form.nama });
+        if (refreshProfile) refreshProfile();
         setSaved(true);
         setTimeout(() => setSaved(false), 2500);
       }

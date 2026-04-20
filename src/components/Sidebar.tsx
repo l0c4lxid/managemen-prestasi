@@ -28,7 +28,6 @@ const navItems: NavItem[] = [
   // Mahasiswa
   { label: 'Cari Lomba & Hibah', href: '/lomba-management', icon: <Swords size={20} />, group: 'Peluang & Prestasi', roles: ['mahasiswa'] },
   { label: 'Event & Bootcamp', href: '/event-management', icon: <CalendarDays size={20} />, group: 'Peluang & Prestasi', roles: ['mahasiswa'] },
-  { label: 'Submit Prestasi', href: '/mahasiswa/submit-prestasi', icon: <Send size={20} />, group: 'Peluang & Prestasi', roles: ['mahasiswa'] },
   { label: 'Riwayat Prestasi', href: '/mahasiswa/riwayat', icon: <Star size={20} />, group: 'Peluang & Prestasi', roles: ['mahasiswa'] },
   { label: 'Bookmark Lomba', href: '/mahasiswa/bookmark', icon: <Bookmark size={20} />, group: 'Peluang & Prestasi', roles: ['mahasiswa'] },
 

@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { Send, Upload, Trophy, Globe, Tag, CheckCircle } from 'lucide-react';
 import type { Competition } from '@/types';
 
-const CATEGORIES = ['Teknologi', 'Akademik', 'Kewirausahaan', 'Sains', 'Seni & Budaya', 'Olahraga', 'Lainnya'];
+const CATEGORIES = ['Akademik', 'Non-Akademik'];
 const LEVELS = ['kampus', 'nasional', 'internasional'];
 
 export default function SubmitPrestasiPage() {

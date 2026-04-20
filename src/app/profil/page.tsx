@@ -1,7 +1,10 @@
 'use client';
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { User, Mail, Phone, Building, MapPin, Calendar, Camera, Save, CheckCircle, Lock, Eye, EyeOff, Shield, Award, BookOpen, X, Upload, Star, TrendingUp,  } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { createClient } from '@/lib/supabase/client';
+import { toast } from 'sonner';
 
 interface ProfileForm {
   namaLengkap: string;
@@ -42,33 +45,100 @@ function SaveButton({ loading, saved, label = 'Simpan Perubahan' }: { loading: b
   );
 }
 
-const statCards = [
-  { label: 'Prestasi Dicatat', value: '24', icon: <Award size={20} />, color: 'from-amber-400 to-orange-500' },
-  { label: 'Lomba Diikuti', value: '12', icon: <Star size={20} />, color: 'from-indigo-500 to-violet-600' },
-  { label: 'Event Dihadiri', value: '8', icon: <BookOpen size={20} />, color: 'from-cyan-500 to-teal-600' },
-  { label: 'Poin Prestasi', value: '1.240', icon: <TrendingUp size={20} />, color: 'from-rose-500 to-pink-600' },
+const statCardsData = [
+  { key: 'achievements', label: 'Prestasi Dicatat', icon: <Award size={20} />, color: 'from-amber-400 to-orange-500' },
+  { key: 'competitions', label: 'Lomba Diikuti', icon: <Star size={20} />, color: 'from-indigo-500 to-violet-600' },
+  { key: 'events', label: 'Event Dihadiri', icon: <BookOpen size={20} />, color: 'from-cyan-500 to-teal-600' },
+  { key: 'points', label: 'Poin Prestasi', icon: <TrendingUp size={20} />, color: 'from-rose-500 to-pink-600' },
 ];
 
 export default function ProfilPage() {
+  const { profile, user, refreshProfile } = useAuth();
+  const supabase = createClient();
   const [activeTab, setActiveTab] = useState<'info' | 'keamanan'>('info');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   const [uploadLoading, setUploadLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [stats, setStats] = useState({
+    achievements: 0,
+    competitions: 0,
+    events: 0,
+    points: 0
+  });
 
   const [form, setForm] = useState<ProfileForm>({
-    namaLengkap: 'Rizky Admin',
-    email: 'admin@prestasikampus.id',
-    telepon: '081234567890',
-    jabatan: 'Admin Kemahasiswaan',
-    unit: 'Biro Kemahasiswaan',
-    lokasi: 'Surakarta, Jawa Tengah',
-    tanggalGabung: 'Januari 2024',
-    bio: 'Pengelola platform prestasi mahasiswa kampus. Bertanggung jawab atas verifikasi dan pengelolaan data prestasi mahasiswa.',
-    nim: '20210001',
-    fakultas: 'Teknik',
-    prodi: 'Teknik Informatika',
-    angkatan: '2021',
+    namaLengkap: '',
+    email: '',
+    telepon: '',
+    jabatan: '',
+    unit: '',
+    lokasi: '',
+    tanggalGabung: '',
+    bio: '',
+    nim: '',
+    fakultas: '',
+    prodi: '',
+    angkatan: '',
   });
+
+  useEffect(() => {
+    if (profile) {
+      setForm({
+        namaLengkap: profile.name || '',
+        email: profile.email || '',
+        telepon: profile.phone || '',
+        jabatan: profile.position || '',
+        unit: profile.unit || '',
+        lokasi: profile.location || '',
+        tanggalGabung: profile.created_at ? new Date(profile.created_at).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) : '',
+        bio: profile.bio || '',
+        nim: profile.nim || '',
+        fakultas: profile.faculty || '',
+        prodi: profile.major || '',
+        angkatan: profile.year || '',
+      });
+      if (profile.avatar_url) {
+        setAvatarPreview(profile.avatar_url);
+      }
+      fetchStats(profile.id);
+    }
+  }, [profile]);
+
+  const fetchStats = async (userId: string) => {
+    try {
+      // Achievements count
+      const { count: achievementsCount } = await supabase
+        .from('achievements')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .eq('status', 'verified');
+
+      // Competitions count (from registrations where competition_id is not null)
+      const { count: competitionsCount } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .not('competition_id', 'is', null);
+
+      // Events count (from registrations where event_id is not null)
+      const { count: eventsCount } = await supabase
+        .from('registrations')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .not('event_id', 'is', null)
+        .eq('status', 'attended');
+
+      setStats({
+        achievements: achievementsCount || 0,
+        competitions: competitionsCount || 0,
+        events: eventsCount || 0,
+        points: (achievementsCount || 0) * 100 // Mock points calculation
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
   const [formLoading, setFormLoading] = useState(false);
   const [formSaved, setFormSaved] = useState(false);
 
@@ -78,31 +148,81 @@ export default function ProfilPage() {
   const [pwSaved, setPwSaved] = useState(false);
   const [pwError, setPwError] = useState('');
 
-  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !user) return;
+
     setUploadLoading(true);
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      setAvatarPreview(ev.target?.result as string);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}-${Math.random()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      if (updateError) throw updateError;
+
+      setAvatarPreview(publicUrl);
+      await refreshProfile();
+      toast.success('Foto profil berhasil diperbarui');
+    } catch (error: any) {
+      toast.error('Gagal mengunggah foto: ' + error.message);
+    } finally {
       setUploadLoading(false);
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) return;
+
     setFormLoading(true);
-    setTimeout(() => {
-      setFormLoading(false);
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({
+          name: form.namaLengkap,
+          phone: form.telepon,
+          position: form.jabatan,
+          unit: form.unit,
+          location: form.lokasi,
+          bio: form.bio,
+          nim: form.nim,
+          faculty: form.fakultas,
+          major: form.prodi,
+          year: form.angkatan,
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
       setFormSaved(true);
+      await refreshProfile();
+      toast.success('Profil berhasil diperbarui');
       setTimeout(() => setFormSaved(false), 2500);
-    }, 900);
+    } catch (error: any) {
+      toast.error('Gagal menyimpan profil: ' + error.message);
+    } finally {
+      setFormLoading(false);
+    }
   };
 
-  const handlePasswordSubmit = (e: React.FormEvent) => {
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setPwError('');
+    
     if (pwForm.passwordBaru !== pwForm.konfirmasiPassword) {
       setPwError('Password baru dan konfirmasi tidak cocok.');
       return;
@@ -111,13 +231,25 @@ export default function ProfilPage() {
       setPwError('Password baru minimal 8 karakter.');
       return;
     }
+
     setPwLoading(true);
-    setTimeout(() => {
-      setPwLoading(false);
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: pwForm.passwordBaru
+      });
+
+      if (error) throw error;
+
       setPwSaved(true);
       setPwForm({ passwordLama: '', passwordBaru: '', konfirmasiPassword: '' });
+      toast.success('Password berhasil diperbarui');
       setTimeout(() => setPwSaved(false), 2500);
-    }, 900);
+    } catch (error: any) {
+      setPwError(error.message);
+      toast.error('Gagal memperbarui password');
+    } finally {
+      setPwLoading(false);
+    }
   };
 
   const initials = form.namaLengkap
@@ -206,13 +338,15 @@ export default function ProfilPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {statCards.map((s) => (
+          {statCardsData.map((s) => (
             <div key={s.label} className="bg-white rounded-2xl shadow-soft border border-slate-100 p-4 flex items-center gap-3">
               <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center text-white flex-shrink-0`}>
                 {s.icon}
               </div>
               <div>
-                <p className="text-xl font-bold text-slate-800">{s.value}</p>
+                <p className="text-xl font-bold text-slate-800">
+                  {stats[s.key as keyof typeof stats].toLocaleString('id-ID')}
+                </p>
                 <p className="text-xs text-slate-500 leading-tight">{s.label}</p>
               </div>
             </div>

@@ -1,6 +1,7 @@
 'use client';
 import React, { useEffect, useState, useMemo } from 'react';
-import { Search, Filter, CheckCircle, XCircle, Clock, Eye, ExternalLink, RefreshCw, BarChart3, Trophy, Users } from 'lucide-react';
+import Link from 'next/link';
+import { Search, Filter, CheckCircle, XCircle, Clock, Eye, ExternalLink, RefreshCw, BarChart3, Trophy, Users, Plus, Edit, Trash2 } from 'lucide-react';
 import AppLayout from '@/components/AppLayout';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
@@ -51,6 +52,92 @@ export default function PrestasiManagementPage() {
     return r;
   }, [data, search, filterStatus, filterLevel]);
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Apakah Anda yakin ingin menghapus data prestasi ini?')) return;
+    setProcessing(id);
+    const { error } = await supabase.from('achievements').delete().eq('id', id);
+    if (error) toast.error('Gagal menghapus data');
+    else {
+      setData(prev => prev.filter(d => d.id !== id));
+      toast.success('Data prestasi berhasil dihapus');
+    }
+    setProcessing(null);
+  };
+
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
+  const [modalForm, setModalForm] = useState({
+    id: '',
+    user_id: '',
+    title: '',
+    description: '',
+    category: 'Akademik',
+    competition_level: 'nasional',
+    proof_url: '',
+    status: 'pending' as Achievement['status']
+  });
+  const [usersList, setUsersList] = useState<{id: string, name: string, nim: string}[]>([]);
+
+  const fetchUsers = async () => {
+    const { data } = await supabase.from('users').select('id, name, nim').eq('role', 'mahasiswa').order('name');
+    setUsersList(data || []);
+  };
+
+  const openAddModal = () => {
+    setModalMode('add');
+    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', proof_url: '', status: 'pending' });
+    setModalOpen(true);
+    fetchUsers();
+  };
+
+  const openEditModal = (item: Achievement) => {
+    setModalMode('edit');
+    setModalForm({
+      id: item.id,
+      user_id: item.user_id,
+      title: item.title,
+      description: item.description || '',
+      category: item.category || 'Akademik',
+      competition_level: item.competition_level || 'nasional',
+      proof_url: item.proof_url || '',
+      status: item.status
+    });
+    setModalOpen(true);
+    fetchUsers();
+  };
+
+  const handleModalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProcessing('modal');
+    try {
+      const payload = {
+        user_id: modalForm.user_id,
+        title: modalForm.title,
+        description: modalForm.description || null,
+        category: modalForm.category,
+        competition_level: modalForm.competition_level,
+        proof_url: modalForm.proof_url || null,
+        status: modalForm.status,
+      };
+
+      if (modalMode === 'edit') {
+        const { error } = await supabase.from('achievements').update(payload).eq('id', modalForm.id);
+        if (error) throw error;
+        toast.success('Berhasil memperbarui data');
+      } else {
+        const { error } = await supabase.from('achievements').insert(payload);
+        if (error) throw error;
+        toast.success('Berhasil menambahkan data');
+      }
+      setModalOpen(false);
+      fetchData();
+    } catch (error: any) {
+      toast.error('Gagal menyimpan data: ' + error.message);
+    } finally {
+      setProcessing(null);
+    }
+  };
+
   const handleVerify = async (id: string, status: 'verified' | 'rejected') => {
     setProcessing(id);
     const { error } = await supabase.from('achievements').update({ status }).eq('id', id);
@@ -81,9 +168,18 @@ export default function PrestasiManagementPage() {
             <h1 className="text-2xl font-bold text-slate-800 tracking-tight">Manajemen Prestasi</h1>
             <p className="text-slate-500 text-sm mt-1">Tinjau, verifikasi, dan kelola seluruh submisi prestasi mahasiswa.</p>
           </div>
-          <button onClick={fetchData} className="btn-ghost">
-            <RefreshCw size={15} /> Refresh
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={fetchData} className="btn-ghost">
+              <RefreshCw size={15} /> Refresh
+            </button>
+            <button
+              onClick={openAddModal}
+              className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-all shadow-md shadow-indigo-100"
+            >
+              <Plus size={16} />
+              Tambah Prestasi
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -182,6 +278,8 @@ export default function PrestasiManagementPage() {
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-1.5">
                           <button onClick={() => setDetailItem(item)} className="p-1.5 rounded-lg hover:bg-indigo-50 text-indigo-600 transition-colors" title="Detail"><Eye size={14} /></button>
+                          <button onClick={() => openEditModal(item)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors" title="Edit"><Edit size={14} /></button>
+                          <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-600 transition-colors" title="Hapus"><Trash2 size={14} /></button>
                           {item.proof_url && (
                             <a href={item.proof_url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors" title="Lihat Bukti"><ExternalLink size={14} /></a>
                           )}
@@ -261,30 +359,132 @@ export default function PrestasiManagementPage() {
         )}
       </div>
 
-      {/* Analytics section */}
-      <div className="mt-6 card p-6">
-        <div className="flex items-center gap-2 mb-5">
-          <BarChart3 size={18} className="text-indigo-600" />
-          <h3 className="font-bold text-slate-800">Analitik Prestasi</h3>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {['Teknologi', 'Akademik', 'Kewirausahaan', 'Seni & Budaya'].map(cat => {
-            const count = data.filter(d => d.category === cat && d.status === 'verified').length;
-            const total = data.filter(d => d.status === 'verified').length || 1;
-            const pct = Math.round((count / total) * 100);
-            return (
-              <div key={cat} className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                <p className="text-xs font-semibold text-slate-500 mb-2">{cat}</p>
-                <p className="text-2xl font-bold text-slate-800">{count}</p>
-                <div className="mt-2 h-1.5 rounded-full bg-slate-200">
-                  <div className="h-full rounded-full bg-indigo-500 transition-all" style={{ width: `${pct}%` }} />
+        {/* Analytics section */}
+        <div className="mt-6 card p-6">
+          <div className="flex items-center gap-2 mb-5">
+            <BarChart3 size={18} className="text-indigo-600" />
+            <h3 className="font-bold text-slate-800">Analitik Prestasi</h3>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {['Akademik', 'Non-Akademik'].map(cat => {
+              const count = data.filter(d => d.category === cat && d.status === 'verified').length;
+              const total = data.filter(d => d.status === 'verified').length || 1;
+              const pct = Math.round((count / total) * 100);
+              return (
+                <div key={cat} className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                  <p className="text-xs font-semibold text-slate-500 mb-2">{cat}</p>
+                  <p className="text-2xl font-bold text-slate-800">{count}</p>
+                  <div className="mt-2 h-1.5 rounded-full bg-slate-200">
+                    <div className="h-full rounded-full bg-indigo-500 transition-all" style={{ width: `${pct}%` }} />
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1">{pct}% dari verified</p>
                 </div>
-                <p className="text-xs text-slate-500 mt-1">{pct}% dari verified</p>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+
+        {/* Add/Edit Modal */}
+        {modalOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 animate-fade-in" onClick={() => setModalOpen(false)}>
+            <div className="bg-white rounded-3xl shadow-soft-lg border border-slate-100 w-full max-w-xl p-6 animate-slide-up" onClick={e => e.stopPropagation()}>
+              <div className="flex items-start justify-between mb-5">
+                <div>
+                  <h3 className="font-bold text-slate-800 text-lg">{modalMode === 'add' ? 'Tambah Prestasi Baru' : 'Edit Data Prestasi'}</h3>
+                  <p className="text-sm text-slate-500 mt-0.5">{modalMode === 'add' ? 'Masukkan data prestasi mahasiswa secara manual.' : 'Perbarui data prestasi mahasiswa.'}</p>
+                </div>
+                <button onClick={() => setModalOpen(false)} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors">✕</button>
+              </div>
+
+              <form onSubmit={handleModalSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Mahasiswa *</label>
+                  <select 
+                    value={modalForm.user_id} 
+                    onChange={e => setModalForm(p => ({...p, user_id: e.target.value}))}
+                    className="input-field py-2.5 text-sm"
+                    required
+                    disabled={modalMode === 'edit'}
+                  >
+                    <option value="">— Pilih Mahasiswa —</option>
+                    {usersList.map(u => (
+                      <option key={u.id} value={u.id}>{u.name} ({u.nim})</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Judul Prestasi *</label>
+                  <input 
+                    type="text"
+                    value={modalForm.title}
+                    onChange={e => setModalForm(p => ({...p, title: e.target.value}))}
+                    className="input-field py-2.5 text-sm"
+                    placeholder="Contoh: Juara 1 Nasional..."
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Kategori *</label>
+                    <select 
+                      value={modalForm.category}
+                      onChange={e => setModalForm(p => ({...p, category: e.target.value}))}
+                      className="input-field py-2.5 text-sm"
+                    >
+                      <option value="Akademik">Akademik</option>
+                      <option value="Non-Akademik">Non-Akademik</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Tingkat *</label>
+                    <select 
+                      value={modalForm.competition_level}
+                      onChange={e => setModalForm(p => ({...p, competition_level: e.target.value}))}
+                      className="input-field py-2.5 text-sm"
+                    >
+                      <option value="kampus">Kampus</option>
+                      <option value="nasional">Nasional</option>
+                      <option value="internasional">Internasional</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Link Bukti</label>
+                  <input 
+                    type="url"
+                    value={modalForm.proof_url}
+                    onChange={e => setModalForm(p => ({...p, proof_url: e.target.value}))}
+                    className="input-field py-2.5 text-sm"
+                    placeholder="https://..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Status</label>
+                  <select 
+                    value={modalForm.status}
+                    onChange={e => setModalForm(p => ({...p, status: e.target.value as Achievement['status']}))}
+                    className="input-field py-2.5 text-sm"
+                  >
+                    <option value="pending">Menunggu</option>
+                    <option value="verified">Terverifikasi</option>
+                    <option value="rejected">Ditolak</option>
+                  </select>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 flex gap-3">
+                  <button type="button" onClick={() => setModalOpen(false)} className="btn-ghost flex-1 justify-center">Batal</button>
+                  <button type="submit" disabled={processing === 'modal'} className="btn-primary flex-1 justify-center">
+                    {processing === 'modal' ? 'Menyimpan...' : 'Simpan Perubahan'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
     </AppLayout>
   );
 }
