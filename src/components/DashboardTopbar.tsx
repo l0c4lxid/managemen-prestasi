@@ -170,9 +170,17 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
             onClick={() => setUserMenuOpen(p => !p)}
             className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-xl hover:bg-slate-100 transition-colors"
           >
-            <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
-              {initials}
-            </div>
+            {profile?.avatar_url ? (
+              <img 
+                src={profile.avatar_url} 
+                alt="Profile" 
+                className="w-7 h-7 rounded-full object-cover border border-slate-200"
+              />
+            ) : (
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold">
+                {initials}
+              </div>
+            )}
             <div className="hidden sm:block text-left">
               <p className="text-sm font-semibold text-slate-800 leading-none">{profile?.name || 'Pengguna'}</p>
               <p className="text-[11px] text-slate-500 mt-0.5">{role ? roleLabel[role] : '—'}</p>
