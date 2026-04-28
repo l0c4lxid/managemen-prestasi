@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { Eye, EyeOff, Trophy, Shield, Zap, BarChart3 } from 'lucide-react';
@@ -49,6 +49,9 @@ export default function AuthPage({ initialMode }: AuthPageProps) {
     window.history.replaceState(null, '', `/${newMode}`);
   };
 
+  const searchParams = useSearchParams();
+  const next = searchParams.get('next');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.email || !form.password) { toast.error('Email dan password wajib diisi'); return; }
@@ -57,7 +60,7 @@ export default function AuthPage({ initialMode }: AuthPageProps) {
       if (mode === 'login') {
         await signIn(form.email, form.password);
         toast.success('Selamat datang kembali!');
-        router.push('/dashboard');
+        router.push(next || '/dashboard');
       } else {
         if (!form.name) { toast.error('Nama lengkap wajib diisi'); return; }
         await signUp(form.email, form.password, { full_name: form.name, role: 'mahasiswa' });

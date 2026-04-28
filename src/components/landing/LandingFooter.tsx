@@ -5,9 +5,9 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 
 const footerLinks = {
   Platform: [
-    { label: 'Wall of Fame', href: '#wall-of-fame' },
-    { label: 'Lomba Aktif', href: '#lomba' },
-    { label: 'Event & Pelatihan', href: '#event' },
+    { label: 'Wall of Fame', href: '/#wall-of-fame' },
+    { label: 'Lomba Aktif', href: '/#lomba' },
+    { label: 'Event & Pelatihan', href: '/#event' },
     { label: 'Dashboard', href: '/dashboard' },
   ],
   Bantuan: [
@@ -34,21 +34,34 @@ export default function LandingFooter() {
               <AppLogo size={34} />
               <span className="font-bold text-lg text-white tracking-tight">PrestasiKampus</span>
             </div>
-            <p className="text-sm text-slate-400 leading-relaxed mb-5 max-w-xs">
-              Platform resmi kemahasiswaan untuk mencatat, memverifikasi, dan memamerkan prestasi mahasiswa Indonesia.
-            </p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <MapPin size={13} className="text-slate-500 flex-shrink-0" />
-                Jl. Ir. Sutami No.36A, Surakarta, Jawa Tengah
+            <div className="mb-6">
+              <h3 className="text-white font-bold text-sm mb-1">Universitas BSI Kampus Solo</h3>
+              <p className="text-[11px] text-slate-500 uppercase tracking-wider font-semibold mb-2">
+                Universitas di Surakarta, Jawa Tengah
+              </p>
+              <div className="flex items-center gap-2 text-xs text-indigo-400 mb-4">
+                <span className="font-bold">4.9</span>
+                <div className="flex text-amber-500">
+                  {'★'.repeat(5)}
+                </div>
+                <span className="text-slate-500">(4,967 ulasan Google)</span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <Mail size={13} className="text-slate-500 flex-shrink-0" />
-                kemahasiswaan@prestasikampus.id
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-start gap-2.5 text-xs text-slate-400">
+                <MapPin size={14} className="text-slate-500 flex-shrink-0 mt-0.5" />
+                <span className="leading-relaxed">
+                  Jl. Letjen Sutoyo No.43, Cengklik, Nusukan, Kec. Banjarsari, Kota Surakarta, Jawa Tengah 57135
+                </span>
               </div>
-              <div className="flex items-center gap-2 text-xs text-slate-400">
-                <Phone size={13} className="text-slate-500 flex-shrink-0" />
-                (0271) 632-163
+              <div className="flex items-center gap-2.5 text-xs text-slate-400">
+                <Phone size={14} className="text-slate-500 flex-shrink-0" />
+                0857-9920-3851
+              </div>
+              <div className="flex items-center gap-2.5 text-xs text-slate-400">
+                <Mail size={14} className="text-slate-500 flex-shrink-0" />
+                pmbubsi.id
               </div>
             </div>
           </div>

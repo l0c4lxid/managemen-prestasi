@@ -1,6 +1,8 @@
+'use client';
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, Star, Users, Trophy, Swords } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface StatItem {
   label: string;
@@ -13,6 +15,15 @@ interface HeroSectionProps {
 }
 
 export default function HeroSection({ stats: dynamicStats, recentAchievements = [] }: HeroSectionProps & { recentAchievements?: any[] }) {
+  const { session, profile } = useAuth();
+  
+  const getDashboardRoute = () => {
+    if (!profile) return '/dashboard';
+    switch (profile.role) {
+      case 'mahasiswa': return '/mahasiswa';
+      default: return '/dashboard';
+    }
+  };
   // Map icon strings to components
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -84,8 +95,11 @@ export default function HeroSection({ stats: dynamicStats, recentAchievements = 
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Link href="/login" className="btn-primary text-base px-7 py-3.5 shadow-brand">
-                Mulai Sekarang
+              <Link 
+                href={session ? getDashboardRoute() : '/register'} 
+                className="btn-primary text-base px-7 py-3.5 shadow-brand"
+              >
+                {session ? 'Ke Dashboard' : 'Mulai Sekarang'}
                 <ArrowRight size={18} />
               </Link>
               <a href="#faq" className="btn-outline text-base px-7 py-3.5">

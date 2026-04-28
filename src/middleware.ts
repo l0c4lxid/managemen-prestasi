@@ -27,17 +27,20 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
   const { pathname } = request.nextUrl;
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
-
+  const isPublicRoute = PUBLIC_ROUTES.includes(pathname) || pathname.startsWith('/p/');
+  
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone();
     url.pathname = DEFAULT_LOGIN;
+    url.searchParams.set('next', pathname);
     return NextResponse.redirect(url);
   }
   
   if (user && (pathname === '/login' || pathname === '/register')) {
     const url = request.nextUrl.clone();
-    url.pathname = DEFAULT_DASHBOARD;
+    const next = request.nextUrl.searchParams.get('next');
+    url.pathname = next || DEFAULT_DASHBOARD;
+    url.search = ''; // clear search params
     return NextResponse.redirect(url);
   }
 

@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Trophy, Medal, Filter } from 'lucide-react';
 import AppImage from '@/components/ui/AppImage';
 import { createClient } from '@/lib/supabase/client';
@@ -183,10 +184,11 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
           {filtered.map((a) => {
             const badge = juaraBadge(a.juara);
             return (
-              <div
+              <Link
                 key={a.id}
+                href={`/p/prestasi/${a.id}`}
                 className="group relative bg-white rounded-2xl border border-slate-100 overflow-hidden 
-                  shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-200 cursor-pointer"
+                  shadow-sm hover:shadow-card-hover hover:-translate-y-1 transition-all duration-200 cursor-pointer block"
               >
                 {/* Image */}
                 <div className="relative aspect-square overflow-hidden">
@@ -221,7 +223,7 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
                     <span className="text-[10px] text-slate-400">{a.tahun}</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })}
         </div>
