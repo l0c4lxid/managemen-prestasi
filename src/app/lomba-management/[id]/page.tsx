@@ -401,10 +401,9 @@ export default function LombaDetailPage() {
         title="Hapus Lomba"
         description="Apakah Anda yakin ingin menghapus lomba ini? Semua data pendaftaran terkait juga akan dihapus."
         confirmLabel="Hapus"
-        variant="danger"
         loading={deleteLoading}
         onConfirm={handleDelete}
-        onCancel={() => setDeleteOpen(false)}
+        onClose={() => setDeleteOpen(false)}
       />
 
       <ConfirmDialog
@@ -412,10 +411,9 @@ export default function LombaDetailPage() {
         title="Hapus Pendaftar"
         description="Apakah Anda yakin ingin menghapus pendaftar ini dari lomba?"
         confirmLabel="Hapus"
-        variant="danger"
         loading={deleteRegLoading}
         onConfirm={handleDeleteReg}
-        onCancel={() => setDeleteRegTarget(null)}
+        onClose={() => setDeleteRegTarget(null)}
       />
     </AppLayout>
   );

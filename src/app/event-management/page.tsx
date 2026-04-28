@@ -78,7 +78,18 @@ export default function EventManagementPage() {
     if (error) {
       toast.error('Gagal memuat data event');
     } else {
-      setData(rows || []);
+      const computedRows = (rows || []).map(r => {
+        let computedStatus = r.status || 'upcoming';
+        if (computedStatus !== 'done') {
+           const compareDate = r.end_date ? new Date(r.end_date) : (r.date ? new Date(r.date) : null);
+           const now = new Date();
+           if (compareDate && compareDate < now) {
+              computedStatus = 'done';
+           }
+        }
+        return { ...r, status: computedStatus };
+      });
+      setData(computedRows);
     }
     setLoading(false);
   };
@@ -122,9 +133,13 @@ export default function EventManagementPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleteLoading(true);
+    
+    // First delete any related registrations to avoid foreign key constraint error
+    await supabase.from('registrations').delete().eq('event_id', deleteTarget);
+    
     const { error } = await supabase.from('events').delete().eq('id', deleteTarget);
     if (error) {
-      toast.error('Gagal menghapus event');
+      toast.error('Gagal menghapus event: ' + error.message);
     } else {
       setData(prev => prev.filter(d => d.id !== deleteTarget));
       toast.success('Event berhasil dihapus');
@@ -398,7 +413,7 @@ export default function EventManagementPage() {
       {canManage && (
         <>
           <EventFormModal open={formOpen} onClose={() => { setFormOpen(false); setEditItem(null); }} onSave={handleSave} editItem={editItem} />
-          <ConfirmDialog open={!!deleteTarget} title="Hapus Event" description="Apakah Anda yakin ingin menghapus event ini?" confirmLabel="Hapus" variant="danger" loading={deleteLoading} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />
+          <ConfirmDialog open={!!deleteTarget} title="Hapus Event" description="Apakah Anda yakin ingin menghapus event ini?" confirmLabel="Hapus" loading={deleteLoading} onConfirm={handleDelete} onClose={() => setDeleteTarget(null)} />
         </>
       )}
     </AppLayout>

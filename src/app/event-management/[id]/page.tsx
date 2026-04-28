@@ -425,10 +425,9 @@ export default function EventDetailPage() {
         title="Hapus Event"
         description="Apakah Anda yakin ingin menghapus event ini? Semua data peserta terkait juga akan dihapus."
         confirmLabel="Hapus"
-        variant="danger"
         loading={deleteLoading}
         onConfirm={handleDelete}
-        onCancel={() => setDeleteOpen(false)}
+        onClose={() => setDeleteOpen(false)}
       />
 
       <ConfirmDialog
@@ -436,10 +435,9 @@ export default function EventDetailPage() {
         title="Hapus Peserta"
         description="Apakah Anda yakin ingin menghapus peserta ini dari event?"
         confirmLabel="Hapus"
-        variant="danger"
         loading={deleteRegLoading}
         onConfirm={handleDeleteReg}
-        onCancel={() => setDeleteRegTarget(null)}
+        onClose={() => setDeleteRegTarget(null)}
       />
     </AppLayout>
   );

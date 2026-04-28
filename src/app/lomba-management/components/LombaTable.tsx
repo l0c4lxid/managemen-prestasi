@@ -397,8 +397,8 @@ export default function LombaTable() {
       <LombaFormModal
         open={formOpen}
         onClose={() => { setFormOpen(false); setEditItem(null); }}
-        onSave={handleSave}
-        editItem={editItem}
+        onSave={handleSave as any}
+        editItem={editItem as any}
       />
 
       <ConfirmDialog

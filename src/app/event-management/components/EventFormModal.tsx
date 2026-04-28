@@ -40,7 +40,7 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
     defaultValues: editItem ? {
       title: editItem.title,
       type: editItem.type || '',
-      date: editItem.date ? editItem.date.split('T')[0] : '',
+      date: editItem.date ? new Date(editItem.date).toISOString().split('T')[0] : '',
       time: editItem.time || '',
       location: editItem.location || '',
       mentor: editItem.mentor || '',
@@ -60,7 +60,7 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
       reset({
         title: editItem.title,
         type: editItem.type || '',
-        date: editItem.date ? editItem.date.split('T')[0] : '',
+        date: editItem.date ? new Date(editItem.date).toISOString().split('T')[0] : '',
         time: editItem.time || '',
         location: editItem.location || '',
         mentor: editItem.mentor || '',
@@ -126,7 +126,7 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
         .eq('id', editItem.id)
         .select()
         .single();
-      if (error) { toast.error('Gagal memperbarui event'); return; }
+      if (error) { toast.error('Gagal memperbarui event: ' + error.message); return; }
       toast.success('Data event berhasil diperbarui');
       onSave(updated as EventItem);
     } else {
@@ -135,7 +135,7 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
         .insert(payload)
         .select()
         .single();
-      if (error) { toast.error('Gagal menambahkan event'); return; }
+      if (error) { toast.error('Gagal menambahkan event: ' + error.message); return; }
       toast.success('Event baru berhasil ditambahkan');
       onSave(created as EventItem);
     }

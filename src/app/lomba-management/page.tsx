@@ -376,7 +376,7 @@ export default function LombaManagementPage() {
       {canManage && (
         <>
           <LombaFormModal open={formOpen} onClose={() => { setFormOpen(false); setEditItem(null); }} onSave={handleSave} editItem={editItem} />
-          <ConfirmDialog open={!!deleteTarget} title="Hapus Lomba" description="Apakah Anda yakin ingin menghapus lomba ini?" confirmLabel="Hapus" variant="danger" loading={deleteLoading} onConfirm={handleDelete} onCancel={() => setDeleteTarget(null)} />
+          <ConfirmDialog open={!!deleteTarget} title="Hapus Lomba" description="Apakah Anda yakin ingin menghapus lomba ini?" confirmLabel="Hapus" loading={deleteLoading} onConfirm={handleDelete} onClose={() => setDeleteTarget(null)} />
         </>
       )}
     </AppLayout>

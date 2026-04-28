@@ -281,9 +281,9 @@ export default function MahasiswaPage() {
       <ConfirmDialog
         open={!!deleteTarget}
         title="Hapus Pengguna"
-        message="Data pengguna ini akan dihapus secara permanen beserta semua datanya. Lanjutkan?"
+        description="Data pengguna ini akan dihapus secara permanen beserta semua datanya. Lanjutkan?"
         onConfirm={handleDelete}
-        onCancel={() => setDeleteTarget(null)}
+        onClose={() => setDeleteTarget(null)}
         loading={deleteLoading}
       />
       <UserFormModal

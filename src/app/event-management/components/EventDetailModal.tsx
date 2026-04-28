@@ -2,7 +2,7 @@
 import React from 'react';
 import { 
   X, Calendar, Clock, MapPin, Users, Mic2, 
-  ExternalLink, Info, CheckCircle2, Globe, Tag
+  ExternalLink, Info, CheckCircle2, Globe, Tag, Plus
 } from 'lucide-react';
 import { EventItem } from '../page';
 
