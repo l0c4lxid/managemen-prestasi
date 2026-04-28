@@ -1,7 +1,8 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Trophy, Medal, Filter } from 'lucide-react';
 import AppImage from '@/components/ui/AppImage';
+import { createClient } from '@/lib/supabase/client';
 
 const achievers: any[] = [];
 
@@ -17,6 +18,35 @@ const juaraBadge = (juara: number) => {
 export default function WallOfFame({ initialData = [] }: { initialData?: any[] }) {
   const [tahun, setTahun] = useState('Semua');
   const [kategori, setKategori] = useState('Semua');
+  const [posters, setPosters] = useState<any[]>([]);
+  const supabase = createClient();
+
+  useEffect(() => {
+    const fetchPosters = async () => {
+      const { data } = await supabase
+        .from('wall_of_fame_posters')
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
+      
+      if (data && data.length > 0) {
+        setPosters(data);
+      } else {
+        // Fallback to static posters if none exist
+        setPosters([
+          { id: 'static-1', image_url: '/poster-1.png', title: 'Poster 1' },
+          { id: 'static-2', image_url: '/poster-2.png', title: 'Poster 2' },
+          { id: 'static-3', image_url: '/poster-3.png', title: 'Poster 3' },
+          { id: 'static-4', image_url: '/poster-4.png', title: 'Poster 4' },
+          { id: 'static-5', image_url: '/poster-5.png', title: 'Poster 5' },
+          { id: 'static-6', image_url: '/poster-6.png', title: 'Poster 6' },
+          { id: 'static-7', image_url: '/poster-7.png', title: 'Poster 7' },
+        ]);
+      }
+    };
+    
+    fetchPosters();
+  }, []);
 
   // Map supabase data to our local format
   const mappedData = initialData.map((item, i) => ({
@@ -74,14 +104,14 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
 
             <div className="animate-marquee flex gap-6 pb-8 pt-4">
               {/* Set 1 */}
-              {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+              {posters.map((poster) => (
                 <div 
-                  key={`poster-1-${num}`} 
+                  key={`poster-1-${poster.id}`} 
                   className="shrink-0 w-[70vw] sm:w-[280px] md:w-[320px] aspect-[1/1.4] relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white transition-transform duration-300 hover:scale-[1.02]"
                 >
                   <AppImage
-                    src={`/poster-${num}.png`}
-                    alt={`Poster Prestasi ${num}`}
+                    src={poster.image_url}
+                    alt={poster.title}
                     fill
                     className="object-contain"
                     sizes="(max-width: 640px) 70vw, 320px"
@@ -89,14 +119,14 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
                 </div>
               ))}
               {/* Set 2 (for seamless loop) */}
-              {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+              {posters.map((poster) => (
                 <div 
-                  key={`poster-2-${num}`} 
+                  key={`poster-2-${poster.id}`} 
                   className="shrink-0 w-[70vw] sm:w-[280px] md:w-[320px] aspect-[1/1.4] relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white transition-transform duration-300 hover:scale-[1.02]"
                 >
                   <AppImage
-                    src={`/poster-${num}.png`}
-                    alt={`Poster Prestasi ${num}`}
+                    src={poster.image_url}
+                    alt={poster.title}
                     fill
                     className="object-contain"
                     sizes="(max-width: 640px) 70vw, 320px"

@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import {
   LayoutDashboard, Trophy, Swords, CalendarDays, Users, Settings,
   ChevronLeft, ChevronRight, LogOut, BarChart3, Bell, UserCircle,
-  Bookmark, Send, ClipboardList, ShieldCheck, Star,
+  Bookmark, Send, ClipboardList, ShieldCheck, Star, Images,
 } from 'lucide-react';
 import type { UserRole } from '@/types';
 
@@ -39,6 +39,7 @@ const navItems: NavItem[] = [
   // Manajemen Program & User
   { label: 'Manajemen Program', href: '/laporan', icon: <ClipboardList size={20} />, group: 'Admin', roles: ['super_admin', 'admin_perencanaan', 'admin_prestasi'] },
   { label: 'Manajemen User', href: '/mahasiswa', icon: <Users size={20} />, group: 'Admin', roles: ['super_admin', 'admin_prestasi', 'admin_lomba'] },
+  { label: 'Manajemen Poster', href: '/poster-management', icon: <Images size={20} />, group: 'Admin', roles: ['super_admin'] },
 
   // Sistem — semua
   { label: 'Notifikasi', href: '/notifikasi', icon: <Bell size={20} />, group: 'Sistem', roles: ['super_admin', 'admin_prestasi', 'admin_lomba', 'admin_perencanaan', 'mahasiswa'] },
