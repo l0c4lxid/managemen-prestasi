@@ -50,12 +50,11 @@ export default async function RootPage() {
         .eq('status', 'active')
         .order('created_at', { ascending: false })
         .limit(6),
-      // Upcoming events
+      // Upcoming & Past events
       supabase.from('events')
         .select('*')
-        .eq('status', 'upcoming')
-        .order('date', { ascending: true })
-        .limit(4)
+        .order('date', { ascending: false })
+        .limit(8)
     ]);
 
     const [achStat, userStat, compStat] = statsRes;
@@ -65,7 +64,12 @@ export default async function RootPage() {
 
     achievements = achRes.data || [];
     competitions = compRes.data || [];
-    events = evRes.data || [];
+    
+    // Sort events: upcoming first (asc date), then finished (desc date)
+    const rawEvents = evRes.data || [];
+    const upcoming = rawEvents.filter(e => e.status === 'upcoming').sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    const finished = rawEvents.filter(e => e.status !== 'upcoming').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    events = [...upcoming, ...finished].slice(0, 6);
   } catch (error) {
     console.error('Error fetching landing data:', error);
   }

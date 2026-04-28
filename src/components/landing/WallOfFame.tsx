@@ -5,9 +5,54 @@ import { Trophy, Medal, Filter } from 'lucide-react';
 import AppImage from '@/components/ui/AppImage';
 import { createClient } from '@/lib/supabase/client';
 
-const achievers: any[] = [];
+const achievers = [
+  {
+    id: 'w-1',
+    name: 'Oktavian Ramadhani',
+    nim: '12220001',
+    prodi: 'Informatika',
+    lomba: 'Juara 3 Sayembara Desain Logo Dies Natalis UTP Surakarta Ke 45',
+    tahun: '2024',
+    juara: 3,
+    kategori: 'Seni & Budaya',
+    img: '/poster-2.png'
+  },
+  {
+    id: 'w-2',
+    name: 'Muhammad Fahrel Yuliyanto',
+    nim: '12220002',
+    prodi: 'Sistem Informasi',
+    lomba: 'Peserta Kompetisi Video Kreatif 4C National Competition',
+    tahun: '2024',
+    juara: 0,
+    kategori: 'Teknologi',
+    img: '/poster-1.png'
+  },
+  {
+    id: 'w-3',
+    name: 'Febriana Ida Nugraheni',
+    nim: '12220003',
+    prodi: 'Informatika',
+    lomba: 'Caraka Terpilih Kampus Mengajar Angkatan 8 Jawa Tengah',
+    tahun: '2024',
+    juara: 1,
+    kategori: 'Akademik',
+    img: '/poster-6.png'
+  },
+  {
+    id: 'w-4',
+    name: 'Shandy Aulia Ramadhani',
+    nim: '12220004',
+    prodi: 'Sistem Informasi',
+    lomba: 'Juara 2 Video Favorit BSI Explore 2025',
+    tahun: '2025',
+    juara: 2,
+    kategori: 'Teknologi',
+    img: '/poster-4.png'
+  }
+];
 
-const tahunOptions = ['Semua', '2026', '2025'];
+const tahunOptions = ['Semua', '2026', '2025', '2024'];
 const kategoriOptions = ['Semua', 'Akademik', 'Non-Akademik', 'Teknologi', 'Sains', 'Seni & Budaya'];
 
 const juaraBadge = (juara: number) => {
@@ -50,17 +95,19 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
   }, []);
 
   // Map supabase data to our local format
-  const mappedData = initialData.map((item, i) => ({
+  const dbData = initialData.map((item, i) => ({
     id: item.id,
     name: item.users?.name || 'Mahasiswa',
     nim: item.users?.nim || '-',
     prodi: item.category || 'Mahasiswa',
     lomba: item.title,
     tahun: new Date(item.created_at).getFullYear().toString(),
-    juara: (i % 3) + 1,
+    juara: item.rank || 0,
     kategori: item.category || 'Akademik',
     img: item.users?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.users?.name || 'M')}&background=random`
   }));
+
+  const mappedData = [...achievers, ...dbData];
 
   const filtered = mappedData.filter((a) => {
     const matchTahun = tahun === 'Semua' || a.tahun === tahun;
