@@ -40,6 +40,73 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
   return (
     <section id="wall-of-fame" className="py-20 bg-gradient-to-b from-white to-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Custom Styles for Marquee */}
+        <style dangerouslySetInnerHTML={{__html: `
+          @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+          }
+          .animate-marquee {
+            animation: marquee 40s linear infinite;
+            width: max-content;
+            will-change: transform;
+          }
+          .animate-marquee:hover {
+            animation-play-state: paused;
+          }
+        `}} />
+
+        {/* Poster Gallery */}
+        <div className="mb-20">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold mb-3">
+              <Trophy size={13} />
+              Galeri Poster
+            </div>
+            <h2 className="section-header">Poster Prestasi Kampus</h2>
+            <p className="text-slate-500 mt-2 text-sm">Berbagai poster pencapaian dan kompetisi mahasiswa.</p>
+          </div>
+          
+          <div className="overflow-hidden w-full relative group">
+            {/* Gradient Fades for Smooth Edges */}
+            <div className="absolute top-0 bottom-0 left-0 w-12 sm:w-24 bg-gradient-to-r from-slate-50 to-transparent z-10 pointer-events-none"></div>
+            <div className="absolute top-0 bottom-0 right-0 w-12 sm:w-24 bg-gradient-to-l from-slate-50 to-transparent z-10 pointer-events-none"></div>
+
+            <div className="animate-marquee flex gap-6 pb-8 pt-4">
+              {/* Set 1 */}
+              {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                <div 
+                  key={`poster-1-${num}`} 
+                  className="shrink-0 w-[70vw] sm:w-[280px] md:w-[320px] aspect-[1/1.4] relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white transition-transform duration-300 hover:scale-[1.02]"
+                >
+                  <AppImage
+                    src={`/poster-${num}.png`}
+                    alt={`Poster Prestasi ${num}`}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 640px) 70vw, 320px"
+                  />
+                </div>
+              ))}
+              {/* Set 2 (for seamless loop) */}
+              {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                <div 
+                  key={`poster-2-${num}`} 
+                  className="shrink-0 w-[70vw] sm:w-[280px] md:w-[320px] aspect-[1/1.4] relative rounded-2xl overflow-hidden shadow-lg border border-slate-200 bg-white transition-transform duration-300 hover:scale-[1.02]"
+                >
+                  <AppImage
+                    src={`/poster-${num}.png`}
+                    alt={`Poster Prestasi ${num}`}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 640px) 70vw, 320px"
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
           <div>
