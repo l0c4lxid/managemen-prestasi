@@ -78,20 +78,18 @@ export default function HeroSection({ stats: dynamicStats, recentAchievements = 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left — Text */}
           <div className="animate-slide-up">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-semibold mb-6 border border-indigo-200">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-100 text-indigo-700 text-xs font-bold mb-6 border border-indigo-200 shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse-slow" />
-              Platform Prestasi Mahasiswa Indonesia
+              Pusat Prestasi Mahasiswa UBSI Surakarta
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight tracking-tight mb-6">
-              Catat & Rayakan{' '}
-              <span className="text-gradient">Prestasi</span>
-              {' '}Terbaikmu
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-900 leading-[1.1] tracking-tight mb-6">
+              Rayakan <span className="text-gradient">Pencapaian</span> <br />
+              Mahasiswa <span className="text-indigo-600">UBSI</span>
             </h1>
 
-            <p className="text-lg text-slate-600 leading-relaxed mb-8 max-w-xl">
-              Platform resmi kampus untuk menemukan lomba bergengsi, mendaftarkan prestasi,
-              dan mendapatkan verifikasi dari kemahasiswaan — semua dalam satu tempat.
+            <p className="text-lg sm:text-xl text-slate-600 leading-relaxed mb-10 max-w-xl font-medium">
+              Wadah resmi civitas akademika <span className="text-slate-900 font-bold">UBSI Surakarta</span> untuk mengeksplorasi kompetisi bergengsi, mengabadikan prestasi, dan membangun portofolio masa depan.
             </p>
 
             <div className="flex flex-wrap gap-4">
