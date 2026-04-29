@@ -18,6 +18,7 @@ interface AchievementModalProps {
     img: string;
     description?: string;
     level?: string;
+    proof_url?: string;
   } | null;
 }
 
@@ -122,10 +123,21 @@ export default function AchievementModal({ isOpen, onClose, achievement }: Achie
             </div>
 
             {/* Actions */}
-            <div className="pt-8 flex">
-              <button className="w-full btn-primary justify-center py-4 rounded-2xl shadow-xl shadow-indigo-600/20 text-xs uppercase tracking-widest font-black">
+            <div className="pt-8 flex flex-col sm:flex-row gap-4">
+              {achievement.proof_url && (
+                <a 
+                  href={achievement.proof_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-indigo-600 text-white text-xs uppercase tracking-widest font-black shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95"
+                >
+                  <Bookmark size={16} />
+                  Lihat Sertifikat
+                </a>
+              )}
+              <button className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-slate-100 text-slate-500 text-xs uppercase tracking-widest font-black hover:bg-slate-50 transition-all active:scale-95">
                 <Share2 size={16} />
-                Bagikan Prestasi
+                Bagikan
               </button>
             </div>
           </div>

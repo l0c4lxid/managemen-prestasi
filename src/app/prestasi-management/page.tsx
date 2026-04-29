@@ -110,7 +110,7 @@ export default function PrestasiManagementPage() {
       description: item.description || '',
       category: item.category || 'Akademik',
       competition_level: item.competition_level || 'nasional',
-      rank: item.rank?.toString() || '',
+      rank: (item.rank === 0 || item.rank === '0') ? '' : item.rank?.toString() || '',
       proof_url: item.proof_url || '',
       status: item.status,
       isNewStudent: false,
@@ -404,45 +404,88 @@ export default function PrestasiManagementPage() {
 
         {/* Detail Modal */}
         {detailItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 animate-fade-in" onClick={() => setDetailItem(null)}>
-            <div className="bg-white rounded-3xl shadow-soft-lg border border-slate-100 w-full max-w-lg p-6 animate-slide-up" onClick={e => e.stopPropagation()}>
-              <div className="flex items-start justify-between mb-5">
-                <div>
-                  <h3 className="font-bold text-slate-800 text-lg">{detailItem.title}</h3>
-                  <p className="text-sm text-slate-500 mt-0.5">{detailItem.users?.name} · {detailItem.users?.nim || detailItem.users?.email}</p>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in" onClick={() => setDetailItem(null)}>
+            <div className="bg-white rounded-[2rem] shadow-2xl border border-slate-100 w-full max-w-xl overflow-hidden animate-slide-up" onClick={e => e.stopPropagation()}>
+              {/* Image Header */}
+              <div className="relative aspect-video bg-slate-100 overflow-hidden">
+                {detailItem.proof_url && detailItem.proof_url.match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
+                  <img src={detailItem.proof_url} alt={detailItem.title} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-gradient-to-br from-slate-50 to-slate-100">
+                    <Trophy size={48} className="mb-2 opacity-20" />
+                    <p className="text-xs font-medium uppercase tracking-widest opacity-50">Pratinjau Foto Tidak Tersedia</p>
+                  </div>
+                )}
+                <div className="absolute top-4 right-4">
+                  <button onClick={() => setDetailItem(null)} className="w-8 h-8 rounded-full bg-black/20 hover:bg-black/40 text-white backdrop-blur-md flex items-center justify-center transition-colors">✕</button>
                 </div>
-                <button onClick={() => setDetailItem(null)} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors">✕</button>
+                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/80 to-transparent">
+                  <span className={`inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/20 text-white backdrop-blur-md mb-2 ${statusCfg[detailItem.status].dot.replace('bg-', 'bg-')}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${statusCfg[detailItem.status].dot}`} />{statusCfg[detailItem.status].label}
+                  </span>
+                  <h3 className="text-xl font-bold text-white line-clamp-2">{detailItem.title}</h3>
+                </div>
               </div>
-              <div className="space-y-3">
-                {detailItem.description && <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Deskripsi</p><p className="text-sm text-slate-700">{detailItem.description}</p></div>}
-                <div className="grid grid-cols-2 gap-3">
-                  <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Kategori</p><p className="text-sm text-slate-700">{detailItem.category || '—'}</p></div>
-                  <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Tingkat</p><p className="text-sm text-slate-700">{detailItem.competition_level || '—'}</p></div>
+
+              <div className="p-6 space-y-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
+                      {(detailItem.users?.name || '?')[0].toUpperCase()}
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800">{detailItem.users?.name}</p>
+                      <p className="text-xs text-slate-500">{detailItem.users?.nim || detailItem.users?.email} · {detailItem.users?.major || 'Mahasiswa'}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Peringkat</p>
+                    <p className="text-lg font-black text-indigo-600">{detailItem.rank || 'Pemenang'}</p>
+                  </div>
                 </div>
-                {detailItem.proof_url && (
+
+                <div className="grid grid-cols-2 gap-6 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                   <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-2">Bukti</p>
-                    <a href={detailItem.proof_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-indigo-600 font-semibold hover:underline">
-                      <ExternalLink size={14} /> Buka Bukti Prestasi
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kategori</p>
+                    <p className="text-sm font-semibold text-slate-700">{detailItem.category || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tingkat</p>
+                    <p className="text-sm font-semibold text-slate-700 capitalize">{detailItem.competition_level || '—'}</p>
+                  </div>
+                </div>
+
+                {detailItem.description && (
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Deskripsi</p>
+                    <p className="text-sm text-slate-600 leading-relaxed">{detailItem.description}</p>
+                  </div>
+                )}
+
+                {detailItem.proof_url && (
+                  <div className="pt-4 border-t border-slate-100">
+                    <a 
+                      href={detailItem.proof_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-bold hover:bg-indigo-100 transition-all border border-indigo-100"
+                    >
+                      <ExternalLink size={16} /> Lihat Dokumen Bukti Asli
                     </a>
                   </div>
                 )}
-                <div><p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Status Saat Ini</p>
-                  <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${statusCfg[detailItem.status].cls}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${statusCfg[detailItem.status].dot}`} />{statusCfg[detailItem.status].label}
-                  </span>
-                </div>
+
+                {canVerify && detailItem.status === 'pending' && (
+                  <div className="flex gap-3 pt-2">
+                    <button onClick={() => handleVerify(detailItem.id, 'rejected')} disabled={processing === detailItem.id} className="flex-1 py-3 rounded-xl border border-red-200 text-red-600 font-bold hover:bg-red-50 transition-all flex items-center justify-center gap-2">
+                      <XCircle size={18} /> Tolak
+                    </button>
+                    <button onClick={() => handleVerify(detailItem.id, 'verified')} disabled={processing === detailItem.id} className="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 shadow-lg shadow-emerald-100 transition-all flex items-center justify-center gap-2">
+                      <CheckCircle size={18} /> Setujui
+                    </button>
+                  </div>
+                )}
               </div>
-              {canVerify && detailItem.status === 'pending' && (
-                <div className="flex gap-3 mt-6 pt-5 border-t border-slate-100">
-                  <button onClick={() => handleVerify(detailItem.id, 'rejected')} disabled={processing === detailItem.id} className="btn-danger flex-1 justify-center">
-                    <XCircle size={15} /> Tolak
-                  </button>
-                  <button onClick={() => handleVerify(detailItem.id, 'verified')} disabled={processing === detailItem.id} className="btn-primary flex-1 justify-center bg-emerald-600 hover:bg-emerald-700">
-                    <CheckCircle size={15} /> Setujui
-                  </button>
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -475,17 +518,22 @@ export default function PrestasiManagementPage() {
 
         {/* Add/Edit Modal */}
         {modalOpen && (
-          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/40 animate-fade-in" onClick={() => setModalOpen(false)}>
-            <div className="bg-white rounded-3xl shadow-soft-lg border border-slate-100 w-full max-w-xl p-6 animate-slide-up" onClick={e => e.stopPropagation()}>
-              <div className="flex items-start justify-between mb-5">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white rounded-[2rem] w-full max-w-2xl shadow-2xl overflow-hidden animate-slide-up flex flex-col max-h-[90vh]">
+              {/* Modal Header */}
+              <div className="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-white shrink-0">
                 <div>
-                  <h3 className="font-bold text-slate-800 text-lg">{modalMode === 'add' ? 'Tambah Prestasi Baru' : 'Edit Data Prestasi'}</h3>
-                  <p className="text-sm text-slate-500 mt-0.5">{modalMode === 'add' ? 'Masukkan data prestasi mahasiswa secara manual.' : 'Perbarui data prestasi mahasiswa.'}</p>
+                  <h2 className="text-xl font-bold text-slate-800">
+                    {modalMode === 'edit' ? 'Edit Data Prestasi' : 'Tambah Prestasi Baru'}
+                  </h2>
+                  <p className="text-sm text-slate-500">{modalMode === 'edit' ? 'Perbarui informasi pencapaian mahasiswa.' : 'Catat prestasi mahasiswa baru ke dalam sistem.'}</p>
                 </div>
-                <button onClick={() => setModalOpen(false)} className="p-2 rounded-xl hover:bg-slate-100 text-slate-500 transition-colors">✕</button>
+                <button onClick={() => setModalOpen(false)} className="p-2 rounded-full hover:bg-slate-100 text-slate-400 transition-colors">✕</button>
               </div>
 
-              <form onSubmit={handleModalSubmit} className="space-y-4">
+              {/* Modal Body (Scrollable) */}
+              <div className="flex-1 overflow-y-auto p-8 scrollbar-thin">
+                <form id="achievement-form" onSubmit={handleModalSubmit} className="space-y-6">
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold text-slate-700 uppercase tracking-tight">Data Mahasiswa</label>
@@ -592,10 +640,10 @@ export default function PrestasiManagementPage() {
                     <label className="block text-xs font-semibold text-slate-600 mb-1.5">Peringkat / Capaian</label>
                     <input 
                       type="text"
-                      value={modalForm.rank}
+                      value={modalForm.rank === '0' ? '' : modalForm.rank}
                       onChange={e => setModalForm(p => ({...p, rank: e.target.value}))}
                       className="input-field py-2.5 text-sm"
-                      placeholder="Contoh: Juara 1, Medali Emas, dll"
+                      placeholder="Contoh: Juara 1, Emas"
                     />
                   </div>
                 </div>
@@ -670,14 +718,33 @@ export default function PrestasiManagementPage() {
                     <option value="rejected">Ditolak</option>
                   </select>
                 </div>
+                </form>
+              </div>
 
-                <div className="pt-4 border-t border-slate-100 flex gap-3">
-                  <button type="button" onClick={() => setModalOpen(false)} className="btn-ghost flex-1 justify-center">Batal</button>
-                  <button type="submit" disabled={processing === 'modal'} className="btn-primary flex-1 justify-center">
-                    {processing === 'modal' ? 'Menyimpan...' : 'Simpan Perubahan'}
-                  </button>
-                </div>
-              </form>
+              {/* Modal Footer (Fixed) */}
+              <div className="px-8 py-5 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-3 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setModalOpen(false)}
+                  className="px-6 py-2.5 rounded-xl text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+                >
+                  Batal
+                </button>
+                <button
+                  form="achievement-form"
+                  type="submit"
+                  disabled={!!processing || uploading}
+                  className="flex items-center gap-2 px-8 py-2.5 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-100 disabled:opacity-60"
+                >
+                  {processing === 'modal' ? (
+                    <><Loader2 size={16} className="animate-spin" /> Menyimpan...</>
+                  ) : uploading ? (
+                    <><Loader2 size={16} className="animate-spin" /> Mengunggah Foto...</>
+                  ) : (
+                    <>Simpan Perubahan</>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         )}

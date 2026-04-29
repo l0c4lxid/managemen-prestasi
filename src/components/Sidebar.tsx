@@ -38,8 +38,7 @@ const navItems: NavItem[] = [
   
   // Manajemen Program & User
   { label: 'Manajemen Program', href: '/laporan', icon: <ClipboardList size={20} />, group: 'Admin', roles: ['super_admin', 'admin_perencanaan', 'admin_prestasi'] },
-  { label: 'Manajemen User', href: '/mahasiswa', icon: <Users size={20} />, group: 'Admin', roles: ['super_admin', 'admin_lomba'] },
-  { label: 'User Prestasi', href: '/mahasiswa', icon: <Users size={20} />, group: 'Admin', roles: ['super_admin', 'admin_prestasi'] },
+  { label: 'Manajemen User', href: '/mahasiswa', icon: <Users size={20} />, group: 'Admin', roles: ['super_admin', 'admin_lomba', 'admin_prestasi'] },
   { label: 'Manajemen Poster', href: '/poster-management', icon: <Images size={20} />, group: 'Admin', roles: ['super_admin', 'admin_prestasi'] },
 
   // Sistem — semua

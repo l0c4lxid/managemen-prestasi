@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { Send, Upload, Trophy, Globe, Tag, CheckCircle } from 'lucide-react';
 import type { Competition } from '@/types';
 
-const CATEGORIES = ['Akademik', 'Non-Akademik'];
+const CATEGORIES = ['Akademik', 'Non-Akademik', 'Teknologi', 'Sains', 'Seni & Budaya'];
 const LEVELS = ['kampus', 'nasional', 'internasional'];
 
 export default function SubmitPrestasiPage() {
@@ -21,9 +21,12 @@ export default function SubmitPrestasiPage() {
     description: '',
     competition_id: '',
     category: '',
-    competition_level: 'nasional',
+    rank: '',
     proof_url: '',
   });
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchComps = async () => {
@@ -37,13 +40,44 @@ export default function SubmitPrestasiPage() {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile?.id) { toast.error('Anda perlu login terlebih dahulu'); return; }
     if (!form.title) { toast.error('Judul prestasi wajib diisi'); return; }
     if (!form.category) { toast.error('Pilih kategori prestasi'); return; }
+    
     setLoading(true);
     try {
+      let currentProofUrl = form.proof_url;
+
+      // 1. Handle file upload if a file was selected
+      if (selectedFile) {
+        setUploading(true);
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+        const filePath = `achievements/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('posters')
+          .upload(filePath, selectedFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('posters')
+          .getPublicUrl(filePath);
+        
+        currentProofUrl = publicUrl;
+      }
+
       const { error } = await supabase.from('achievements').insert({
         user_id: profile.id,
         title: form.title,
@@ -51,7 +85,8 @@ export default function SubmitPrestasiPage() {
         competition_id: form.competition_id || null,
         category: form.category,
         competition_level: form.competition_level,
-        proof_url: form.proof_url || null,
+        rank: form.rank || null,
+        proof_url: currentProofUrl || null,
         status: 'pending',
       });
       if (error) throw error;
@@ -67,11 +102,14 @@ export default function SubmitPrestasiPage() {
 
       setSubmitted(true);
       toast.success('Prestasi berhasil disubmit! Menunggu verifikasi admin.');
-      setForm({ title: '', description: '', competition_id: '', category: '', competition_level: 'nasional', proof_url: '' });
+      setForm({ title: '', description: '', competition_id: '', category: '', competition_level: 'nasional', rank: '', proof_url: '' });
+      setSelectedFile(null);
+      setPreviewUrl(null);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Gagal submit prestasi');
     } finally {
       setLoading(false);
+      setUploading(false);
     }
   };
 
@@ -113,11 +151,16 @@ export default function SubmitPrestasiPage() {
                     {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="label-text">Tingkat Kompetisi</label>
-                  <select name="competition_level" value={form.competition_level} onChange={handleChange} className="input-field">
+                  <label className="label-text">Tingkat Kompetisi *</label>
+                  <select name="competition_level" value={form.competition_level} onChange={handleChange} className="input-field" required>
                     {LEVELS.map(l => <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
                   </select>
+                </div>
+                <div>
+                  <label className="label-text">Peringkat / Juara</label>
+                  <input name="rank" value={form.rank} onChange={handleChange} type="text" placeholder="Contoh: Juara 1, Medali Emas..." className="input-field" />
                 </div>
               </div>
               <div>
@@ -128,12 +171,52 @@ export default function SubmitPrestasiPage() {
                 </select>
               </div>
               <div>
-                <label className="label-text">Link Bukti / Sertifikat *</label>
-                <div className="relative">
-                  <Upload size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input name="proof_url" value={form.proof_url} onChange={handleChange} type="url" placeholder="https://drive.google.com/… atau link sertifikat" className="input-field pl-9" />
+                <label className="label-text">Foto / Bukti Prestasi *</label>
+                <div className="space-y-3">
+                  <div className="relative group border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-2xl bg-slate-50 transition-colors overflow-hidden aspect-video flex flex-col items-center justify-center">
+                    {previewUrl ? (
+                      <div className="absolute inset-0 w-full h-full">
+                        <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <p className="text-white text-xs font-bold">Klik untuk ganti foto</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center p-4">
+                        <Upload className="mx-auto h-8 w-8 text-slate-300 mb-2" />
+                        <p className="text-xs text-slate-500 font-medium">Klik atau seret foto sertifikat/kegiatan</p>
+                        <p className="text-[10px] text-slate-400 mt-1">PNG, JPG, max 5MB</p>
+                      </div>
+                    )}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleFileSelect}
+                      className="absolute inset-0 opacity-0 cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100"></span></div>
+                    <div className="relative flex justify-center text-[10px] uppercase font-bold text-slate-400"><span className="bg-white px-2">Atau gunakan URL</span></div>
+                  </div>
+
+                  <input 
+                    name="proof_url" 
+                    value={form.proof_url} 
+                    onChange={e => {
+                      handleChange(e);
+                      if (e.target.value) {
+                        setPreviewUrl(e.target.value);
+                        setSelectedFile(null);
+                      }
+                    }} 
+                    type="url" 
+                    placeholder="https://... (Gunakan URL gambar)" 
+                    className="input-field" 
+                  />
                 </div>
-                <p className="text-xs text-slate-400 mt-1.5">Lampirkan link Google Drive, Dropbox, atau URL langsung ke sertifikat/bukti.</p>
+                <p className="text-xs text-slate-400 mt-1.5">Lampirkan foto saat menerima penghargaan atau sertifikat prestasi.</p>
               </div>
               <div className="pt-2">
                 <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3">
