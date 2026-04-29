@@ -42,6 +42,7 @@ export default function MahasiswaPage() {
   const { role } = useAuth();
   const isAdmin = role && role !== 'mahasiswa';
   const isSuperAdmin = role === 'super_admin';
+  const canManage = role === 'super_admin' || role === 'admin_prestasi';
 
   useEffect(() => {
     fetchMahasiswa();
@@ -147,13 +148,13 @@ export default function MahasiswaPage() {
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold text-slate-800 tracking-tight">
-              {isSuperAdmin ? 'Manajemen User' : 'Data Mahasiswa'}
+              {canManage ? 'Manajemen User' : 'Data Mahasiswa'}
             </h1>
             <p className="text-slate-500 text-sm mt-1">
-              {isSuperAdmin ? 'Kelola data seluruh pengguna sistem.' : 'Lihat data mahasiswa terdaftar.'}
+              {canManage ? 'Kelola data seluruh pengguna sistem.' : 'Lihat data mahasiswa terdaftar.'}
             </p>
           </div>
-          {isSuperAdmin && (
+          {canManage && (
             <button
               onClick={() => { setEditTarget(null); setIsModalOpen(true); }}
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-medium transition-colors"
@@ -204,13 +205,13 @@ export default function MahasiswaPage() {
                       <div className="flex items-center gap-1.5">{label}<SortIcon field={field} /></div>
                     </th>
                   ))}
-                  {isSuperAdmin && <th className="px-4 py-3 text-right font-semibold text-slate-600">Aksi</th>}
+                  {canManage && <th className="px-4 py-3 text-right font-semibold text-slate-600">Aksi</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-50">
                 {loading ? (
                   <tr>
-                    <td colSpan={isSuperAdmin ? 7 : 6} className="py-12 text-center text-slate-500">
+                    <td colSpan={canManage ? 7 : 6} className="py-12 text-center text-slate-500">
                       <div className="flex flex-col items-center justify-center">
                         <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-3"></div>
                         <p>Memuat data mahasiswa...</p>
@@ -218,7 +219,7 @@ export default function MahasiswaPage() {
                     </td>
                   </tr>
                 ) : paginated.length === 0 ? (
-                  <tr><td colSpan={isSuperAdmin ? 7 : 6} className="py-16"><EmptyState title="Tidak ada mahasiswa" description="Belum ada data mahasiswa yang sesuai filter." /></td></tr>
+                  <tr><td colSpan={canManage ? 7 : 6} className="py-16"><EmptyState title="Tidak ada mahasiswa" description="Belum ada data mahasiswa yang sesuai filter." /></td></tr>
                 ) : paginated.map(row => (
                   <tr key={row.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-4 py-3 font-mono text-xs text-slate-500">{row.nim || '-'}</td>
@@ -246,7 +247,7 @@ export default function MahasiswaPage() {
                         <BookOpen size={12} />{row.total_prestasi} Prestasi
                       </span>
                     </td>
-                    {isSuperAdmin && (
+                    {canManage && (
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
                           <button onClick={() => { setEditTarget(row); setIsModalOpen(true); }} className="p-2 rounded-xl border border-slate-200 text-slate-500 hover:bg-slate-50 transition-colors" title="Edit">Edit</button>

@@ -137,7 +137,7 @@ export default function LombaManagementPage() {
             <h1 className="text-2xl font-bold text-slate-800 tracking-tight">{isAdmin ? 'Manajemen Lomba & Hibah' : 'Cari Lomba & Hibah'}</h1>
             <p className="text-slate-500 text-sm mt-1">{isAdmin ? 'Kelola daftar kompetisi, hibah, dan PKM untuk mahasiswa.' : 'Temukan kompetisi dan program hibah yang sesuai dengan minat Anda.'}</p>
           </div>
-          {isAdmin && (
+          {canManage && (
             <button onClick={() => { setEditItem(null); setFormOpen(true); }} className="btn-primary">
               <Plus size={16} /> Tambah Lomba
             </button>
@@ -345,11 +345,15 @@ export default function LombaManagementPage() {
                       {isAdmin && <td className="px-4 py-3 text-sm text-slate-700 font-semibold">{participationCounts[lomba.id] || 0}</td>}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
-                          {canManage ? (
+                          {isAdmin ? (
                             <>
-                              <button onClick={() => router.push(`/lomba-management/${lomba.id}`)} className="p-1.5 rounded-lg hover:bg-indigo-50 text-indigo-600 transition-colors" title="Detail"><Eye size={14} /></button>
-                              <button onClick={() => { setEditItem(lomba); setFormOpen(true); }} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors" title="Edit"><Pencil size={14} /></button>
-                              <button onClick={() => setDeleteTarget(lomba.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors" title="Hapus"><Trash2 size={14} /></button>
+                              <button onClick={() => setDetailItem(lomba)} className="p-1.5 rounded-lg hover:bg-indigo-50 text-indigo-600 transition-colors" title="Detail"><Eye size={14} /></button>
+                              {canManage && (
+                                <>
+                                  <button onClick={() => { setEditItem(lomba); setFormOpen(true); }} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors" title="Edit"><Pencil size={14} /></button>
+                                  <button onClick={() => setDeleteTarget(lomba.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-500 transition-colors" title="Hapus"><Trash2 size={14} /></button>
+                                </>
+                              )}
                             </>
                           ) : (
                             <button onClick={() => toggleBookmark(lomba.id)} disabled={bookmarkLoading === lomba.id} className={`p-1.5 rounded-lg transition-colors ${isBookmarked ? 'text-indigo-600 bg-indigo-50' : 'text-slate-400 hover:text-indigo-600 hover:bg-indigo-50'}`} title={isBookmarked ? 'Hapus Bookmark' : 'Simpan'}>
