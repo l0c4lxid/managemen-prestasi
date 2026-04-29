@@ -31,7 +31,7 @@ export default function RecentActivity() {
       // 1. Fetch latest achievements
       const { data: achievements } = await supabase
         .from('achievements')
-        .select('id, title, status, created_at, users(name)')
+        .select('id, title, status, created_at, users:user_id(name)')
         .order('created_at', { ascending: false })
         .limit(5);
 

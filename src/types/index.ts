@@ -62,12 +62,20 @@ export interface Achievement {
   description?: string | null;
   proof_url?: string | null;
   status: AchievementStatus;
+  rank?: string | number | null;
   verified_by?: string | null;
   created_at: string;
   category?: string | null;
   competition_level?: string | null;
   // Joined fields
-  users?: { name: string; email: string; nim?: string | null } | null;
+  users?: { 
+    id: string;
+    name: string; 
+    email: string; 
+    nim?: string | null; 
+    major?: string | null; 
+    avatar_url?: string | null 
+  } | null;
   competitions?: { title: string } | null;
   verifier?: { name: string } | null;
 }

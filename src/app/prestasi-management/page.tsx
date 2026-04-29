@@ -1,10 +1,10 @@
 'use client';
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { Search, Filter, CheckCircle, XCircle, Clock, Eye, ExternalLink, RefreshCw, BarChart3, Trophy, Users, Plus, Edit, Trash2 } from 'lucide-react';
-import AppLayout from '@/components/AppLayout';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
+import { Search, Filter, CheckCircle, XCircle, Clock, Eye, ExternalLink, RefreshCw, BarChart3, Trophy, Users, Plus, Edit, Trash2, Image as ImageIcon, Loader2 } from 'lucide-react';
+import AppLayout from '@/components/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Achievement } from '@/types';
 
@@ -23,6 +23,9 @@ export default function PrestasiManagementPage() {
   const [data, setData] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<StatusFilter>('all');
   const [filterLevel, setFilterLevel] = useState('all');
@@ -94,6 +97,8 @@ export default function PrestasiManagementPage() {
     setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', rank: '', proof_url: '', status: 'pending', isNewStudent: false, newName: '', newNim: '', newEmail: '', newMajor: '' });
     setModalOpen(true);
     fetchUsers();
+    setSelectedFile(null);
+    setPreviewUrl(null);
   };
 
   const openEditModal = (item: Achievement) => {
@@ -116,12 +121,44 @@ export default function PrestasiManagementPage() {
     });
     setModalOpen(true);
     fetchUsers();
+    setSelectedFile(null);
+    setPreviewUrl(item.proof_url || null);
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setSelectedFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
   };
 
   const handleModalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setProcessing('modal');
     try {
+      let currentProofUrl = modalForm.proof_url;
+
+      // 1. Handle file upload if a file was selected
+      if (selectedFile) {
+        setUploading(true);
+        const fileExt = selectedFile.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+        const filePath = `achievements/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('posters')
+          .upload(filePath, selectedFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('posters')
+          .getPublicUrl(filePath);
+        
+        currentProofUrl = publicUrl;
+      }
+
       let targetUserId = modalForm.user_id;
 
       if (modalMode === 'add' && modalForm.isNewStudent) {
@@ -154,7 +191,7 @@ export default function PrestasiManagementPage() {
         category: modalForm.category,
         competition_level: modalForm.competition_level,
         rank: modalForm.rank || null,
-        proof_url: modalForm.proof_url || null,
+        proof_url: currentProofUrl || null,
         status: modalForm.status,
       };
 
@@ -173,6 +210,7 @@ export default function PrestasiManagementPage() {
       toast.error('Gagal menyimpan data: ' + error.message);
     } finally {
       setProcessing(null);
+      setUploading(false);
     }
   };
 
@@ -573,20 +611,50 @@ export default function PrestasiManagementPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Link Foto / Bukti Prestasi</label>
-                  <div className="space-y-2">
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Foto / Bukti Prestasi</label>
+                  <div className="space-y-3">
+                    {/* File Upload Area */}
+                    <div className="relative group border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-2xl bg-slate-50 transition-colors overflow-hidden aspect-video flex flex-col items-center justify-center">
+                      {previewUrl ? (
+                        <div className="absolute inset-0 w-full h-full">
+                          <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <p className="text-white text-xs font-bold">Klik untuk ganti foto</p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-center p-4">
+                          <ImageIcon className="mx-auto h-8 w-8 text-slate-300 mb-2" />
+                          <p className="text-xs text-slate-500 font-medium">Klik atau seret foto ke sini</p>
+                          <p className="text-[10px] text-slate-400 mt-1">PNG, JPG, max 5MB</p>
+                        </div>
+                      )}
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={handleFileSelect}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                      />
+                    </div>
+
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100"></span></div>
+                      <div className="relative flex justify-center text-[10px] uppercase font-bold text-slate-400"><span className="bg-white px-2">Atau gunakan URL</span></div>
+                    </div>
+
                     <input 
                       type="url"
                       value={modalForm.proof_url}
-                      onChange={e => setModalForm(p => ({...p, proof_url: e.target.value}))}
+                      onChange={e => {
+                        setModalForm(p => ({...p, proof_url: e.target.value}));
+                        if (e.target.value) {
+                          setPreviewUrl(e.target.value);
+                          setSelectedFile(null);
+                        }
+                      }}
                       className="input-field py-2.5 text-sm"
-                      placeholder="https://... (Gunakan URL gambar untuk tampil di landing page)"
+                      placeholder="https://... (Gunakan URL gambar)"
                     />
-                    {modalForm.proof_url && modalForm.proof_url.match(/\.(jpeg|jpg|gif|png|webp)$/) && (
-                      <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
-                        <img src={modalForm.proof_url} alt="Preview" className="w-full h-full object-contain" />
-                      </div>
-                    )}
                   </div>
                 </div>
 
