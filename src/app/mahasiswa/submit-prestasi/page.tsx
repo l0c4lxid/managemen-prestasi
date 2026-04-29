@@ -21,6 +21,7 @@ export default function SubmitPrestasiPage() {
     description: '',
     competition_id: '',
     category: '',
+    competition_level: 'nasional',
     rank: '',
     proof_url: '',
   });
@@ -151,17 +152,16 @@ export default function SubmitPrestasiPage() {
                     {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="label-text">Tingkat Kompetisi *</label>
                   <select name="competition_level" value={form.competition_level} onChange={handleChange} className="input-field" required>
                     {LEVELS.map(l => <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
                   </select>
                 </div>
-                <div>
-                  <label className="label-text">Peringkat / Juara</label>
-                  <input name="rank" value={form.rank} onChange={handleChange} type="text" placeholder="Contoh: Juara 1, Medali Emas..." className="input-field" />
-                </div>
+              </div>
+              <div>
+                <label className="label-text">Peringkat / Juara</label>
+                <input name="rank" value={form.rank} onChange={handleChange} type="text" placeholder="Contoh: Juara 1, Medali Emas..." className="input-field" />
               </div>
               <div>
                 <label className="label-text">Lomba Terkait <span className="text-slate-400 font-normal">(opsional)</span></label>
