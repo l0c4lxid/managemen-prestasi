@@ -55,14 +55,20 @@ export default function PrestasiManagementPage() {
     return r;
   }, [data, search, filterStatus, filterLevel]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus data prestasi ini?')) return;
+  const handleDeleteRequest = (item: Achievement) => {
+    setDeleteConfirm({ id: item.id, title: item.title });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm) return;
+    const { id } = deleteConfirm;
     setProcessing(id);
     const { error } = await supabase.from('achievements').delete().eq('id', id);
     if (error) toast.error('Gagal menghapus data');
     else {
       setData(prev => prev.filter(d => d.id !== id));
       toast.success('Data prestasi berhasil dihapus');
+      setDeleteConfirm(null);
     }
     setProcessing(null);
   };
@@ -86,6 +92,7 @@ export default function PrestasiManagementPage() {
     newEmail: '',
     newMajor: '',
   });
+  const [deleteConfirm, setDeleteConfirm] = useState<{id: string, title: string} | null>(null);
   const [usersList, setUsersList] = useState<{id: string, name: string, nim: string}[]>([]);
 
   const fetchUsers = async () => {
@@ -371,7 +378,7 @@ export default function PrestasiManagementPage() {
                         <div className="flex items-center gap-1.5">
                           <button onClick={() => setDetailItem(item)} className="p-1.5 rounded-lg hover:bg-indigo-50 text-indigo-600 transition-colors" title="Detail"><Eye size={14} /></button>
                           <button onClick={() => openEditModal(item)} className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-600 transition-colors" title="Edit"><Edit size={14} /></button>
-                          <button onClick={() => handleDelete(item.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-600 transition-colors" title="Hapus"><Trash2 size={14} /></button>
+                          <button onClick={() => handleDeleteRequest(item)} className="p-1.5 rounded-lg hover:bg-red-50 text-red-600 transition-colors" title="Hapus"><Trash2 size={14} /></button>
                           {item.proof_url && (
                             <a href={item.proof_url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors" title="Lihat Bukti"><ExternalLink size={14} /></a>
                           )}
@@ -772,6 +779,49 @@ export default function PrestasiManagementPage() {
                     <>Simpan Perubahan</>
                   )}
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Delete Confirmation Modal */}
+        {deleteConfirm && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <div 
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300" 
+              onClick={() => setDeleteConfirm(null)} 
+            />
+            <div className="relative w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 border border-slate-100">
+              <div className="p-8 text-center">
+                <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce shadow-inner">
+                  <Trash2 size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-slate-800 mb-2">Hapus Prestasi?</h3>
+                <p className="text-sm text-slate-500 leading-relaxed mb-8">
+                  Apakah Anda yakin ingin menghapus <span className="font-bold text-slate-700 italic">"{deleteConfirm.title}"</span>? Tindakan ini tidak dapat dibatalkan.
+                </p>
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={confirmDelete}
+                    disabled={!!processing}
+                    className="w-full py-4 rounded-2xl bg-red-500 text-white text-sm font-black uppercase tracking-widest shadow-xl shadow-red-500/20 hover:bg-red-600 transition-all active:scale-95 disabled:opacity-50"
+                  >
+                    {processing === deleteConfirm.id ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 size={16} className="animate-spin" />
+                        MENGHAPUS...
+                      </div>
+                    ) : (
+                      'YA, HAPUS SEKARANG'
+                    )}
+                  </button>
+                  <button
+                    onClick={() => setDeleteConfirm(null)}
+                    className="w-full py-4 rounded-2xl bg-slate-50 text-slate-500 text-sm font-bold hover:bg-slate-100 transition-all active:scale-95"
+                  >
+                    TIDAK, BATALKAN
+                  </button>
+                </div>
               </div>
             </div>
           </div>
