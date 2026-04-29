@@ -101,12 +101,16 @@ function SidebarContent({ collapsed, onToggleCollapse, activePath, isMobile }: {
     <div className="flex flex-col h-full">
       <div className={`flex items-center h-16 px-4 border-b border-slate-100 ${collapsed ? 'justify-center' : 'justify-between'}`}>
         {!collapsed && (
-          <div className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
             <AppLogo size={32} />
             <span className="font-bold text-base text-slate-800 tracking-tight">PrestasiKampus</span>
-          </div>
+          </Link>
         )}
-        {collapsed && <AppLogo size={32} />}
+        {collapsed && (
+          <Link href="/" className="hover:opacity-80 transition-opacity flex justify-center w-full">
+            <AppLogo size={32} />
+          </Link>
+        )}
         {!isMobile && (
           <button onClick={onToggleCollapse} className="p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors" aria-label="Toggle sidebar">
             {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}

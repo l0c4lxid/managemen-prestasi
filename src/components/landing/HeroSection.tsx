@@ -147,7 +147,7 @@ export default function HeroSection({ stats: dynamicStats, recentAchievements = 
                 {/* Main Floating Glass Trophy */}
                 <div className="relative w-64 h-64 bg-white/10 backdrop-blur-3xl rounded-[3rem] border border-white/30 shadow-[0_32px_64px_rgba(79,70,229,0.2)] flex items-center justify-center animate-float overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-white/5 opacity-50" />
-                  <Trophy size={100} className="text-indigo-600 drop-shadow-[0_0_20px_rgba(79,70,229,0.5)] animate-rotate-y" strokeWidth={1} />
+                  <Trophy size={100} className="text-indigo-600 drop-shadow-[0_0_20px_rgba(79,70,229,0.5)]" strokeWidth={1} />
                   
                   {/* Internal Glow */}
                   <div className="absolute -bottom-10 w-full h-20 bg-indigo-500/20 blur-2xl" />
@@ -192,8 +192,8 @@ export default function HeroSection({ stats: dynamicStats, recentAchievements = 
 
                 {/* Achievement Connections (Visual Lines) */}
                 <svg className="absolute inset-0 w-full h-full -z-10 overflow-visible opacity-30">
-                  <path d="M-100,-50 Q0,0 50,150" fill="none" stroke="url(#grad1)" strokeWidth="2" strokeDasharray="5,5" />
-                  <path d="M300,100 Q200,250 50,200" fill="none" stroke="url(#grad2)" strokeWidth="2" strokeDasharray="5,5" />
+                  <path d="M-100,-50 Q0,0 50,150" fill="none" stroke="url(#grad1)" strokeWidth="2" strokeDasharray="10,10" className="animate-dash" />
+                  <path d="M300,100 Q200,250 50,200" fill="none" stroke="url(#grad2)" strokeWidth="2" strokeDasharray="10,10" className="animate-dash-reverse" />
                   <defs>
                     <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor="#4f46e5" />
@@ -207,10 +207,6 @@ export default function HeroSection({ stats: dynamicStats, recentAchievements = 
                 </svg>
               </div>
 
-              {/* Decorative Geometric Shapes */}
-              <div className="absolute top-0 left-0 w-4 h-4 bg-indigo-400 rounded-full animate-ping" />
-              <div className="absolute bottom-1/4 right-0 w-8 h-8 border-4 border-cyan-200 rounded-lg rotate-45 animate-bounce-slow" />
-              <div className="absolute top-1/2 left-0 w-12 h-1 bg-gradient-to-r from-indigo-500 to-transparent rounded-full" />
             </div>
           </div>
         </div>

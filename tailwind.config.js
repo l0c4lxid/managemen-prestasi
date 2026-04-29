@@ -51,6 +51,15 @@ module.exports = {
         'slide-right': 'slideRight 0.25s ease-out',
         'scale-in': 'scaleIn 0.15s ease-out',
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'float-slow': 'float 8s ease-in-out infinite',
+        'float-delay': 'float 7s ease-in-out infinite 1.5s',
+        'rotate-y': 'rotateY 10s linear infinite',
+        'spin-slow': 'spin 12s linear infinite',
+        'blob': 'blob 7s infinite',
+        'bounce-slow': 'bounce 4s infinite',
+        'dash': 'dash 20s linear infinite',
+        'dash-reverse': 'dashReverse 20s linear infinite',
       },
       keyframes: {
         fadeIn: {
@@ -68,6 +77,26 @@ module.exports = {
         scaleIn: {
           '0%': { opacity: '0', transform: 'scale(0.95)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        rotateY: {
+          '0%': { transform: 'rotateY(0deg)' },
+          '100%': { transform: 'rotateY(360deg)' },
+        },
+        blob: {
+          '0%': { transform: 'translate(0px, 0px) scale(1)' },
+          '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+          '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+          '100%': { transform: 'translate(0px, 0px) scale(1)' },
+        },
+        dash: {
+          'to': { strokeDashoffset: '-1000' },
+        },
+        dashReverse: {
+          'to': { strokeDashoffset: '1000' },
         },
       },
     },
