@@ -1,91 +1,68 @@
-# Next.js
+# PrestasiKampus — Universitas BSI Kampus Solo
 
-A modern Next.js 15 application built with TypeScript and Tailwind CSS.
+**PrestasiKampus** adalah platform manajemen prestasi mahasiswa terpadu yang dirancang khusus untuk Universitas BSI Kampus Solo. Sistem ini bertujuan untuk mendokumentasikan, merayakan, dan memverifikasi setiap pencapaian mahasiswa dalam satu wadah profesional yang terintegrasi.
 
-## 🚀 Features
+## 🚀 Fitur Utama
 
-- **Next.js 15** - Latest version with improved performance and features
-- **React 19** - Latest React version with enhanced capabilities
-- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
+- **Premium Landing Page** - Tampilan modern dengan *Achievement Galaxy* dan *Elite Wall of Fame* yang interaktif.
+- **Role-Based Dashboard** - Dashboard khusus untuk Mahasiswa, Admin Prestasi, Admin Lomba, dan Super Admin.
+- **Elite Wall of Fame** - Galeri prestasi mahasiswa terverifikasi dengan fitur filter tahun dan kategori (Akademik, Teknologi, Seni, dll).
+- **Manajemen Event & Lomba** - Sistem pendaftaran dan monitoring kegiatan workshop, seminar, serta kompetisi nasional/internasional.
+- **Verified Student ID** - Setiap prestasi divalidasi oleh bagian kemahasiswaan untuk menjamin keaslian data.
+- **Poster Glory Feed** - Marquee interaktif yang menampilkan poster-poster kegiatan dan pencapaian terbaru.
+- **Sistem Notifikasi** - Pemberitahuan real-time untuk status verifikasi dan pengumuman lomba baru.
 
-## 🛠️ Installation
+## 🛠️ Tech Stack
 
-1. Install dependencies:
-  ```bash
-  npm install
-  # or
-  yarn install
-  ```
+- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Database & Auth**: [Supabase](https://supabase.com/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **State Management**: React Context API
+- **Toasts**: [Sonner](https://sonner.emilkowal.ski/)
 
-2. Start the development server:
-  ```bash
-  npm run dev
-  # or
-  yarn dev
-  ```
-3. Open [http://localhost:4028](http://localhost:4028) with your browser to see the result.
+## ⚙️ Instalasi Lokal
 
-## 📁 Project Structure
+1. **Clone repository**:
+   ```bash
+   git clone <repository-url>
+   cd prestasikampus
+   ```
 
-```
-nextjs/
-├── public/             # Static assets
-├── src/
-│   ├── app/            # App router components
-│   │   ├── layout.tsx  # Root layout component
-│   │   └── page.tsx    # Main page component
-│   ├── components/     # Reusable UI components
-│   ├── styles/         # Global styles and Tailwind configuration
-├── next.config.mjs     # Next.js configuration
-├── package.json        # Project dependencies and scripts
-├── postcss.config.js   # PostCSS configuration
-└── tailwind.config.js  # Tailwind CSS configuration
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-```
+3. **Konfigurasi Environment Variables**:
+   Buat file `.env` di root directory dan masukkan kredensial Supabase Anda:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+   ```
 
-## 🧩 Page Editing
+4. **Jalankan Development Server**:
+   ```bash
+   npm run dev
+   ```
+   Buka [http://localhost:4028](http://localhost:4028) untuk melihat aplikasi.
 
-You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Struktur Proyek Utama
 
-## 🎨 Styling
+- `src/app/` - Routing aplikasi dan halaman utama.
+- `src/components/` - Komponen UI reusable (Landing, Dashboard, Auth).
+- `src/contexts/` - Logika autentikasi dan global state.
+- `src/lib/` - Konfigurasi Supabase dan utilitas lainnya.
+- `src/types/` - Definisi TypeScript interfaces.
+- `src/styles/` - Konfigurasi Tailwind dan styling global.
 
-This project uses Tailwind CSS for styling with the following features:
-- Utility-first approach for rapid development
-- Custom theme configuration
-- Responsive design utilities
-- PostCSS and Autoprefixer integration
+## 📱 Role & Akses
 
-## 📦 Available Scripts
+- **Mahasiswa**: Mendaftarkan prestasi, mencari lomba, dan melihat riwayat sertifikasi.
+- **Admin Prestasi**: Memverifikasi pengajuan prestasi mahasiswa.
+- **Admin Lomba**: Mengelola data kompetisi dan event yang tersedia.
+- **Super Admin**: Kendali penuh atas user, poster, dan seluruh konfigurasi sistem.
 
-- `npm run dev` - Start development server on port 4028
-- `npm run build` - Build the application for production
-- `npm run start` - Start the development server
-- `npm run serve` - Start the production server
-- `npm run lint` - Run ESLint to check code quality
-- `npm run lint:fix` - Fix ESLint issues automatically
-- `npm run format` - Format code with Prettier
-
-## 📱 Deployment
-
-Build the application for production:
-
-  ```bash
-  npm run build
-  ```
-
-## 📚 Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial
-
-You can check out the [Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## 🙏 Acknowledgments
-
-- Built with [Rocket.new](https://rocket.new)
-- Powered by Next.js and React
-- Styled with Tailwind CSS
-
-Built with ❤️ on Rocket.new
+---
+Dikembangkan dengan ❤️ untuk kemajuan prestasi mahasiswa **Universitas BSI Kampus Solo**.
