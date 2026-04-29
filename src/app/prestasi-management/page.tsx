@@ -73,6 +73,7 @@ export default function PrestasiManagementPage() {
     description: '',
     category: 'Akademik',
     competition_level: 'nasional',
+    rank: 0,
     proof_url: '',
     status: 'pending' as Achievement['status']
   });
@@ -85,7 +86,7 @@ export default function PrestasiManagementPage() {
 
   const openAddModal = () => {
     setModalMode('add');
-    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', proof_url: '', status: 'pending' });
+    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', rank: 0, proof_url: '', status: 'pending' });
     setModalOpen(true);
     fetchUsers();
   };
@@ -99,6 +100,7 @@ export default function PrestasiManagementPage() {
       description: item.description || '',
       category: item.category || 'Akademik',
       competition_level: item.competition_level || 'nasional',
+      rank: item.rank || 0,
       proof_url: item.proof_url || '',
       status: item.status
     });
@@ -116,6 +118,7 @@ export default function PrestasiManagementPage() {
         description: modalForm.description || null,
         category: modalForm.category,
         competition_level: modalForm.competition_level,
+        rank: modalForm.rank || 0,
         proof_url: modalForm.proof_url || null,
         status: modalForm.status,
       };
@@ -425,18 +428,22 @@ export default function PrestasiManagementPage() {
                   />
                 </div>
 
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Kategori *</label>
+                  <select 
+                    value={modalForm.category}
+                    onChange={e => setModalForm(p => ({...p, category: e.target.value}))}
+                    className="input-field py-2.5 text-sm"
+                  >
+                    <option value="Akademik">Akademik</option>
+                    <option value="Non-Akademik">Non-Akademik</option>
+                    <option value="Teknologi">Teknologi</option>
+                    <option value="Sains">Sains</option>
+                    <option value="Seni & Budaya">Seni & Budaya</option>
+                  </select>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Kategori *</label>
-                    <select 
-                      value={modalForm.category}
-                      onChange={e => setModalForm(p => ({...p, category: e.target.value}))}
-                      className="input-field py-2.5 text-sm"
-                    >
-                      <option value="Akademik">Akademik</option>
-                      <option value="Non-Akademik">Non-Akademik</option>
-                    </select>
-                  </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 mb-1.5">Tingkat *</label>
                     <select 
@@ -449,10 +456,33 @@ export default function PrestasiManagementPage() {
                       <option value="internasional">Internasional</option>
                     </select>
                   </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Peringkat / Juara</label>
+                    <select 
+                      value={modalForm.rank || '0'}
+                      onChange={e => setModalForm(p => ({...p, rank: parseInt(e.target.value)}))}
+                      className="input-field py-2.5 text-sm"
+                    >
+                      <option value="0">Peserta / Lainnya</option>
+                      <option value="1">Juara 1</option>
+                      <option value="2">Juara 2</option>
+                      <option value="3">Juara 3</option>
+                    </select>
+                  </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Link Bukti</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Deskripsi Lengkap</label>
+                  <textarea 
+                    value={modalForm.description}
+                    onChange={e => setModalForm(p => ({...p, description: e.target.value}))}
+                    className="input-field py-2.5 text-sm min-h-[100px] resize-none"
+                    placeholder="Tuliskan detail prestasi, proses kompetisi, dll..."
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Link Bukti / Foto</label>
                   <input 
                     type="url"
                     value={modalForm.proof_url}
@@ -463,14 +493,14 @@ export default function PrestasiManagementPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Status</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Status Verifikasi</label>
                   <select 
                     value={modalForm.status}
                     onChange={e => setModalForm(p => ({...p, status: e.target.value as Achievement['status']}))}
                     className="input-field py-2.5 text-sm"
                   >
-                    <option value="pending">Menunggu</option>
-                    <option value="verified">Terverifikasi</option>
+                    <option value="pending">Menunggu Verifikasi</option>
+                    <option value="verified">Terverifikasi (Tampil di Landing)</option>
                     <option value="rejected">Ditolak</option>
                   </select>
                 </div>

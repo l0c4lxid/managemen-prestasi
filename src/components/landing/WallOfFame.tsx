@@ -15,7 +15,8 @@ const achievers = [
     tahun: '2024',
     juara: 3,
     kategori: 'Seni & Budaya',
-    img: '/poster-2.png'
+    img: '/poster-2.png',
+    description: 'Berhasil menyisihkan puluhan peserta dalam sayembara desain logo nasional. Karya desain yang diajukan memiliki filosofi mendalam tentang pertumbuhan dan kolaborasi akademik.'
   },
   {
     id: 'w-2',
@@ -26,7 +27,8 @@ const achievers = [
     tahun: '2024',
     juara: 0,
     kategori: 'Teknologi',
-    img: '/poster-1.png'
+    img: '/poster-1.png',
+    description: 'Mewakili Universitas BSI dalam ajang kompetisi video kreatif tingkat nasional. Mengangkat tema digitalisasi kampus untuk masa depan yang lebih inklusif.'
   },
   {
     id: 'w-3',
@@ -37,7 +39,8 @@ const achievers = [
     tahun: '2024',
     juara: 1,
     kategori: 'Akademik',
-    img: '/poster-6.png'
+    img: '/poster-6.png',
+    description: 'Terpilih sebagai Caraka dalam program Kampus Mengajar Kemendikbudristek. Berdedikasi meningkatkan literasi dan numerasi di sekolah dasar daerah 3T.'
   },
   {
     id: 'w-4',
@@ -48,11 +51,13 @@ const achievers = [
     tahun: '2025',
     juara: 2,
     kategori: 'Teknologi',
-    img: '/poster-4.png'
+    img: '/poster-4.png',
+    description: 'Meraih predikat Video Favorit pilihan juri dan penonton dalam ajang BSI Explore. Dokumentasi perjalanan pengabdian masyarakat yang inspiratif dan sinematik.'
   }
 ];
 
 import Lightbox from '@/components/ui/Lightbox';
+import AchievementModal from '@/components/landing/AchievementModal';
 
 const tahunOptions = ['Semua', '2026', '2025', '2024'];
 const kategoriOptions = ['Semua', 'Akademik', 'Non-Akademik', 'Teknologi', 'Sains', 'Seni & Budaya'];
@@ -60,7 +65,8 @@ const kategoriOptions = ['Semua', 'Akademik', 'Non-Akademik', 'Teknologi', 'Sain
 const juaraBadge = (juara: number) => {
   if (juara === 1) return { label: 'Juara 1', className: 'badge-gold', icon: <Trophy size={11} /> };
   if (juara === 2) return { label: 'Juara 2', className: 'badge-silver', icon: <Medal size={11} /> };
-  return { label: 'Juara 3', className: 'badge-bronze', icon: <Medal size={11} /> };
+  if (juara === 3) return { label: 'Juara 3', className: 'badge-bronze', icon: <Medal size={11} /> };
+  return { label: 'Pemenang', className: 'bg-indigo-100 text-indigo-700 border-indigo-200 px-2 py-0.5 rounded-full flex items-center gap-1 text-[9px] font-black uppercase tracking-tighter', icon: <Trophy size={11} /> };
 };
 
 export default function WallOfFame({ initialData = [] }: { initialData?: any[] }) {
@@ -69,6 +75,10 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
   const [posters, setPosters] = useState<any[]>([]);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [selectedPoster, setSelectedPoster] = useState<any>(null);
+  
+  const [selectedAchievement, setSelectedAchievement] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const supabase = createClient();
 
   useEffect(() => {
@@ -103,17 +113,23 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
     setIsLightboxOpen(true);
   };
 
+  const openAchievement = (a: any) => {
+    setSelectedAchievement(a);
+    setIsModalOpen(true);
+  };
+
   // Map supabase data to our local format
-  const dbData = initialData.map((item, i) => ({
+  const dbData = initialData.map((item) => ({
     id: item.id,
     name: item.users?.name || 'Mahasiswa',
     nim: item.users?.nim || '-',
-    prodi: item.category || 'Mahasiswa',
+    prodi: item.users?.major || item.category || 'Mahasiswa',
     lomba: item.title,
     tahun: new Date(item.created_at).getFullYear().toString(),
-    juara: (i % 3) + 1, // Fallback for display
+    juara: item.rank || 1,
     kategori: item.category || 'Akademik',
-    img: item.users?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.users?.name || 'M')}&background=random`
+    img: item.users?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.users?.name || 'M')}&background=random`,
+    description: item.description
   }));
 
   const mappedData = [...achievers, ...dbData];
@@ -212,6 +228,13 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
           />
         )}
 
+        {/* Achievement Modal */}
+        <AchievementModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          achievement={selectedAchievement}
+        />
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10">
           <div>
@@ -258,9 +281,9 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
           {filtered.map((a) => {
             const badge = juaraBadge(a.juara);
             return (
-              <Link
+              <div
                 key={a.id}
-                href={`/p/prestasi/${a.id}`}
+                onClick={() => openAchievement(a)}
                 className="group relative bg-white rounded-3xl border border-slate-100 overflow-hidden 
                   shadow-soft hover:shadow-premium hover:-translate-y-2 transition-all duration-300 cursor-pointer block"
               >
@@ -297,7 +320,7 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
                     <span className="text-[10px] text-indigo-500 font-black">{a.tahun}</span>
                   </div>
                 </div>
-              </Link>
+              </div>
             );
           })}
         </div>

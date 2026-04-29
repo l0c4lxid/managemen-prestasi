@@ -38,8 +38,8 @@ export default async function RootPage() {
       // Recent achievements (Wall of Fame)
       supabase.from('achievements')
         .select(`
-          id, title, status, created_at,
-          users (id, name, avatar_url, nim)
+          id, title, description, rank, category, proof_url, status, created_at,
+          users (id, name, avatar_url, nim, major)
         `)
         .eq('status', 'verified')
         .order('created_at', { ascending: false })

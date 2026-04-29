@@ -30,7 +30,6 @@ export default function AuthPage({ initialMode }: AuthPageProps) {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', nim: '' });
-  const [testUsers, setTestUsers] = useState<AppUser[]>([]);
 
   // Auto redirect if already logged in
   React.useEffect(() => {
@@ -40,14 +39,6 @@ export default function AuthPage({ initialMode }: AuthPageProps) {
     }
   }, [user, authLoading, next, router]);
 
-  React.useEffect(() => {
-    const fetchUsers = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from('users').select('*').limit(6);
-      if (data) setTestUsers(data);
-    };
-    fetchUsers();
-  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -216,29 +207,6 @@ export default function AuthPage({ initialMode }: AuthPageProps) {
             </p>
           </div>
 
-          {/* Quick Login for Testing */}
-          {mode === 'login' && testUsers.length > 0 && (
-            <div className="mt-6 p-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl">
-              <h3 className="text-xs font-bold text-indigo-800 mb-2 flex items-center gap-1.5 uppercase tracking-wider">
-                <Zap size={14} className="text-indigo-500" /> Quick Testing Login
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {testUsers.map((u) => (
-                  <button
-                    key={u.id}
-                    onClick={() => {
-                      setForm(prev => ({ ...prev, email: u.email, password: 'password123' }));
-                      toast.info(`Auto-filled: ${u.email}`);
-                    }}
-                    className="text-left px-3 py-2 bg-white hover:bg-indigo-50 border border-indigo-100 rounded-xl transition-colors flex flex-col min-w-[140px] flex-1"
-                  >
-                    <span className="text-xs font-bold text-slate-700 truncate">{u.name}</span>
-                    <span className="text-[10px] text-slate-500 capitalize">{u.role}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           <p className="text-center text-xs text-slate-400 mt-6">
             © 2025 PrestasiKampus · Platform Kemahasiswaan
