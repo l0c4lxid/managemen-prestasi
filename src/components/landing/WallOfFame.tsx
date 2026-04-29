@@ -5,56 +5,7 @@ import { Trophy, Medal, Filter } from 'lucide-react';
 import AppImage from '@/components/ui/AppImage';
 import { createClient } from '@/lib/supabase/client';
 
-const achievers = [
-  {
-    id: 'w-1',
-    name: 'Oktavian Ramadhani',
-    nim: '12220001',
-    prodi: 'Informatika',
-    lomba: 'Juara 3 Sayembara Desain Logo Dies Natalis UTP Surakarta Ke 45',
-    tahun: '2024',
-    juara: 3,
-    kategori: 'Seni & Budaya',
-    img: '/poster-2.png',
-    description: 'Berhasil menyisihkan puluhan peserta dalam sayembara desain logo nasional. Karya desain yang diajukan memiliki filosofi mendalam tentang pertumbuhan dan kolaborasi akademik.'
-  },
-  {
-    id: 'w-2',
-    name: 'Muhammad Fahrel Yuliyanto',
-    nim: '12220002',
-    prodi: 'Sistem Informasi',
-    lomba: 'Peserta Kompetisi Video Kreatif 4C National Competition',
-    tahun: '2024',
-    juara: 0,
-    kategori: 'Teknologi',
-    img: '/poster-1.png',
-    description: 'Mewakili Universitas BSI dalam ajang kompetisi video kreatif tingkat nasional. Mengangkat tema digitalisasi kampus untuk masa depan yang lebih inklusif.'
-  },
-  {
-    id: 'w-3',
-    name: 'Febriana Ida Nugraheni',
-    nim: '12220003',
-    prodi: 'Informatika',
-    lomba: 'Caraka Terpilih Kampus Mengajar Angkatan 8 Jawa Tengah',
-    tahun: '2024',
-    juara: 1,
-    kategori: 'Akademik',
-    img: '/poster-6.png',
-    description: 'Terpilih sebagai Caraka dalam program Kampus Mengajar Kemendikbudristek. Berdedikasi meningkatkan literasi dan numerasi di sekolah dasar daerah 3T.'
-  },
-  {
-    id: 'w-4',
-    name: 'Shandy Aulia Ramadhani',
-    nim: '12220004',
-    prodi: 'Sistem Informasi',
-    lomba: 'Juara 2 Video Favorit BSI Explore 2025',
-    tahun: '2025',
-    juara: 2,
-    kategori: 'Teknologi',
-    img: '/poster-4.png',
-    description: 'Meraih predikat Video Favorit pilihan juri dan penonton dalam ajang BSI Explore. Dokumentasi perjalanan pengabdian masyarakat yang inspiratif dan sinematik.'
-  }
-];
+const achievers: any[] = [];
 
 import Lightbox from '@/components/ui/Lightbox';
 import AchievementModal from '@/components/landing/AchievementModal';
@@ -62,11 +13,17 @@ import AchievementModal from '@/components/landing/AchievementModal';
 const tahunOptions = ['Semua', '2026', '2025', '2024'];
 const kategoriOptions = ['Semua', 'Akademik', 'Non-Akademik', 'Teknologi', 'Sains', 'Seni & Budaya'];
 
-const juaraBadge = (juara: number) => {
-  if (juara === 1) return { label: 'Juara 1', className: 'badge-gold', icon: <Trophy size={11} /> };
-  if (juara === 2) return { label: 'Juara 2', className: 'badge-silver', icon: <Medal size={11} /> };
-  if (juara === 3) return { label: 'Juara 3', className: 'badge-bronze', icon: <Medal size={11} /> };
-  return { label: 'Pemenang', className: 'bg-indigo-100 text-indigo-700 border-indigo-200 px-2 py-0.5 rounded-full flex items-center gap-1 text-[9px] font-black uppercase tracking-tighter', icon: <Trophy size={11} /> };
+const juaraBadge = (juara: number | string) => {
+  const j = juara.toString().toLowerCase();
+  if (j === '1' || j.includes('pertama') || j.includes('juara 1')) return { label: 'Juara 1', className: 'badge-gold', icon: <Trophy size={11} /> };
+  if (j === '2' || j.includes('kedua') || j.includes('juara 2')) return { label: 'Juara 2', className: 'badge-silver', icon: <Medal size={11} /> };
+  if (j === '3' || j.includes('ketiga') || j.includes('juara 3')) return { label: 'Juara 3', className: 'badge-bronze', icon: <Medal size={11} /> };
+  
+  return { 
+    label: juara.toString() || 'Pemenang', 
+    className: 'bg-indigo-100 text-indigo-700 border-indigo-200 px-2 py-0.5 rounded-full flex items-center gap-1 text-[9px] font-black uppercase tracking-tighter', 
+    icon: <Trophy size={11} /> 
+  };
 };
 
 export default function WallOfFame({ initialData = [] }: { initialData?: any[] }) {
@@ -126,9 +83,11 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
     prodi: item.users?.major || item.category || 'Mahasiswa',
     lomba: item.title,
     tahun: new Date(item.created_at).getFullYear().toString(),
-    juara: item.rank || 1,
+    juara: item.rank || '1',
     kategori: item.category || 'Akademik',
-    img: item.users?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.users?.name || 'M')}&background=random`,
+    img: (item.proof_url && item.proof_url.match(/\.(jpeg|jpg|gif|png|webp)$/)) 
+      ? item.proof_url 
+      : (item.users?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.users?.name || 'M')}&background=random`),
     description: item.description
   }));
 

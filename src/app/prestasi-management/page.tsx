@@ -73,9 +73,14 @@ export default function PrestasiManagementPage() {
     description: '',
     category: 'Akademik',
     competition_level: 'nasional',
-    rank: 0,
+    rank: '',
     proof_url: '',
-    status: 'pending' as Achievement['status']
+    status: 'pending' as Achievement['status'],
+    isNewStudent: false,
+    newName: '',
+    newNim: '',
+    newEmail: '',
+    newMajor: '',
   });
   const [usersList, setUsersList] = useState<{id: string, name: string, nim: string}[]>([]);
 
@@ -86,7 +91,7 @@ export default function PrestasiManagementPage() {
 
   const openAddModal = () => {
     setModalMode('add');
-    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', rank: 0, proof_url: '', status: 'pending' });
+    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', rank: '', proof_url: '', status: 'pending', isNewStudent: false, newName: '', newNim: '', newEmail: '', newMajor: '' });
     setModalOpen(true);
     fetchUsers();
   };
@@ -100,9 +105,14 @@ export default function PrestasiManagementPage() {
       description: item.description || '',
       category: item.category || 'Akademik',
       competition_level: item.competition_level || 'nasional',
-      rank: item.rank || 0,
+      rank: item.rank?.toString() || '',
       proof_url: item.proof_url || '',
-      status: item.status
+      status: item.status,
+      isNewStudent: false,
+      newName: '',
+      newNim: '',
+      newEmail: '',
+      newMajor: '',
     });
     setModalOpen(true);
     fetchUsers();
@@ -112,13 +122,38 @@ export default function PrestasiManagementPage() {
     e.preventDefault();
     setProcessing('modal');
     try {
+      let targetUserId = modalForm.user_id;
+
+      if (modalMode === 'add' && modalForm.isNewStudent) {
+        // Create new user first
+        const { data: newUser, error: userError } = await supabase
+          .from('users')
+          .insert({
+            name: modalForm.newName,
+            nim: modalForm.newNim,
+            email: modalForm.newEmail || `${modalForm.newNim}@student.prestasi.com`,
+            role: 'mahasiswa',
+            major: modalForm.newMajor,
+          })
+          .select()
+          .single();
+        
+        if (userError) {
+          if (userError.code === '23505') throw new Error('NIM atau Email sudah terdaftar di sistem.');
+          throw userError;
+        }
+        targetUserId = newUser.id;
+      }
+
+      if (!targetUserId) throw new Error('Silakan pilih atau input mahasiswa terlebih dahulu.');
+
       const payload = {
-        user_id: modalForm.user_id,
+        user_id: targetUserId,
         title: modalForm.title,
         description: modalForm.description || null,
         category: modalForm.category,
         competition_level: modalForm.competition_level,
-        rank: modalForm.rank || 0,
+        rank: modalForm.rank || null,
         proof_url: modalForm.proof_url || null,
         status: modalForm.status,
       };
@@ -264,8 +299,21 @@ export default function PrestasiManagementPage() {
                         </div>
                       </td>
                       <td className="px-5 py-3.5">
-                        <p className="font-medium text-slate-800 line-clamp-1">{item.title}</p>
-                        {item.competitions?.title && <p className="text-xs text-slate-500">{item.competitions.title}</p>}
+                        <div className="flex items-center gap-3">
+                          {item.proof_url && item.proof_url.match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
+                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-100 flex-shrink-0 bg-slate-50">
+                              <img src={item.proof_url} alt="Prestasi" className="w-full h-full object-cover" />
+                            </div>
+                          ) : (
+                            <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 flex-shrink-0">
+                              <Trophy size={14} />
+                            </div>
+                          )}
+                          <div className="min-w-0">
+                            <p className="font-medium text-slate-800 line-clamp-1">{item.title}</p>
+                            {item.competitions?.title && <p className="text-xs text-slate-500 truncate">{item.competitions.title}</p>}
+                          </div>
+                        </div>
                       </td>
                       <td className="px-5 py-3.5">
                         {item.category ? <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">{item.category}</span> : <span className="text-slate-400">—</span>}
@@ -400,20 +448,66 @@ export default function PrestasiManagementPage() {
               </div>
 
               <form onSubmit={handleModalSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Mahasiswa *</label>
-                  <select 
-                    value={modalForm.user_id} 
-                    onChange={e => setModalForm(p => ({...p, user_id: e.target.value}))}
-                    className="input-field py-2.5 text-sm"
-                    required
-                    disabled={modalMode === 'edit'}
-                  >
-                    <option value="">— Pilih Mahasiswa —</option>
-                    {usersList.map(u => (
-                      <option key={u.id} value={u.id}>{u.name} ({u.nim})</option>
-                    ))}
-                  </select>
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-700 uppercase tracking-tight">Data Mahasiswa</label>
+                    {modalMode === 'add' && (
+                      <button 
+                        type="button" 
+                        onClick={() => setModalForm(p => ({...p, isNewStudent: !p.isNewStudent}))}
+                        className="text-[10px] font-bold text-indigo-600 hover:underline"
+                      >
+                        {modalForm.isNewStudent ? 'Pilih Mahasiswa Terdaftar' : 'Mahasiswa Belum Terdaftar?'}
+                      </button>
+                    )}
+                  </div>
+
+                  {modalForm.isNewStudent ? (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="col-span-2">
+                        <input 
+                          type="text" 
+                          placeholder="Nama Lengkap Mahasiswa" 
+                          value={modalForm.newName}
+                          onChange={e => setModalForm(p => ({...p, newName: e.target.value}))}
+                          className="input-field py-2 text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <input 
+                          type="text" 
+                          placeholder="NIM" 
+                          value={modalForm.newNim}
+                          onChange={e => setModalForm(p => ({...p, newNim: e.target.value}))}
+                          className="input-field py-2 text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <input 
+                          type="text" 
+                          placeholder="Program Studi" 
+                          value={modalForm.newMajor}
+                          onChange={e => setModalForm(p => ({...p, newMajor: e.target.value}))}
+                          className="input-field py-2 text-sm"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <select 
+                      value={modalForm.user_id} 
+                      onChange={e => setModalForm(p => ({...p, user_id: e.target.value}))}
+                      className="input-field py-2.5 text-sm bg-white"
+                      required
+                      disabled={modalMode === 'edit'}
+                    >
+                      <option value="">— Pilih Mahasiswa —</option>
+                      {usersList.map(u => (
+                        <option key={u.id} value={u.id}>{u.name} ({u.nim})</option>
+                      ))}
+                    </select>
+                  )}
                 </div>
 
                 <div>
@@ -457,17 +551,14 @@ export default function PrestasiManagementPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Peringkat / Juara</label>
-                    <select 
-                      value={modalForm.rank || '0'}
-                      onChange={e => setModalForm(p => ({...p, rank: parseInt(e.target.value)}))}
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Peringkat / Capaian</label>
+                    <input 
+                      type="text"
+                      value={modalForm.rank}
+                      onChange={e => setModalForm(p => ({...p, rank: e.target.value}))}
                       className="input-field py-2.5 text-sm"
-                    >
-                      <option value="0">Peserta / Lainnya</option>
-                      <option value="1">Juara 1</option>
-                      <option value="2">Juara 2</option>
-                      <option value="3">Juara 3</option>
-                    </select>
+                      placeholder="Contoh: Juara 1, Medali Emas, dll"
+                    />
                   </div>
                 </div>
 
@@ -482,14 +573,21 @@ export default function PrestasiManagementPage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Link Bukti / Foto</label>
-                  <input 
-                    type="url"
-                    value={modalForm.proof_url}
-                    onChange={e => setModalForm(p => ({...p, proof_url: e.target.value}))}
-                    className="input-field py-2.5 text-sm"
-                    placeholder="https://..."
-                  />
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Link Foto / Bukti Prestasi</label>
+                  <div className="space-y-2">
+                    <input 
+                      type="url"
+                      value={modalForm.proof_url}
+                      onChange={e => setModalForm(p => ({...p, proof_url: e.target.value}))}
+                      className="input-field py-2.5 text-sm"
+                      placeholder="https://... (Gunakan URL gambar untuk tampil di landing page)"
+                    />
+                    {modalForm.proof_url && modalForm.proof_url.match(/\.(jpeg|jpg|gif|png|webp)$/) && (
+                      <div className="relative w-full aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-50">
+                        <img src={modalForm.proof_url} alt="Preview" className="w-full h-full object-contain" />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 <div>
