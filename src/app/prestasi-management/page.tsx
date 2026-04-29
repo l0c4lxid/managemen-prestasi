@@ -85,6 +85,7 @@ export default function PrestasiManagementPage() {
     rank: '',
     proof_url: '',
     document_url: '',
+    year: new Date().getFullYear().toString(),
     status: 'pending' as Achievement['status'],
     isNewStudent: false,
     newName: '',
@@ -102,7 +103,7 @@ export default function PrestasiManagementPage() {
 
   const openAddModal = () => {
     setModalMode('add');
-    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', rank: '', proof_url: '', document_url: '', status: 'pending', isNewStudent: false, newName: '', newNim: '', newEmail: '', newMajor: '' });
+    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', rank: '', proof_url: '', document_url: '', year: new Date().getFullYear().toString(), status: 'pending', isNewStudent: false, newName: '', newNim: '', newEmail: '', newMajor: '' });
     setModalOpen(true);
     fetchUsers();
     setSelectedFile(null);
@@ -121,6 +122,7 @@ export default function PrestasiManagementPage() {
       rank: (item.rank === 0 || item.rank === '0') ? '' : item.rank?.toString() || '',
       proof_url: item.proof_url || '',
       document_url: item.document_url || '',
+      year: item.year || new Date(item.created_at).getFullYear().toString(),
       status: item.status,
       isNewStudent: false,
       newName: '',
@@ -177,7 +179,7 @@ export default function PrestasiManagementPage() {
           .insert({
             name: modalForm.newName,
             nim: modalForm.newNim,
-            email: modalForm.newEmail || `${modalForm.newNim}@student.prestasi.com`,
+            email: modalForm.newEmail || `${modalForm.newNim}@bsi.ac.id`,
             role: 'mahasiswa',
             major: modalForm.newMajor,
           })
@@ -202,6 +204,7 @@ export default function PrestasiManagementPage() {
         rank: modalForm.rank || null,
         proof_url: currentProofUrl || null,
         document_url: modalForm.document_url || null,
+        year: modalForm.year,
         status: modalForm.status,
       };
 
@@ -448,13 +451,16 @@ export default function PrestasiManagementPage() {
                       <p className="text-xs text-slate-500">{detailItem.users?.nim || detailItem.users?.email} · {detailItem.users?.major || 'Mahasiswa'}</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Peringkat</p>
-                    <p className="text-lg font-black text-indigo-600">{detailItem.rank || 'Pemenang'}</p>
-                  </div>
+                  <Link 
+                    href={`/mahasiswa?search=${detailItem.users?.nim || detailItem.users?.name}`}
+                    className="p-2 rounded-xl bg-slate-50 text-slate-400 hover:bg-indigo-50 hover:text-indigo-600 transition-all border border-slate-100 group"
+                    title="Edit Profil Mahasiswa"
+                  >
+                    <Edit size={16} className="group-hover:scale-110 transition-transform" />
+                  </Link>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div className="grid grid-cols-3 gap-6 p-4 rounded-2xl bg-slate-50 border border-slate-100">
                   <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Kategori</p>
                     <p className="text-sm font-semibold text-slate-700">{detailItem.category || '—'}</p>
@@ -462,6 +468,10 @@ export default function PrestasiManagementPage() {
                   <div>
                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tingkat</p>
                     <p className="text-sm font-semibold text-slate-700 capitalize">{detailItem.competition_level || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Tahun</p>
+                    <p className="text-sm font-semibold text-slate-700">{detailItem.year || new Date(detailItem.created_at).getFullYear()}</p>
                   </div>
                 </div>
 
@@ -567,6 +577,14 @@ export default function PrestasiManagementPage() {
                         {modalForm.isNewStudent ? 'Pilih Mahasiswa Terdaftar' : 'Mahasiswa Belum Terdaftar?'}
                       </button>
                     )}
+                    {modalMode === 'edit' && modalForm.user_id && (
+                      <Link 
+                        href={`/mahasiswa?search=${modalForm.user_id}`}
+                        className="text-[10px] font-bold text-slate-400 hover:text-indigo-600 flex items-center gap-1 transition-colors"
+                      >
+                        <ExternalLink size={10} /> Edit Profil Mahasiswa
+                      </Link>
+                    )}
                   </div>
 
                   {modalForm.isNewStudent ? (
@@ -644,7 +662,7 @@ export default function PrestasiManagementPage() {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 mb-1.5">Tingkat *</label>
                     <select 
@@ -658,13 +676,23 @@ export default function PrestasiManagementPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Peringkat / Capaian</label>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Capaian</label>
                     <input 
                       type="text"
                       value={modalForm.rank === '0' ? '' : modalForm.rank}
                       onChange={e => setModalForm(p => ({...p, rank: e.target.value}))}
                       className="input-field py-2.5 text-sm"
-                      placeholder="Contoh: Juara 1, Emas"
+                      placeholder="Juara 1, dll"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Tahun</label>
+                    <input 
+                      type="text"
+                      value={modalForm.year}
+                      onChange={e => setModalForm(p => ({...p, year: e.target.value}))}
+                      className="input-field py-2.5 text-sm"
+                      placeholder="2024"
                     />
                   </div>
                 </div>

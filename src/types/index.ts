@@ -62,6 +62,7 @@ export interface Achievement {
   description?: string | null;
   proof_url?: string | null;
   document_url?: string | null;
+  year?: string | null;
   status: AchievementStatus;
   rank?: string | number | null;
   verified_by?: string | null;

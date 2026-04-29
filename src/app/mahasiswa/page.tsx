@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import AppLayout from '@/components/AppLayout';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import EmptyState from '@/components/ui/EmptyState';
@@ -29,7 +30,8 @@ export default function MahasiswaPage() {
   const supabase = createClient();
   const [data, setData] = useState<MahasiswaStats[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const searchParams = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get('search') || '');
   const [page, setPage] = useState(1);
   const perPage = 10;
   const [sortField, setSortField] = useState<SortField>('name');

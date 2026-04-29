@@ -38,7 +38,7 @@ export default async function RootPage() {
       // Recent achievements (Wall of Fame)
       supabase.from('achievements')
         .select(`
-          id, title, description, rank, category, proof_url, status, created_at,
+          id, title, description, rank, category, proof_url, document_url, year, status, created_at,
           users!user_id (id, name, avatar_url, nim, major)
         `)
         .eq('status', 'verified')

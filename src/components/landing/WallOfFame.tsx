@@ -82,7 +82,6 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
     nim: item.users?.nim || '-',
     prodi: item.users?.major || item.category || 'Mahasiswa',
     lomba: item.title,
-    tahun: new Date(item.created_at).getFullYear().toString(),
     juara: item.rank || '1',
     kategori: item.category || 'Akademik',
     img: (item.proof_url && item.proof_url.match(/\.(jpeg|jpg|gif|png|webp)$/)) 
@@ -90,7 +89,8 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
       : (item.users?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.users?.name || 'M')}&background=random`),
     description: item.description,
     proof_url: item.proof_url,
-    document_url: item.document_url
+    document_url: item.document_url,
+    tahun: item.year || (item.created_at ? new Date(item.created_at).getFullYear().toString() : '2026')
   }));
 
   const mappedData = [...achievers, ...dbData];
