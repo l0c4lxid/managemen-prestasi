@@ -6,7 +6,7 @@ import { Menu, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const navLinks = [
-  { label: 'Wall of Fame', href: '/#wall-of-fame' },
+  { label: 'Prestasi', href: '/#prestasi' },
   { label: 'Lomba', href: '/#lomba' },
   { label: 'Event', href: '/#event' },
   { label: 'Tentang', href: '/#tentang' },

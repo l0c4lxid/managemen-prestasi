@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import Link from 'next/link';
-import { ArrowRight, Star, Users, Trophy, Swords } from 'lucide-react';
+import { ArrowRight, Star, Users, Trophy, Swords, Shield, Zap } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface StatItem {
@@ -131,47 +131,86 @@ export default function HeroSection({ stats: dynamicStats, recentAchievements = 
             </div>
           </div>
 
-          {/* Right — Stats visual */}
+          {/* Right — Illustrative Achievement Galaxy */}
           <div className="relative hidden lg:block">
-            <div className="relative">
-              {/* Main visual card */}
-              <div className="bg-white rounded-3xl shadow-soft-lg border border-slate-100 p-6 animate-slide-up">
-                <div className="flex items-center justify-between mb-5">
-                  <div>
-                    <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Wall of Fame</p>
-                    <h3 className="text-lg font-bold text-slate-800 mt-0.5">Prestasi Terbaru</h3>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">Live</span>
+            <div className="relative h-[600px] w-full flex items-center justify-center">
+              {/* Animated Glow Background */}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[150%] h-[150%] -z-10 overflow-hidden">
+                <div className="absolute top-1/4 left-1/4 w-[60%] h-[60%] bg-indigo-500/10 rounded-full blur-[140px] animate-pulse-slow" />
+                <div className="absolute bottom-1/4 right-1/4 w-[60%] h-[60%] bg-cyan-400/10 rounded-full blur-[140px] animate-bounce-slow" />
+              </div>
+
+              {/* Central Core Illustration */}
+              <div className="relative z-20 group">
+                <div className="absolute inset-0 bg-indigo-600/20 blur-[100px] rounded-full scale-150 animate-pulse-slow" />
+                
+                {/* Main Floating Glass Trophy */}
+                <div className="relative w-64 h-64 bg-white/10 backdrop-blur-3xl rounded-[3rem] border border-white/30 shadow-[0_32px_64px_rgba(79,70,229,0.2)] flex items-center justify-center animate-float overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-white/5 opacity-50" />
+                  <Trophy size={100} className="text-indigo-600 drop-shadow-[0_0_20px_rgba(79,70,229,0.5)] animate-rotate-y" strokeWidth={1} />
+                  
+                  {/* Internal Glow */}
+                  <div className="absolute -bottom-10 w-full h-20 bg-indigo-500/20 blur-2xl" />
                 </div>
 
-                <div className="space-y-3">
-                  {visualItems.map((item) => (
-                    <div key={`hero-item-${item.nim}`} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors">
-                      <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center text-white text-xs font-bold flex-shrink-0`}>
-                        #{item.juara}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-slate-800 truncate">{item.name}</p>
-                        <p className="text-xs text-slate-500 truncate">{item.lomba}</p>
-                      </div>
-                      <Trophy size={14} className="text-amber-500 flex-shrink-0" />
+                {/* Orbiting Elements - Achievement Spheres */}
+                <div className="absolute -top-12 -left-20 w-40 p-4 bg-white/80 backdrop-blur-md rounded-3xl border border-white/50 shadow-2xl animate-float-slow group-hover:scale-110 transition-transform duration-700">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white">
+                      <Star size={20} fill="currentColor" />
                     </div>
-                  ))}
+                    <div>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">National</p>
+                      <p className="text-sm font-black text-slate-800">Juara 1</p>
+                    </div>
+                  </div>
                 </div>
+
+                <div className="absolute -bottom-16 -right-16 w-48 p-5 bg-slate-900/90 backdrop-blur-md rounded-[2rem] border border-white/10 shadow-2xl animate-float-delay group-hover:translate-x-4 transition-transform duration-700">
+                   <div className="flex items-center gap-4 mb-4">
+                     <div className="w-10 h-10 rounded-xl bg-indigo-500 flex items-center justify-center text-white">
+                       <Shield size={20} />
+                     </div>
+                     <p className="text-[10px] font-bold text-indigo-200 uppercase tracking-widest">Verified ID</p>
+                   </div>
+                   <div className="space-y-2">
+                     <div className="h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full w-[95%] bg-indigo-400" />
+                     </div>
+                     <p className="text-[9px] text-white/50 font-medium italic text-right">Student Authenticated</p>
+                   </div>
+                </div>
+
+                {/* Circular Skill Badge Orbit */}
+                <div className="absolute top-1/2 -right-24 w-24 h-24 bg-white/40 backdrop-blur-xl rounded-full border border-white/50 flex items-center justify-center animate-spin-slow">
+                   <Zap size={32} className="text-amber-500" />
+                </div>
+
+                <div className="absolute top-0 -right-32 w-20 h-20 bg-cyan-500 rounded-3xl rotate-12 flex items-center justify-center text-white shadow-xl animate-float-slow">
+                   <Users size={32} />
+                </div>
+
+                {/* Achievement Connections (Visual Lines) */}
+                <svg className="absolute inset-0 w-full h-full -z-10 overflow-visible opacity-30">
+                  <path d="M-100,-50 Q0,0 50,150" fill="none" stroke="url(#grad1)" strokeWidth="2" strokeDasharray="5,5" />
+                  <path d="M300,100 Q200,250 50,200" fill="none" stroke="url(#grad2)" strokeWidth="2" strokeDasharray="5,5" />
+                  <defs>
+                    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#4f46e5" />
+                      <stop offset="100%" stopColor="#06b6d4" />
+                    </linearGradient>
+                    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#06b6d4" />
+                      <stop offset="100%" stopColor="#4f46e5" />
+                    </linearGradient>
+                  </defs>
+                </svg>
               </div>
 
-              {/* Floating stat cards */}
-              <div className="absolute -bottom-6 -left-8 bg-white rounded-2xl shadow-soft border border-slate-100 p-4 animate-slide-up">
-                <p className="text-xs text-slate-500 font-medium">Prestasi Bulan Ini</p>
-                <p className="text-2xl font-extrabold text-indigo-700 tabular-nums mt-0.5">+{displayStats[0]?.value}</p>
-                <p className="text-xs text-emerald-600 font-semibold mt-0.5">↑ Update Realtime</p>
-              </div>
-
-              <div className="absolute -top-6 -right-6 bg-white rounded-2xl shadow-soft border border-slate-100 p-4 animate-slide-up">
-                <p className="text-xs text-slate-500 font-medium">Tingkat Verifikasi</p>
-                <p className="text-2xl font-extrabold text-emerald-600 tabular-nums mt-0.5">99.2%</p>
-                <p className="text-xs text-slate-500 font-medium mt-0.5">dalam 48 jam</p>
-              </div>
+              {/* Decorative Geometric Shapes */}
+              <div className="absolute top-0 left-0 w-4 h-4 bg-indigo-400 rounded-full animate-ping" />
+              <div className="absolute bottom-1/4 right-0 w-8 h-8 border-4 border-cyan-200 rounded-lg rotate-45 animate-bounce-slow" />
+              <div className="absolute top-1/2 left-0 w-12 h-1 bg-gradient-to-r from-indigo-500 to-transparent rounded-full" />
             </div>
           </div>
         </div>

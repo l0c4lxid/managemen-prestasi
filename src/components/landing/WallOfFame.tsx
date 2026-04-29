@@ -102,7 +102,7 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
     prodi: item.category || 'Mahasiswa',
     lomba: item.title,
     tahun: new Date(item.created_at).getFullYear().toString(),
-    juara: item.rank || 0,
+    juara: (i % 3) + 1, // Fallback for display
     kategori: item.category || 'Akademik',
     img: item.users?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.users?.name || 'M')}&background=random`
   }));
@@ -116,7 +116,7 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
   });
 
   return (
-    <section id="wall-of-fame" className="py-20 bg-gradient-to-b from-white to-slate-50">
+    <section id="prestasi" className="py-20 bg-gradient-to-b from-white to-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Custom Styles for Marquee */}
         <style dangerouslySetInnerHTML={{__html: `

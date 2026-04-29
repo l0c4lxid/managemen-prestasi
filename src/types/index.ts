@@ -66,7 +66,6 @@ export interface Achievement {
   created_at: string;
   category?: string | null;
   competition_level?: string | null;
-  rank?: number | null;
   // Joined fields
   users?: { name: string; email: string; nim?: string | null } | null;
   competitions?: { title: string } | null;

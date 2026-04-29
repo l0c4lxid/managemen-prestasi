@@ -74,8 +74,7 @@ export default function PrestasiManagementPage() {
     category: 'Akademik',
     competition_level: 'nasional',
     proof_url: '',
-    status: 'pending' as Achievement['status'],
-    rank: 0
+    status: 'pending' as Achievement['status']
   });
   const [usersList, setUsersList] = useState<{id: string, name: string, nim: string}[]>([]);
 
@@ -86,7 +85,7 @@ export default function PrestasiManagementPage() {
 
   const openAddModal = () => {
     setModalMode('add');
-    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', proof_url: '', status: 'pending', rank: 0 });
+    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', proof_url: '', status: 'pending' });
     setModalOpen(true);
     fetchUsers();
   };
@@ -101,8 +100,7 @@ export default function PrestasiManagementPage() {
       category: item.category || 'Akademik',
       competition_level: item.competition_level || 'nasional',
       proof_url: item.proof_url || '',
-      status: item.status,
-      rank: item.rank || 0
+      status: item.status
     });
     setModalOpen(true);
     fetchUsers();
@@ -120,7 +118,6 @@ export default function PrestasiManagementPage() {
         competition_level: modalForm.competition_level,
         proof_url: modalForm.proof_url || null,
         status: modalForm.status,
-        rank: modalForm.rank,
       };
 
       if (modalMode === 'edit') {
@@ -238,7 +235,6 @@ export default function PrestasiManagementPage() {
                   <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Prestasi</th>
                   <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Kategori</th>
                   <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Tingkat</th>
-                  <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Juara</th>
                   <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Status</th>
                   <th className="px-5 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Aksi</th>
                 </tr>
@@ -273,17 +269,6 @@ export default function PrestasiManagementPage() {
                       </td>
                       <td className="px-5 py-3.5">
                         {item.competition_level ? <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-cyan-50 text-cyan-700">{item.competition_level}</span> : <span className="text-slate-400">—</span>}
-                      </td>
-                      <td className="px-5 py-3.5">
-                        {item.rank && item.rank > 0 ? (
-                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                            item.rank === 1 ? 'bg-amber-100 text-amber-700' : 
-                            item.rank === 2 ? 'bg-slate-200 text-slate-700' : 
-                            'bg-orange-100 text-orange-700'
-                          }`}>
-                            Juara {item.rank}
-                          </span>
-                        ) : <span className="text-slate-400">Peserta</span>}
                       </td>
                       <td className="px-5 py-3.5">
                         <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border ${sc.cls}`}>
@@ -487,20 +472,6 @@ export default function PrestasiManagementPage() {
                     <option value="pending">Menunggu</option>
                     <option value="verified">Terverifikasi</option>
                     <option value="rejected">Ditolak</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Peringkat / Juara</label>
-                  <select 
-                    value={modalForm.rank}
-                    onChange={e => setModalForm(p => ({...p, rank: parseInt(e.target.value)}))}
-                    className="input-field py-2.5 text-sm"
-                  >
-                    <option value="0">Peserta / Lainnya</option>
-                    <option value="1">Juara 1</option>
-                    <option value="2">Juara 2</option>
-                    <option value="3">Juara 3</option>
                   </select>
                 </div>
 

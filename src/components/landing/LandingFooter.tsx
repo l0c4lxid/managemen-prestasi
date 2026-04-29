@@ -5,7 +5,7 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 
 const footerLinks = {
   Platform: [
-    { label: 'Wall of Fame', href: '/#wall-of-fame' },
+    { label: 'Prestasi', href: '/#prestasi' },
     { label: 'Lomba Aktif', href: '/#lomba' },
     { label: 'Event & Pelatihan', href: '/#event' },
     { label: 'Dashboard', href: '/dashboard' },

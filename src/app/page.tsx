@@ -64,12 +64,7 @@ export default async function RootPage() {
 
     achievements = achRes.data || [];
     competitions = compRes.data || [];
-    
-    // Sort events: upcoming first (asc date), then finished (desc date)
-    const rawEvents = evRes.data || [];
-    const upcoming = rawEvents.filter(e => e.status === 'upcoming').sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    const finished = rawEvents.filter(e => e.status !== 'upcoming').sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    events = [...upcoming, ...finished].slice(0, 6);
+    events = evRes.data || [];
   } catch (error) {
     console.error('Error fetching landing data:', error);
   }
