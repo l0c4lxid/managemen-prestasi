@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import AppLayout from '@/components/AppLayout';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -26,7 +26,7 @@ interface MahasiswaStats {
 type SortField = keyof MahasiswaStats;
 type SortDir = 'asc' | 'desc' | null;
 
-export default function MahasiswaPage() {
+function MahasiswaContent() {
   const supabase = createClient();
   const [data, setData] = useState<MahasiswaStats[]>([]);
   const [loading, setLoading] = useState(true);
@@ -296,5 +296,13 @@ export default function MahasiswaPage() {
         editData={editTarget}
       />
     </AppLayout>
+  );
+}
+
+export default function MahasiswaPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50"><RefreshCw className="animate-spin text-indigo-500" /></div>}>
+      <MahasiswaContent />
+    </Suspense>
   );
 }
