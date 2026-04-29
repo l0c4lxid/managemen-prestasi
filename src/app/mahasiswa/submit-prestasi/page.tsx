@@ -24,6 +24,7 @@ export default function SubmitPrestasiPage() {
     competition_level: 'nasional',
     rank: '',
     proof_url: '',
+    document_url: '',
   });
   const [uploading, setUploading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -88,6 +89,7 @@ export default function SubmitPrestasiPage() {
         competition_level: form.competition_level,
         rank: form.rank || null,
         proof_url: currentProofUrl || null,
+        document_url: form.document_url || null,
         status: 'pending',
       });
       if (error) throw error;
@@ -216,7 +218,16 @@ export default function SubmitPrestasiPage() {
                     className="input-field" 
                   />
                 </div>
-                <p className="text-xs text-slate-400 mt-1.5">Lampirkan foto saat menerima penghargaan atau sertifikat prestasi.</p>
+                <p className="text-xs text-slate-400 mt-1.5">Foto ini akan ditampilkan di galeri prestasi landing page.</p>
+              </div>
+
+              <div>
+                <label className="label-text">Link Dokumen Tambahan <span className="text-slate-400 font-normal">(Google Drive, Dropbox, dll)</span></label>
+                <div className="relative">
+                  <Globe size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input name="document_url" value={form.document_url} onChange={handleChange} type="url" placeholder="https://drive.google.com/..." className="input-field pl-9" />
+                </div>
+                <p className="text-xs text-slate-400 mt-1.5">Gunakan link ini untuk melampirkan sertifikat PDF atau folder bukti lainnya.</p>
               </div>
               <div className="pt-2">
                 <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3">

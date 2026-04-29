@@ -89,7 +89,8 @@ export default function WallOfFame({ initialData = [] }: { initialData?: any[] }
       ? item.proof_url 
       : (item.users?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.users?.name || 'M')}&background=random`),
     description: item.description,
-    proof_url: item.proof_url
+    proof_url: item.proof_url,
+    document_url: item.document_url
   }));
 
   const mappedData = [...achievers, ...dbData];

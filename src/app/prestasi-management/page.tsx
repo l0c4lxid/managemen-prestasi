@@ -3,7 +3,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
-import { Search, Filter, CheckCircle, XCircle, Clock, Eye, ExternalLink, RefreshCw, BarChart3, Trophy, Users, Plus, Edit, Trash2, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Search, Filter, CheckCircle, XCircle, Clock, Eye, ExternalLink, RefreshCw, BarChart3, Trophy, Users, Plus, Edit, Trash2, Image as ImageIcon, Loader2, Globe } from 'lucide-react';
 import AppLayout from '@/components/AppLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Achievement } from '@/types';
@@ -78,6 +78,7 @@ export default function PrestasiManagementPage() {
     competition_level: 'nasional',
     rank: '',
     proof_url: '',
+    document_url: '',
     status: 'pending' as Achievement['status'],
     isNewStudent: false,
     newName: '',
@@ -94,7 +95,7 @@ export default function PrestasiManagementPage() {
 
   const openAddModal = () => {
     setModalMode('add');
-    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', rank: '', proof_url: '', status: 'pending', isNewStudent: false, newName: '', newNim: '', newEmail: '', newMajor: '' });
+    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', rank: '', proof_url: '', document_url: '', status: 'pending', isNewStudent: false, newName: '', newNim: '', newEmail: '', newMajor: '' });
     setModalOpen(true);
     fetchUsers();
     setSelectedFile(null);
@@ -112,6 +113,7 @@ export default function PrestasiManagementPage() {
       competition_level: item.competition_level || 'nasional',
       rank: (item.rank === 0 || item.rank === '0') ? '' : item.rank?.toString() || '',
       proof_url: item.proof_url || '',
+      document_url: item.document_url || '',
       status: item.status,
       isNewStudent: false,
       newName: '',
@@ -192,6 +194,7 @@ export default function PrestasiManagementPage() {
         competition_level: modalForm.competition_level,
         rank: modalForm.rank || null,
         proof_url: currentProofUrl || null,
+        document_url: modalForm.document_url || null,
         status: modalForm.status,
       };
 
@@ -462,7 +465,18 @@ export default function PrestasiManagementPage() {
                   </div>
                 )}
 
-                {detailItem.proof_url && (
+                {detailItem.document_url ? (
+                  <div className="pt-4 border-t border-slate-100">
+                    <a 
+                      href={detailItem.document_url} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-bold hover:bg-indigo-100 transition-all border border-indigo-100"
+                    >
+                      <ExternalLink size={16} /> Lihat Dokumen Bukti Asli
+                    </a>
+                  </div>
+                ) : detailItem.proof_url && (
                   <div className="pt-4 border-t border-slate-100">
                     <a 
                       href={detailItem.proof_url} 
@@ -470,7 +484,7 @@ export default function PrestasiManagementPage() {
                       rel="noopener noreferrer" 
                       className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-indigo-50 text-indigo-700 text-sm font-bold hover:bg-indigo-100 transition-all border border-indigo-100"
                     >
-                      <ExternalLink size={16} /> Lihat Dokumen Bukti Asli
+                      <ExternalLink size={16} /> Lihat Dokumen/Foto Bukti
                     </a>
                   </div>
                 )}
@@ -703,6 +717,20 @@ export default function PrestasiManagementPage() {
                       className="input-field py-2.5 text-sm"
                       placeholder="https://... (Gunakan URL gambar)"
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Link Dokumen Tambahan (G-Drive, dll)</label>
+                    <div className="relative">
+                      <Globe size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input 
+                        type="url"
+                        value={modalForm.document_url}
+                        onChange={e => setModalForm(p => ({...p, document_url: e.target.value}))}
+                        className="input-field py-2.5 pl-9 text-sm"
+                        placeholder="https://drive.google.com/..."
+                      />
+                    </div>
                   </div>
                 </div>
 
