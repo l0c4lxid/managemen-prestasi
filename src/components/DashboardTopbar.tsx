@@ -46,7 +46,13 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
   }, [profile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSignOut = async () => {
-    try { await signOut(); router.push('/sign-up-login'); } catch { toast.error('Gagal keluar'); }
+    try { 
+      await signOut(); 
+      router.refresh();
+      router.replace('/login'); 
+    } catch { 
+      toast.error('Gagal keluar'); 
+    }
   };
 
   useEffect(() => {

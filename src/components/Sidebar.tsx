@@ -77,7 +77,13 @@ function SidebarContent({ collapsed, onToggleCollapse, activePath, isMobile }: {
   const router = useRouter();
 
   const handleSignOut = async () => {
-    try { await signOut(); router.push('/sign-up-login'); } catch { toast.error('Gagal keluar'); }
+    try { 
+      await signOut(); 
+      router.refresh();
+      router.replace('/login'); 
+    } catch { 
+      toast.error('Gagal keluar'); 
+    }
   };
 
   const roleLabel: Record<string, string> = {

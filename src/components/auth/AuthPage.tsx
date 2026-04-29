@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 import { Eye, EyeOff, Trophy, Shield, Zap, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import AppLogo from '@/components/ui/AppLogo';
+import { createClient } from '@/lib/supabase/client';
+import type { AppUser } from '@/types';
 
 const features = [
   { icon: Trophy, label: 'Kelola Prestasi', desc: 'Submisi & verifikasi prestasi mahasiswa secara digital' },
@@ -14,21 +16,29 @@ const features = [
   { icon: BarChart3, label: 'Analitik', desc: 'Dashboard interaktif dengan grafik tren prestasi kampus' },
 ];
 
-import { createClient } from '@/lib/supabase/client';
-import type { AppUser } from '@/types';
-
 interface AuthPageProps {
   initialMode: 'login' | 'register';
 }
 
 export default function AuthPage({ initialMode }: AuthPageProps) {
-  const { signIn, signUp } = useAuth();
+  const { signIn, signUp, user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get('next');
+
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', nim: '' });
   const [testUsers, setTestUsers] = useState<AppUser[]>([]);
+
+  // Auto redirect if already logged in
+  React.useEffect(() => {
+    if (user && !authLoading) {
+      router.refresh();
+      router.replace(next || '/dashboard');
+    }
+  }, [user, authLoading, next, router]);
 
   React.useEffect(() => {
     const fetchUsers = async () => {
@@ -45,24 +55,31 @@ export default function AuthPage({ initialMode }: AuthPageProps) {
 
   const handleModeChange = (newMode: 'login' | 'register') => {
     setMode(newMode);
-    // Optionally update the URL without refreshing
     window.history.replaceState(null, '', `/${newMode}`);
   };
 
-  const searchParams = useSearchParams();
-  const next = searchParams.get('next');
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.email || !form.password) { toast.error('Email dan password wajib diisi'); return; }
+    if (!form.email || !form.password) { 
+      toast.error('Email dan password wajib diisi'); 
+      return; 
+    }
+    
     setLoading(true);
     try {
       if (mode === 'login') {
         await signIn(form.email, form.password);
         toast.success('Selamat datang kembali!');
-        router.push(next || '/dashboard');
+        // These will likely be handled by the useEffect redirect, 
+        // but keeping them here for immediate feedback and as a fallback
+        router.refresh();
+        router.replace(next || '/dashboard');
       } else {
-        if (!form.name) { toast.error('Nama lengkap wajib diisi'); return; }
+        if (!form.name) { 
+          toast.error('Nama lengkap wajib diisi'); 
+          setLoading(false);
+          return; 
+        }
         await signUp(form.email, form.password, { full_name: form.name, role: 'mahasiswa' });
         toast.success('Akun berhasil dibuat! Silakan login.');
         handleModeChange('login');
@@ -132,12 +149,14 @@ export default function AuthPage({ initialMode }: AuthPageProps) {
 
             <div className="flex rounded-xl border border-slate-200 p-1 mb-6">
               <button
+                type="button"
                 onClick={() => handleModeChange('login')}
                 className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${mode === 'login' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-800'}`}
               >
                 Masuk
               </button>
               <button
+                type="button"
                 onClick={() => handleModeChange('register')}
                 className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${mode === 'register' ? 'bg-indigo-600 text-white shadow-sm' : 'text-slate-600 hover:text-slate-800'}`}
               >

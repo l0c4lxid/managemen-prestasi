@@ -29,7 +29,7 @@ export default function CtaSection() {
 
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Link
-                href="/sign-up-login"
+                href="/login"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl bg-white text-indigo-700 text-sm font-bold
                   hover:bg-indigo-50 active:scale-95 transition-all duration-150 shadow-lg"
               >
@@ -37,7 +37,7 @@ export default function CtaSection() {
                 <ArrowRight size={18} />
               </Link>
               <Link
-                href="/sign-up-login"
+                href="/login"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-2xl border-2 border-white/60 text-white text-sm font-semibold
                   hover:bg-white/10 active:scale-95 transition-all duration-150"
               >
