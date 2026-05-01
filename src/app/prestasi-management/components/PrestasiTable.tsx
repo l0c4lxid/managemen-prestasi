@@ -135,7 +135,7 @@ export default function PrestasiTable() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleteLoading(true);
-    // TODO: Backend — DELETE /api/prestasi/:id
+
     await new Promise((r) => setTimeout(r, 800));
     setData((prev) => prev.filter((d) => d.id !== deleteTarget));
     setDeleteLoading(false);
@@ -144,7 +144,7 @@ export default function PrestasiTable() {
   };
 
   const handleBulkDelete = async () => {
-    // TODO: Backend — DELETE /api/prestasi/bulk with { ids: [...] }
+
     await new Promise((r) => setTimeout(r, 600));
     setData((prev) => prev.filter((d) => !selected.has(d.id)));
     const count = selected.size;
@@ -165,7 +165,7 @@ export default function PrestasiTable() {
   };
 
   const handleVerifyInline = async (id: string, action: 'approve' | 'reject') => {
-    // TODO: Backend — PATCH /api/prestasi/:id/verify
+
     await new Promise((r) => setTimeout(r, 500));
     setData((prev) =>
       prev.map((d) =>

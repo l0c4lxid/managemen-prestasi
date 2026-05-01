@@ -23,7 +23,7 @@ export default function CtaSection() {
             </h2>
 
             <p className="text-white/80 text-base lg:text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
-              Bergabung dengan lebih dari 1.200 mahasiswa yang sudah memanfaatkan PrestasiKampus
+              Bergabung dengan lebih dari 1.200 mahasiswa yang sudah memanfaatkan SiBerkas
               untuk mendapatkan pengakuan resmi atas kerja keras mereka.
             </p>
 

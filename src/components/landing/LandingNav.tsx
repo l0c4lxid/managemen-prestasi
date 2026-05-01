@@ -51,7 +51,7 @@ export default function LandingNav() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group">
             <AppLogo size={38} className="group-hover:rotate-12 transition-transform duration-300" />
-            <span className="font-bold text-xl text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors">PrestasiKampus</span>
+            <span className="font-bold text-xl text-slate-900 tracking-tight group-hover:text-indigo-600 transition-colors">SiBerkas</span>
           </Link>
 
           {/* Desktop nav */}

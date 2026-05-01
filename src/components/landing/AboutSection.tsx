@@ -4,8 +4,8 @@ import { ChevronDown, HelpCircle, ShieldCheck, Zap, Globe } from 'lucide-react';
 
 const faqs = [
   {
-    question: "Apa itu PrestasiSolo?",
-    answer: "PrestasiSolo adalah platform resmi pendataan dan manajemen prestasi mahasiswa. Di sini kamu bisa menemukan informasi lomba terbaru, mendaftar event pengembangan diri, hingga memverifikasi sertifikat prestasimu secara digital untuk keperluan SKPI."
+    question: "Apa itu SiBerkas?",
+    answer: "SiBerkas adalah platform resmi pendataan dan manajemen prestasi mahasiswa. Di sini kamu bisa menemukan informasi lomba terbaru, mendaftar event pengembangan diri, hingga memverifikasi sertifikat prestasimu secara digital untuk keperluan SKPI."
   },
   {
     question: "Bagaimana cara mendaftarkan prestasi saya?",
@@ -43,7 +43,7 @@ export default function AboutSection() {
               Informasi & FAQ
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6 leading-tight">
-              Segala Hal yang Perlu Kamu Ketahui Tentang <span className="text-indigo-600">PrestasiSolo</span>
+              Segala Hal yang Perlu Kamu Ketahui Tentang <span className="text-indigo-600">SiBerkas</span>
             </h2>
             <p className="text-slate-600 mb-8 leading-relaxed">
               Kami hadir untuk memudahkan mahasiswa dalam meniti karir kompetitif dan mendokumentasikan setiap pencapaian berharga selama masa perkuliahan.

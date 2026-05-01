@@ -32,7 +32,7 @@ export default function LandingFooter() {
           <div className="lg:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
               <AppLogo size={34} />
-              <span className="font-bold text-lg text-white tracking-tight">PrestasiKampus</span>
+              <span className="font-bold text-lg text-white tracking-tight">SiBerkas</span>
             </div>
             <div className="mb-6">
               <h3 className="text-white font-bold text-sm mb-1">Universitas BSI Kampus Solo</h3>
@@ -85,7 +85,7 @@ export default function LandingFooter() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-8">
           <p className="text-xs text-slate-500">
-            © 2026 PrestasiKampus. Hak cipta dilindungi. Dikembangkan untuk kemajuan mahasiswa Indonesia.
+            © 2026 SiBerkas. Hak cipta dilindungi. Dikembangkan untuk kemajuan mahasiswa Indonesia.
           </p>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse-slow" />

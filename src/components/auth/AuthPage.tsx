@@ -96,7 +96,7 @@ export default function AuthPage({ initialMode }: AuthPageProps) {
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
               <AppLogo size={28} />
             </div>
-            <span className="font-bold text-xl text-white tracking-tight">PrestasiKampus</span>
+            <span className="font-bold text-xl text-white tracking-tight">SiBerkas</span>
           </Link>
           <h1 className="text-4xl font-extrabold text-white leading-tight mb-4">
             Sistem Manajemen<br />Prestasi Kampus<br />
@@ -123,7 +123,7 @@ export default function AuthPage({ initialMode }: AuthPageProps) {
       <div className="flex-1 flex items-center justify-center p-8 bg-slate-50 relative">
         <Link href="/" className="lg:hidden absolute top-8 left-8 flex items-center gap-2.5">
           <AppLogo size={32} />
-          <span className="font-bold text-lg text-slate-800">PrestasiKampus</span>
+          <span className="font-bold text-lg text-slate-800">SiBerkas</span>
         </Link>
         <div className="w-full max-w-md mt-12 lg:mt-0">
           <div className="bg-white rounded-3xl border border-slate-100 shadow-soft-lg p-8">
@@ -209,7 +209,7 @@ export default function AuthPage({ initialMode }: AuthPageProps) {
 
 
           <p className="text-center text-xs text-slate-400 mt-6">
-            © 2025 PrestasiKampus · Platform Kemahasiswaan
+            © 2025 SiBerkas · Platform Kemahasiswaan
           </p>
         </div>
       </div>

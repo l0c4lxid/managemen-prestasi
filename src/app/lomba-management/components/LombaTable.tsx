@@ -112,7 +112,6 @@ export default function LombaTable() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     setDeleteLoading(true);
-    // TODO: Backend — DELETE /api/lomba/:id
     await new Promise((r) => setTimeout(r, 700));
     setData((prev) => prev.filter((d) => d.id !== deleteTarget));
     setDeleteLoading(false);

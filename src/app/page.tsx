@@ -8,6 +8,11 @@ import AboutSection from '@/components/landing/AboutSection';
 import CtaSection from '@/components/landing/CtaSection';
 import LandingFooter from '@/components/landing/LandingFooter';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Beranda',
+};
 
 export default async function RootPage() {
   const supabase = await createServerSupabaseClient();

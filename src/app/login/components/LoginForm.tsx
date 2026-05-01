@@ -13,8 +13,8 @@ interface LoginFormData {
 }
 
 const demoCredentials = [
-  { role: 'Admin Kemahasiswaan', email: 'admin@prestasikampus.id', password: 'Admin@2026!' },
-  { role: 'Mahasiswa', email: 'mahasiswa@prestasikampus.id', password: 'Mhs@2026!' },
+  { role: 'Admin Kemahasiswaan', email: 'admin@siberkas.id', password: 'Admin@2026!' },
+  { role: 'Mahasiswa', email: 'mahasiswa@siberkas.id', password: 'Mhs@2026!' },
 ];
 
 interface Props {
@@ -63,7 +63,7 @@ export default function LoginForm({ onSwitchToRegister }: Props) {
           <label className="label-text">Email Kampus</label>
           <input
             type="email"
-            placeholder="nama@prestasikampus.id"
+            placeholder="nama@siberkas.id"
             className={`input-field ${errors.email ? 'border-red-400 focus:border-red-500 focus:ring-red-500/30' : ''}`}
             {...register('email', {
               required: 'Email wajib diisi',

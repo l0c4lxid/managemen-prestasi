@@ -103,7 +103,7 @@ function SidebarContent({ collapsed, onToggleCollapse, activePath, isMobile }: {
         {!collapsed && (
           <Link href="/" className="flex items-center gap-2.5 hover:opacity-80 transition-opacity">
             <AppLogo size={32} />
-            <span className="font-bold text-base text-slate-800 tracking-tight">PrestasiKampus</span>
+            <span className="font-bold text-base text-slate-800 tracking-tight">SiBerkas</span>
           </Link>
         )}
         {collapsed && (

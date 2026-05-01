@@ -33,7 +33,7 @@ export default function AuthContainer() {
           {/* Logo */}
           <div className="flex items-center gap-3 mb-12">
             <AppLogo size={40} />
-            <span className="font-extrabold text-xl text-white tracking-tight">PrestasiKampus</span>
+            <span className="font-extrabold text-xl text-white tracking-tight">SiBerkas</span>
           </div>
 
           {/* Headline */}
@@ -78,7 +78,7 @@ export default function AuthContainer() {
         {/* Mobile logo */}
         <div className="lg:hidden flex items-center gap-2 mb-8">
           <AppLogo size={36} />
-          <span className="font-bold text-lg text-slate-800">PrestasiKampus</span>
+          <span className="font-bold text-lg text-slate-800">SiBerkas</span>
         </div>
 
         <div className="w-full max-w-md">

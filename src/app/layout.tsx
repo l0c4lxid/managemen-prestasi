@@ -10,9 +10,12 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'PrestasiKampus — Platform Manajemen Prestasi Mahasiswa',
+  title: {
+    template: 'SiBerkas | %s',
+    default: 'SiBerkas — Sistem Informasi Basis Evaluasi Rekap Kegiatan dan Arsip Prestasi Mahasiswa',
+  },
   description:
-    'PrestasiKampus — sistem terpadu manajemen prestasi, kompetisi, dan program kemahasiswaan berbasis peran untuk kampus Indonesia.',
+    'SIBERKAS — Sistem Informasi Basis Evaluasi Rekap Kegiatan dan Arsip prestasi mahasiswa Indonesia.',
   icons: { icon: [{ url: '/favicon.ico', type: 'image/x-icon' }] },
 };
 

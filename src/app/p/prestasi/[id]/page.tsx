@@ -6,6 +6,16 @@ import AppImage from '@/components/ui/AppImage';
 import LandingNav from '@/components/landing/LandingNav';
 import LandingFooter from '@/components/landing/LandingFooter';
 import { ArrowLeft, Trophy, Calendar, User, Tag, ShieldCheck, Download, ExternalLink, Share2 } from 'lucide-react';
+import { Metadata } from 'next';
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  const supabase = await createServerSupabaseClient();
+  const { data } = await supabase.from('achievements').select('title').eq('id', id).single();
+  return {
+    title: data?.title || 'Detail Prestasi',
+  };
+}
 
 export default async function PublicAchievementPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;

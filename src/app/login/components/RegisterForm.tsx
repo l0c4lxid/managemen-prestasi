@@ -37,7 +37,7 @@ export default function RegisterForm({ onSwitchToLogin }: Props) {
   const password = watch('password');
 
   const onSubmit = async (_data: RegisterFormData) => {
-    // TODO: Backend — POST /api/auth/register with form data
+
     await new Promise((r) => setTimeout(r, 1200));
     toast.success('Akun berhasil dibuat! Silakan masuk.');
     setTimeout(() => router.push('/dashboard'), 800);
@@ -207,7 +207,7 @@ export default function RegisterForm({ onSwitchToLogin }: Props) {
             <span className="text-indigo-600 font-semibold hover:text-indigo-700 cursor-pointer">Syarat & Ketentuan</span>
             {' '}dan{' '}
             <span className="text-indigo-600 font-semibold hover:text-indigo-700 cursor-pointer">Kebijakan Privasi</span>
-            {' '}PrestasiKampus
+            {' '}SiBerkas
           </span>
         </label>
         {errors.agreeTerms && <p className="text-xs text-red-600 -mt-2">{errors.agreeTerms.message}</p>}
