@@ -703,8 +703,11 @@ export default function PrestasiManagementPage() {
                     value={modalForm.description}
                     onChange={e => setModalForm(p => ({...p, description: e.target.value}))}
                     className="input-field py-2.5 text-sm min-h-[100px] resize-none"
-                    placeholder="Tuliskan detail prestasi, proses kompetisi, dll..."
+                    placeholder="Tuliskan detail prestasi. Gunakan format [Nama Tombol][https://link-anda.com] untuk menambahkan tombol link (contoh: [Dokumentasi][https://drive.google.com/xyz])."
                   />
+                  <p className="text-[10px] text-slate-500 mt-1.5 leading-snug">
+                    *Gunakan format <code className="bg-slate-100 text-slate-700 px-1 py-0.5 rounded font-mono">[Nama Tombol][URL]</code> untuk memunculkan tombol eksternal. Teks ini tidak akan terlihat di deskripsi.
+                  </p>
                 </div>
 
                 <div>
@@ -731,39 +734,6 @@ export default function PrestasiManagementPage() {
                         accept="image/*" 
                         onChange={handleFileSelect}
                         className="absolute inset-0 opacity-0 cursor-pointer"
-                      />
-                    </div>
-
-                    <div className="relative">
-                      <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100"></span></div>
-                      <div className="relative flex justify-center text-[10px] uppercase font-bold text-slate-400"><span className="bg-white px-2">Atau gunakan URL</span></div>
-                    </div>
-
-                    <input 
-                      type="url"
-                      value={modalForm.proof_url}
-                      onChange={e => {
-                        setModalForm(p => ({...p, proof_url: e.target.value}));
-                        if (e.target.value) {
-                          setPreviewUrl(e.target.value);
-                          setSelectedFile(null);
-                        }
-                      }}
-                      className="input-field py-2.5 text-sm"
-                      placeholder="https://... (Gunakan URL gambar)"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Link Dokumen Tambahan (G-Drive, dll)</label>
-                    <div className="relative">
-                      <Globe size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input 
-                        type="url"
-                        value={modalForm.document_url}
-                        onChange={e => setModalForm(p => ({...p, document_url: e.target.value}))}
-                        className="input-field py-2.5 pl-9 text-sm"
-                        placeholder="https://drive.google.com/..."
                       />
                     </div>
                   </div>

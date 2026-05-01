@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
-import { X, Trophy, Medal, MapPin, Calendar, User, Bookmark, Share2, GraduationCap } from 'lucide-react';
+import { toast } from 'sonner';
+import { X, Trophy, Medal, MapPin, Calendar, User, Bookmark, Share2, GraduationCap, ExternalLink } from 'lucide-react';
 import AppImage from '@/components/ui/AppImage';
 
 interface AchievementModalProps {
@@ -19,12 +20,40 @@ interface AchievementModalProps {
     description?: string;
     rank?: string;
     document_url?: string;
+    proof_url?: string;
     year?: string;
   } | null;
 }
 
 export default function AchievementModal({ isOpen, onClose, achievement }: AchievementModalProps) {
   if (!isOpen || !achievement) return null;
+
+  const extractUrl = (text?: string) => {
+    if (!text) return { url: null, buttonText: 'Lihat Tautan', cleanText: text };
+    
+    // Check for [Button Text][URL] format
+    const markdownLinkRegex = /\[(.*?)\]\[(.*?)\]/;
+    const mdMatch = text.match(markdownLinkRegex);
+    
+    if (mdMatch) {
+      return {
+        url: mdMatch[2],
+        buttonText: mdMatch[1] || 'Lihat Tautan',
+        cleanText: text.replace(mdMatch[0], '').trim()
+      };
+    }
+    
+    // Fallback to raw URL
+    const urlRegex = /(https?:\/\/[^\s]+)/;
+    const match = text.match(urlRegex);
+    return {
+      url: match ? match[1] : null,
+      buttonText: 'Lihat Tautan',
+      cleanText: match ? text.replace(urlRegex, '').trim() : text.trim()
+    };
+  };
+
+  const { url: targetUrl, buttonText, cleanText: cleanDescription } = extractUrl(achievement.description);
 
   const juaraBadge = (juara: number) => {
     if (juara === 1) return { label: 'Juara 1', className: 'bg-amber-100 text-amber-700 border-amber-200', icon: <Trophy size={16} className="text-amber-600" /> };
@@ -100,7 +129,7 @@ export default function AchievementModal({ isOpen, onClose, achievement }: Achie
               <div>
                 <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Detail Pencapaian</h5>
                 <p className="text-slate-600 leading-relaxed font-medium text-base">
-                  {achievement.description || "Mahasiswa Universitas BSI Kampus Solo berhasil meraih prestasi membanggakan dalam kompetisi ini. Pencapaian ini merupakan bukti dedikasi dan kerja keras dalam mengasah kompetensi di bidangnya."}
+                  {cleanDescription || "Mahasiswa Universitas BSI Kampus Solo berhasil meraih prestasi membanggakan dalam kompetisi ini. Pencapaian ini merupakan bukti dedikasi dan kerja keras dalam mengasah kompetensi di bidangnya."}
                 </p>
               </div>
 
@@ -125,18 +154,32 @@ export default function AchievementModal({ isOpen, onClose, achievement }: Achie
 
             {/* Actions */}
             <div className="pt-8 flex flex-col sm:flex-row gap-4">
-              {(achievement.document_url || achievement.proof_url) && (
+              {targetUrl && (
                 <a 
-                  href={achievement.document_url || achievement.proof_url}
+                  href={targetUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-indigo-600 text-white text-xs uppercase tracking-widest font-black shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95"
                 >
-                  <Bookmark size={16} />
-                  {achievement.document_url ? 'Lihat Dokumen Bukti' : 'Lihat Sertifikat'}
+                  <ExternalLink size={16} />
+                  {buttonText}
                 </a>
               )}
-              <button className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-slate-100 text-slate-500 text-xs uppercase tracking-widest font-black hover:bg-slate-50 transition-all active:scale-95">
+              <button 
+                onClick={() => {
+                  const url = `${window.location.origin}/p/prestasi/${achievement.id}`;
+                  if (navigator.share) {
+                    navigator.share({
+                      title: achievement.name,
+                      url: url,
+                    }).catch(console.error);
+                  } else {
+                    navigator.clipboard.writeText(url);
+                    toast.success('Link berhasil disalin ke clipboard!');
+                  }
+                }}
+                className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl border-2 border-slate-100 text-slate-500 text-xs uppercase tracking-widest font-black hover:bg-slate-50 transition-all active:scale-95"
+              >
                 <Share2 size={16} />
                 Bagikan
               </button>

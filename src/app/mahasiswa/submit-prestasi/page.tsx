@@ -105,7 +105,7 @@ export default function SubmitPrestasiPage() {
 
       setSubmitted(true);
       toast.success('Prestasi berhasil disubmit! Menunggu verifikasi admin.');
-      setForm({ title: '', description: '', competition_id: '', category: '', competition_level: 'nasional', rank: '', proof_url: '' });
+      setForm({ title: '', description: '', competition_id: '', category: '', competition_level: 'nasional', rank: '', proof_url: '', document_url: '' });
       setSelectedFile(null);
       setPreviewUrl(null);
     } catch (err: unknown) {
@@ -144,7 +144,10 @@ export default function SubmitPrestasiPage() {
               </div>
               <div>
                 <label className="label-text">Deskripsi</label>
-                <textarea name="description" value={form.description} onChange={handleChange} rows={4} placeholder="Jelaskan pencapaian Anda secara singkat…" className="input-field resize-none" />
+                <textarea name="description" value={form.description} onChange={handleChange} rows={4} placeholder="Jelaskan pencapaian Anda secara singkat. Gunakan format [Nama Tombol][https://link-anda.com] untuk menambahkan tombol link (contoh: [Dokumentasi][https://drive.google.com/xyz])." className="input-field resize-none" />
+                <p className="text-[10px] text-slate-500 mt-1.5 leading-snug">
+                  *Gunakan format <code className="bg-slate-100 text-slate-700 px-1 py-0.5 rounded font-mono">[Nama Tombol][URL]</code> untuk memunculkan tombol eksternal. Teks ini tidak akan terlihat di deskripsi.
+                </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -198,36 +201,8 @@ export default function SubmitPrestasiPage() {
                     />
                   </div>
 
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-slate-100"></span></div>
-                    <div className="relative flex justify-center text-[10px] uppercase font-bold text-slate-400"><span className="bg-white px-2">Atau gunakan URL</span></div>
-                  </div>
-
-                  <input 
-                    name="proof_url" 
-                    value={form.proof_url} 
-                    onChange={e => {
-                      handleChange(e);
-                      if (e.target.value) {
-                        setPreviewUrl(e.target.value);
-                        setSelectedFile(null);
-                      }
-                    }} 
-                    type="url" 
-                    placeholder="https://... (Gunakan URL gambar)" 
-                    className="input-field" 
-                  />
                 </div>
                 <p className="text-xs text-slate-400 mt-1.5">Foto ini akan ditampilkan di galeri prestasi landing page.</p>
-              </div>
-
-              <div>
-                <label className="label-text">Link Dokumen Tambahan <span className="text-slate-400 font-normal">(Google Drive, Dropbox, dll)</span></label>
-                <div className="relative">
-                  <Globe size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input name="document_url" value={form.document_url} onChange={handleChange} type="url" placeholder="https://drive.google.com/..." className="input-field pl-9" />
-                </div>
-                <p className="text-xs text-slate-400 mt-1.5">Gunakan link ini untuk melampirkan sertifikat PDF atau folder bukti lainnya.</p>
               </div>
               <div className="pt-2">
                 <button type="submit" disabled={loading} className="btn-primary w-full justify-center py-3">

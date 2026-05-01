@@ -5,15 +5,23 @@ import { createServerSupabaseClient } from '@/lib/supabase/server';
 import AppImage from '@/components/ui/AppImage';
 import LandingNav from '@/components/landing/LandingNav';
 import LandingFooter from '@/components/landing/LandingFooter';
+import ShareButton from '@/components/ui/ShareButton';
 import { ArrowLeft, Trophy, Calendar, User, Tag, ShieldCheck, Download, ExternalLink, Share2 } from 'lucide-react';
 import { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const supabase = await createServerSupabaseClient();
-  const { data } = await supabase.from('achievements').select('title').eq('id', id).single();
+  const { data } = await supabase.from('achievements').select('title, description, proof_url').eq('id', id).single();
+  
   return {
     title: data?.title || 'Detail Prestasi',
+    description: data?.description || 'Prestasi membanggakan dari mahasiswa kami.',
+    openGraph: {
+      title: data?.title || 'Detail Prestasi',
+      description: data?.description || 'Prestasi membanggakan dari mahasiswa kami.',
+      images: data?.proof_url ? [data.proof_url] : [],
+    }
   };
 }
 
@@ -33,6 +41,33 @@ export default async function PublicAchievementPage({ params }: { params: Promis
 
   const isVerified = achievement.status === 'verified';
 
+  const extractUrl = (text?: string) => {
+    if (!text) return { url: null, buttonText: 'Lihat Tautan', cleanText: text };
+    
+    // Check for [Button Text][URL] format
+    const markdownLinkRegex = /\[(.*?)\]\[(.*?)\]/;
+    const mdMatch = text.match(markdownLinkRegex);
+    
+    if (mdMatch) {
+      return {
+        url: mdMatch[2],
+        buttonText: mdMatch[1] || 'Lihat Tautan',
+        cleanText: text.replace(mdMatch[0], '').trim()
+      };
+    }
+    
+    // Fallback to raw URL
+    const urlRegex = /(https?:\/\/[^\s]+)/;
+    const match = text.match(urlRegex);
+    return {
+      url: match ? match[1] : null,
+      buttonText: 'Lihat Tautan',
+      cleanText: match ? text.replace(urlRegex, '').trim() : text.trim()
+    };
+  };
+
+  const { url: targetUrl, buttonText, cleanText: cleanDescription } = extractUrl(achievement.description);
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
       <LandingNav />
@@ -46,9 +81,7 @@ export default async function PublicAchievementPage({ params }: { params: Promis
               Kembali ke Wall of Fame
             </Link>
             <div className="flex items-center gap-2">
-               <button className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
-                 <Share2 size={16} />
-               </button>
+               <ShareButton id={achievement.id} title={achievement.title} />
             </div>
           </div>
 
@@ -82,15 +115,15 @@ export default async function PublicAchievementPage({ params }: { params: Promis
                      </div>
                    )}
                 </div>
-                {achievement.proof_url && (
+                {targetUrl && (
                   <a 
-                    href={achievement.proof_url} 
+                    href={targetUrl} 
                     target="_blank" 
                     rel="noreferrer"
                     className="mt-6 flex items-center gap-2 text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
                   >
                     <ExternalLink size={14} />
-                    Lihat Dokumen Lengkap
+                    {buttonText}
                   </a>
                 )}
               </div>
@@ -160,11 +193,11 @@ export default async function PublicAchievementPage({ params }: { params: Promis
                   </div>
 
                   {/* Description */}
-                  {achievement.description && (
+                  {cleanDescription && (
                     <div className="pt-4 border-t border-slate-100">
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Deskripsi Tambahan</p>
                       <p className="text-sm text-slate-600 leading-relaxed">
-                        {achievement.description}
+                        {cleanDescription}
                       </p>
                     </div>
                   )}
