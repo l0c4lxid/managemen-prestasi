@@ -114,6 +114,7 @@ export default function PublicLombaPage({ params }: { params: Promise<{ id: stri
                       src={lomba.poster_url} 
                       alt={lomba.title} 
                       fill 
+                      priority={true}
                       style={{ objectFit: 'contain' }}
                       className="group-hover:scale-[1.03] transition-transform duration-1000 shadow-2xl rounded-2xl"
                     />

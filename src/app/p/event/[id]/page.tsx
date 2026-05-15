@@ -116,8 +116,9 @@ export default function PublicEventPage({ params }: { params: Promise<{ id: stri
                       src={event.poster_url} 
                       alt={event.title} 
                       fill 
+                      priority={true}
                       style={{ objectFit: 'contain' }}
-                      className="group-hover:scale-[1.02] transition-transform duration-700 shadow-2xl rounded-lg"
+                      className="group-hover:scale-[1.03] transition-transform duration-1000 shadow-2xl rounded-2xl"
                     />
                   </div>
                 </>
