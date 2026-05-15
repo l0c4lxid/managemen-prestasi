@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import {
   LayoutDashboard, Trophy, Swords, CalendarDays, Users,
   ChevronLeft, ChevronRight, LogOut, BarChart3, Bell, UserCircle,
-  Bookmark, Send, ClipboardList, ShieldCheck, Star, Images,
+  Bookmark, ShieldCheck, Star, Images, ClipboardList
 } from 'lucide-react';
 import type { UserRole } from '@/types';
 import LogoutConfirmModal from './modals/LogoutConfirmModal';
@@ -23,26 +23,26 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  // Utama — semua role
+  // Utama
   { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={20} />, group: 'Utama', roles: ['super_admin', 'admin_prestasi', 'admin_lomba', 'admin_perencanaan', 'mahasiswa'] },
 
-  // Mahasiswa
-  { label: 'Cari Lomba & Hibah', href: '/lomba-management', icon: <Swords size={20} />, group: 'Peluang & Prestasi', roles: ['mahasiswa'] },
-  { label: 'Event & Bootcamp', href: '/event-management', icon: <CalendarDays size={20} />, group: 'Peluang & Prestasi', roles: ['mahasiswa'] },
-  { label: 'Riwayat Prestasi', href: '/mahasiswa/riwayat', icon: <Star size={20} />, group: 'Peluang & Prestasi', roles: ['mahasiswa'] },
-  { label: 'Bookmark Lomba', href: '/mahasiswa/bookmark', icon: <Bookmark size={20} />, group: 'Peluang & Prestasi', roles: ['mahasiswa'] },
-
-  // Admin Lomba, Event & Prestasi
-  { label: 'Manajemen Lomba', href: '/lomba-management', icon: <Swords size={20} />, group: 'Admin', roles: ['super_admin', 'admin_lomba', 'admin_prestasi'] },
-  { label: 'Event & Bootcamp', href: '/event-management', icon: <CalendarDays size={20} />, group: 'Admin', roles: ['super_admin', 'admin_lomba', 'admin_prestasi'] },
-  { label: 'Manajemen Prestasi', href: '/prestasi-management', icon: <ShieldCheck size={20} />, group: 'Admin', roles: ['super_admin', 'admin_prestasi', 'admin_lomba'] },
+  // Pusat Kompetisi (Mahasiswa & Admin)
+  { label: 'Cari Lomba & Hibah', href: '/lomba-management', icon: <Swords size={20} />, group: 'Pusat Kompetisi', roles: ['mahasiswa', 'super_admin', 'admin_lomba', 'admin_prestasi'] },
+  { label: 'Event & Bootcamp', href: '/event-management', icon: <CalendarDays size={20} />, group: 'Pusat Kompetisi', roles: ['mahasiswa', 'super_admin', 'admin_lomba', 'admin_prestasi'] },
   
-  // Manajemen Program & User
-  { label: 'Manajemen Program', href: '/laporan', icon: <ClipboardList size={20} />, group: 'Admin', roles: ['super_admin', 'admin_perencanaan', 'admin_prestasi'] },
-  { label: 'Manajemen User', href: '/mahasiswa', icon: <Users size={20} />, group: 'Admin', roles: ['super_admin', 'admin_lomba', 'admin_prestasi'] },
-  { label: 'Manajemen Poster', href: '/poster-management', icon: <Images size={20} />, group: 'Admin', roles: ['super_admin', 'admin_prestasi'] },
+  // Portofolio (Mahasiswa)
+  { label: 'Riwayat Prestasi', href: '/mahasiswa/riwayat', icon: <Star size={20} />, group: 'Portofolio Saya', roles: ['mahasiswa'] },
+  { label: 'Bookmark Lomba', href: '/mahasiswa/bookmark', icon: <Bookmark size={20} />, group: 'Portofolio Saya', roles: ['mahasiswa'] },
 
-  // Sistem — semua
+  // Administrasi (Admin)
+  { label: 'Verifikasi Prestasi', href: '/prestasi-management', icon: <ShieldCheck size={20} />, group: 'Administrasi Data', roles: ['super_admin', 'admin_prestasi', 'admin_lomba'] },
+  { label: 'Manajemen User', href: '/mahasiswa', icon: <Users size={20} />, group: 'Administrasi Data', roles: ['super_admin', 'admin_lomba', 'admin_prestasi'] },
+  { label: 'Manajemen Poster', href: '/poster-management', icon: <Images size={20} />, group: 'Administrasi Data', roles: ['super_admin', 'admin_prestasi'] },
+  
+  // Analitik (Admin)
+  { label: 'Laporan & Analitik', href: '/laporan', icon: <BarChart3 size={20} />, group: 'Laporan & Analitik', roles: ['super_admin', 'admin_perencanaan', 'admin_prestasi'] },
+
+  // Sistem
   { label: 'Notifikasi', href: '/notifikasi', icon: <Bell size={20} />, group: 'Sistem', roles: ['super_admin', 'admin_prestasi', 'admin_lomba', 'admin_perencanaan', 'mahasiswa'] },
   { label: 'Profil', href: '/profil', icon: <UserCircle size={20} />, group: 'Sistem', roles: ['super_admin', 'admin_prestasi', 'admin_lomba', 'admin_perencanaan', 'mahasiswa'] },
 ];
@@ -96,7 +96,6 @@ function SidebarContent({ collapsed, onToggleCollapse, activePath, isMobile }: {
     admin_lomba: 'Admin Lomba', admin_perencanaan: 'Admin Perencanaan', mahasiswa: 'Mahasiswa',
   };
 
-  // Build unique group → items filtered by role
   const visibleItems = navItems.filter(item => !role || item.roles.includes(role));
   const groups = Array.from(new Set(visibleItems.map(i => i.group)));
 

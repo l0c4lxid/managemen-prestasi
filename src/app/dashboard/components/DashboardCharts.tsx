@@ -5,6 +5,7 @@ import {
   ResponsiveContainer, Legend
 } from 'recharts';
 import { createClient } from '@/lib/supabase/client';
+import { useSettings } from '@/contexts/SettingsContext';
 
 interface TrendData {
   bulan: string;
@@ -45,6 +46,7 @@ const CustomTooltipBar = ({ active, payload, label }: { active?: boolean; payloa
 };
 
 export default function DashboardCharts() {
+  const { academicYear, semester } = useSettings();
   const [trendData, setTrendData] = useState<TrendData[]>([]);
   const [kategoriData, setKategoriData] = useState<KategoriData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -54,47 +56,69 @@ export default function DashboardCharts() {
       setLoading(true);
       const supabase = createClient();
 
-      // Generate last 6 months labels
-      const months = [];
-      for (let i = 5; i >= 0; i--) {
-        const d = new Date();
-        d.setMonth(d.getMonth() - i);
-        months.push({
-          full: d.toISOString().substring(0, 7), // YYYY-MM
-          label: d.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }).replace('.', '')
+      const { data: achievements } = await supabase
+        .from('achievements')
+        .select('status, created_at, category');
+
+      if (!achievements) {
+        setLoading(false);
+        return;
+      }
+
+      // Filter achievements by Academic Year and Semester
+      let filtered = achievements;
+      if (academicYear !== 'Semua') {
+        const startYear = parseInt(academicYear.split('/')[0]);
+        const endYear = startYear + 1;
+        filtered = achievements.filter(a => {
+          const date = new Date(a.created_at);
+          const m = date.getMonth() + 1;
+          const y = date.getFullYear();
+          const isInYear = (y === startYear && m >= 8) || (y === endYear && m <= 7);
+          if (!isInYear) return false;
+          if (semester === 'Ganjil') return (y === startYear && m >= 8) || (y === endYear && m === 1);
+          if (semester === 'Genap') return (y === endYear && m >= 2 && m <= 7);
+          return true;
+        });
+      } else if (semester !== 'Semua') {
+        filtered = achievements.filter(a => {
+          const m = (new Date(a.created_at)).getMonth() + 1;
+          if (semester === 'Ganjil') return m >= 8 || m === 1;
+          return m >= 2 && m <= 7;
         });
       }
 
-      // Fetch Trend Data
-      const { data: achievements } = await supabase
-        .from('achievements')
-        .select('status, created_at');
-
-      const trendMap: Record<string, TrendData> = {};
-      months.forEach(m => {
-        trendMap[m.full] = { bulan: m.label, diverifikasi: 0, ditolak: 0, draf: 0 };
-      });
-
-      achievements?.forEach(a => {
-        const monthKey = a.created_at.substring(0, 7);
-        if (trendMap[monthKey]) {
-          if (a.status === 'verified') trendMap[monthKey].diverifikasi++;
-          else if (a.status === 'rejected') trendMap[monthKey].ditolak++;
-          else if (a.status === 'draft') trendMap[monthKey].draf++;
-        }
-      });
-
-      setTrendData(Object.values(trendMap));
-
-      // Fetch Category Data
-      const { data: catCounts } = await supabase
-        .from('achievements')
-        .select('kategori')
-        .eq('status', 'verified');
+      // Generate Trend Data
+      const bulanNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      const trendMap: Record<number, TrendData> = {};
       
+      // Initialize months
+      for (let i = 0; i < 12; i++) {
+        trendMap[i] = { bulan: bulanNames[i], diverifikasi: 0, ditolak: 0, draf: 0 };
+      }
+
+      filtered.forEach(a => {
+        const month = new Date(a.created_at).getMonth();
+        if (a.status === 'verified') trendMap[month].diverifikasi++;
+        else if (a.status === 'rejected') trendMap[month].ditolak++;
+        else if (a.status === 'draft') trendMap[month].draf++;
+      });
+
+      // Filter out months with 0 data if year is not 'Semua' and semester is selected
+      let finalTrend = Object.values(trendMap);
+      if (academicYear !== 'Semua' || semester !== 'Semua') {
+        // Only show relevant months for the academic year if filtering
+        if (semester === 'Ganjil') finalTrend = [trendMap[7], trendMap[8], trendMap[9], trendMap[10], trendMap[11], trendMap[0]];
+        else if (semester === 'Genap') finalTrend = [trendMap[1], trendMap[2], trendMap[3], trendMap[4], trendMap[5], trendMap[6]];
+      }
+
+      setTrendData(finalTrend);
+
+      // Category Data
       const catMap: Record<string, number> = {};
-      catCounts?.forEach(c => {
-        if (c.kategori) catMap[c.kategori] = (catMap[c.kategori] || 0) + 1;
+      filtered.filter(a => a.status === 'verified').forEach(c => {
+        const cat = c.category || 'Lainnya';
+        catMap[cat] = (catMap[cat] || 0) + 1;
       });
 
       const formattedCat = Object.entries(catMap)
@@ -102,15 +126,12 @@ export default function DashboardCharts() {
         .sort((a, b) => b.count - a.count)
         .slice(0, 6);
 
-      setKategoriData(formattedCat.length > 0 ? formattedCat : [
-        { kategori: 'Belum ada data', count: 0 }
-      ]);
-
+      setKategoriData(formattedCat.length > 0 ? formattedCat : [{ kategori: 'Belum ada data', count: 0 }]);
       setLoading(false);
     };
 
     fetchData();
-  }, []);
+  }, [academicYear, semester]);
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -118,7 +139,10 @@ export default function DashboardCharts() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-base font-bold text-slate-800">Tren Submisi Prestasi</h3>
-            <p className="text-xs text-slate-500 mt-0.5">6 bulan terakhir — diverifikasi, ditolak, draf</p>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {academicYear !== 'Semua' ? `TA ${academicYear}` : 'Seluruh Waktu'} 
+              {semester !== 'Semua' ? ` — Semester ${semester}` : ''}
+            </p>
           </div>
           <span className="text-[11px] text-slate-400 font-medium">
             {trendData[0]?.bulan} – {trendData[trendData.length - 1]?.bulan}

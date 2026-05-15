@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import '../styles/tailwind.css';
 import { Toaster } from 'sonner';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { SettingsProvider } from '@/contexts/SettingsContext';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -24,15 +25,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="id" suppressHydrationWarning>
       <body className="font-sans antialiased" suppressHydrationWarning>
         <AuthProvider>
-          {children}
-          <Toaster
-            position="top-right"
-            richColors
-            closeButton
-            toastOptions={{
-              style: { fontFamily: 'DM Sans, sans-serif', borderRadius: '12px' },
-            }}
-          />
+          <SettingsProvider>
+            {children}
+            <Toaster
+              position="top-right"
+              richColors
+              closeButton
+              toastOptions={{
+                style: { fontFamily: 'DM Sans, sans-serif', borderRadius: '12px' },
+              }}
+            />
+          </SettingsProvider>
         </AuthProvider>
       </body>
     </html>

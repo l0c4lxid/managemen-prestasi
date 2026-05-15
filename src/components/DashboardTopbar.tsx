@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import LogoutConfirmModal from './modals/LogoutConfirmModal';
+import { useSettings } from '@/contexts/SettingsContext';
 
 interface DashboardTopbarProps {
   onMobileMenuToggle: () => void;
@@ -17,6 +18,7 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const { profile, role, signOut } = useAuth();
+  const { academicYear, setAcademicYear, semester, setSemester, availableYears } = useSettings();
   const router = useRouter();
   const supabase = createClient();
 
@@ -173,8 +175,25 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
           )}
         </Link>
 
-        <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-semibold">
-          <span>TA 2026/2027</span>
+        <div className="hidden sm:flex items-center gap-1 px-1 py-1 rounded-xl bg-slate-50 border border-slate-100">
+          <select 
+            value={academicYear} 
+            onChange={(e) => setAcademicYear(e.target.value)}
+            className="px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-bold text-indigo-700 focus:outline-none focus:ring-1 focus:ring-indigo-300"
+          >
+            {availableYears.map(year => (
+              <option key={year} value={year}>{year === 'Semua' ? 'Semua TA' : `TA ${year}`}</option>
+            ))}
+          </select>
+          <select 
+            value={semester} 
+            onChange={(e) => setSemester(e.target.value as any)}
+            className="px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-bold text-indigo-700 focus:outline-none focus:ring-1 focus:ring-indigo-300"
+          >
+            <option value="Semua">Semua</option>
+            <option value="Ganjil">Ganjil</option>
+            <option value="Genap">Genap</option>
+          </select>
         </div>
 
         <div className="relative">
