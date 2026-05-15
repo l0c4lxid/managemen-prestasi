@@ -2,10 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, Bell, Menu, ChevronDown, Settings, LogOut, User, Trophy, Calendar } from 'lucide-react';
+import { Search, Bell, Menu, ChevronDown, LogOut, User, Trophy, Calendar } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
+import LogoutConfirmModal from './modals/LogoutConfirmModal';
 
 interface DashboardTopbarProps {
   onMobileMenuToggle: () => void;
@@ -23,6 +24,8 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
   const [searchResults, setSearchResults] = useState<{ id: string, title: string, type: 'achievement' | 'event', url: string }[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const roleLabel: Record<string, string> = {
@@ -46,12 +49,15 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
   }, [profile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSignOut = async () => {
+    setLogoutLoading(true);
     try { 
       await signOut(); 
       router.refresh();
       router.replace('/login'); 
     } catch { 
       toast.error('Gagal keluar'); 
+      setLogoutLoading(false);
+      setShowLogoutModal(false);
     }
   };
 
@@ -204,12 +210,8 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
                 <User size={15} className="text-slate-500" />
                 Profil Saya
               </Link>
-              <Link href="/pengaturan" onClick={() => setUserMenuOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 transition-colors">
-                <Settings size={15} className="text-slate-500" />
-                Pengaturan
-              </Link>
               <div className="border-t border-slate-100 mt-1 pt-1">
-                <button onClick={handleSignOut} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                <button onClick={() => setShowLogoutModal(true)} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
                   <LogOut size={15} />
                   Keluar
                 </button>
@@ -218,6 +220,12 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
           )}
         </div>
       </div>
+      <LogoutConfirmModal 
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleSignOut}
+        loading={logoutLoading}
+      />
     </header>
   );
 }

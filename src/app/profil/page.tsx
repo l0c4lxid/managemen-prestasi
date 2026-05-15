@@ -53,7 +53,7 @@ const statCardsData = [
 ];
 
 export default function ProfilPage() {
-  const { profile, user, refreshProfile } = useAuth();
+  const { profile, user, refreshProfile, role } = useAuth();
   const supabase = createClient();
   const [activeTab, setActiveTab] = useState<'info' | 'keamanan'>('info');
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -260,7 +260,7 @@ export default function ProfilPage() {
     .toUpperCase();
 
   return (
-    <AppLayout>
+    <AppLayout activePath="/profil">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Header Card */}
         <div className="bg-white rounded-2xl shadow-soft border border-slate-100 overflow-hidden">
@@ -308,7 +308,12 @@ export default function ProfilPage() {
 
                 <div className="pb-1">
                   <h1 className="text-xl font-bold text-slate-800">{form.namaLengkap}</h1>
-                  <p className="text-sm text-slate-500">{form.jabatan} · {form.unit}</p>
+                  <p className="text-sm text-slate-500">
+                    {role === 'mahasiswa' 
+                      ? `${form.nim || 'NIM —'} · ${form.prodi || 'Program Studi —'}`
+                      : `${form.jabatan || 'Jabatan —'} · ${form.unit || 'Unit —'}`
+                    }
+                  </p>
                   <div className="flex items-center gap-1.5 mt-1 text-xs text-slate-400">
                     <MapPin size={12} />
                     <span>{form.lokasi}</span>
@@ -419,28 +424,32 @@ export default function ProfilPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Jabatan</label>
-                    <div className="relative">
-                      <Building size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        value={form.jabatan}
-                        onChange={(e) => setForm((p) => ({ ...p, jabatan: e.target.value }))}
-                        className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
-                        placeholder="Jabatan"
-                      />
-                    </div>
-                  </div>
+                  {role !== 'mahasiswa' && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1.5">Jabatan</label>
+                        <div className="relative">
+                          <Building size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                          <input
+                            value={form.jabatan}
+                            onChange={(e) => setForm((p) => ({ ...p, jabatan: e.target.value }))}
+                            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+                            placeholder="Jabatan"
+                          />
+                        </div>
+                      </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Unit / Divisi</label>
-                    <input
-                      value={form.unit}
-                      onChange={(e) => setForm((p) => ({ ...p, unit: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
-                      placeholder="Unit atau divisi"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1.5">Unit / Divisi</label>
+                        <input
+                          value={form.unit}
+                          onChange={(e) => setForm((p) => ({ ...p, unit: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+                          placeholder="Unit atau divisi"
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 mb-1.5">Lokasi</label>
@@ -455,45 +464,49 @@ export default function ProfilPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">NIM (jika mahasiswa)</label>
-                    <input
-                      value={form.nim}
-                      onChange={(e) => setForm((p) => ({ ...p, nim: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
-                      placeholder="Nomor Induk Mahasiswa"
-                    />
-                  </div>
+                  {role === 'mahasiswa' && (
+                    <>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1.5">NIM</label>
+                        <input
+                          value={form.nim}
+                          onChange={(e) => setForm((p) => ({ ...p, nim: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+                          placeholder="Nomor Induk Mahasiswa"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Angkatan</label>
-                    <input
-                      value={form.angkatan}
-                      onChange={(e) => setForm((p) => ({ ...p, angkatan: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
-                      placeholder="Tahun angkatan"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1.5">Angkatan</label>
+                        <input
+                          value={form.angkatan}
+                          onChange={(e) => setForm((p) => ({ ...p, angkatan: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+                          placeholder="Tahun angkatan"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Fakultas</label>
-                    <input
-                      value={form.fakultas}
-                      onChange={(e) => setForm((p) => ({ ...p, fakultas: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
-                      placeholder="Nama fakultas"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1.5">Fakultas</label>
+                        <input
+                          value={form.fakultas}
+                          onChange={(e) => setForm((p) => ({ ...p, fakultas: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+                          placeholder="Nama fakultas"
+                        />
+                      </div>
 
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Program Studi</label>
-                    <input
-                      value={form.prodi}
-                      onChange={(e) => setForm((p) => ({ ...p, prodi: e.target.value }))}
-                      className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
-                      placeholder="Program studi"
-                    />
-                  </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 mb-1.5">Program Studi</label>
+                        <input
+                          value={form.prodi}
+                          onChange={(e) => setForm((p) => ({ ...p, prodi: e.target.value }))}
+                          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+                          placeholder="Program studi"
+                        />
+                      </div>
+                    </>
+                  )}
 
                   <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold text-slate-600 mb-1.5">Bio</label>

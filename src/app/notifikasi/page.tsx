@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import AppLayout from '@/components/AppLayout';
-import { Bell, CheckCheck, Trash2, Trophy, Swords, CalendarDays, Info, CheckCircle, Clock, Search } from 'lucide-react';
+import { Bell, CheckCheck, Trash2, Trophy, Swords, CalendarDays, Info, CheckCircle, Clock, Search, X, Users } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -10,12 +10,19 @@ import type { Notification } from '@/types';
 type FilterType = 'all' | string;
 
 const typeConfig: Record<string, { icon: React.ReactNode; bg: string; color: string; label: string }> = {
-  submit: { icon: <Trophy size={16} />, bg: 'bg-amber-50', color: 'text-amber-600', label: 'Prestasi' },
-  verification: { icon: <CheckCircle size={16} />, bg: 'bg-emerald-50', color: 'text-emerald-600', label: 'Verifikasi' },
-  lomba: { icon: <Swords size={16} />, bg: 'bg-indigo-50', color: 'text-indigo-600', label: 'Lomba' },
-  event: { icon: <CalendarDays size={16} />, bg: 'bg-cyan-50', color: 'text-cyan-600', label: 'Event' },
+  new_achievement: { icon: <Trophy size={16} />, bg: 'bg-amber-50', color: 'text-amber-600', label: 'Prestasi Baru' },
+  achievement_verified: { icon: <CheckCircle size={16} />, bg: 'bg-emerald-50', color: 'text-emerald-600', label: 'Verifikasi' },
+  achievement_rejected: { icon: <X size={16} />, bg: 'bg-red-50', color: 'text-red-600', label: 'Ditolak' },
+  new_competition: { icon: <Swords size={16} />, bg: 'bg-indigo-50', color: 'text-indigo-600', label: 'Lomba Baru' },
+  new_user: { icon: <Users size={16} />, bg: 'bg-blue-50', color: 'text-blue-600', label: 'User Baru' },
   system: { icon: <Info size={16} />, bg: 'bg-slate-100', color: 'text-slate-500', label: 'Sistem' },
+  event: { icon: <CalendarDays size={16} />, bg: 'bg-cyan-50', color: 'text-cyan-600', label: 'Event' },
 };
+
+function formatTypeLabel(type: string) {
+  if (typeConfig[type]) return typeConfig[type].label;
+  return type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
 
 export default function NotifikasiPage() {
   const { profile } = useAuth();
@@ -100,7 +107,7 @@ export default function NotifikasiPage() {
 
         {/* Stats tabs */}
         <div className="flex flex-wrap gap-2">
-          {[{ key: 'all', label: 'Semua', count: notifs.length }, ...types.map(t => ({ key: t, label: typeConfig[t]?.label || t, count: notifs.filter(n => n.type === t).length }))].map(tab => (
+          {[{ key: 'all', label: 'Semua', count: notifs.length }, ...types.map(t => ({ key: t, label: formatTypeLabel(t), count: notifs.filter(n => n.type === t).length }))].map(tab => (
             <button key={tab.key} onClick={() => setFilterType(tab.key)}
               className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border transition-all ${filterType === tab.key ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
             >

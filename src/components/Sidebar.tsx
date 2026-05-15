@@ -6,11 +6,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
-  LayoutDashboard, Trophy, Swords, CalendarDays, Users, Settings,
+  LayoutDashboard, Trophy, Swords, CalendarDays, Users,
   ChevronLeft, ChevronRight, LogOut, BarChart3, Bell, UserCircle,
   Bookmark, Send, ClipboardList, ShieldCheck, Star, Images,
 } from 'lucide-react';
 import type { UserRole } from '@/types';
+import LogoutConfirmModal from './modals/LogoutConfirmModal';
 
 interface NavItem {
   label: string;
@@ -44,7 +45,6 @@ const navItems: NavItem[] = [
   // Sistem — semua
   { label: 'Notifikasi', href: '/notifikasi', icon: <Bell size={20} />, group: 'Sistem', roles: ['super_admin', 'admin_prestasi', 'admin_lomba', 'admin_perencanaan', 'mahasiswa'] },
   { label: 'Profil', href: '/profil', icon: <UserCircle size={20} />, group: 'Sistem', roles: ['super_admin', 'admin_prestasi', 'admin_lomba', 'admin_perencanaan', 'mahasiswa'] },
-  { label: 'Pengaturan', href: '/pengaturan', icon: <Settings size={20} />, group: 'Sistem', roles: ['super_admin'] },
 ];
 
 interface SidebarProps {
@@ -75,14 +75,19 @@ function SidebarContent({ collapsed, onToggleCollapse, activePath, isMobile }: {
 }) {
   const { profile, role, signOut } = useAuth();
   const router = useRouter();
+  const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+  const [logoutLoading, setLogoutLoading] = React.useState(false);
 
   const handleSignOut = async () => {
+    setLogoutLoading(true);
     try { 
       await signOut(); 
       router.refresh();
       router.replace('/login'); 
     } catch { 
       toast.error('Gagal keluar'); 
+      setLogoutLoading(false);
+      setShowLogoutModal(false);
     }
   };
 
@@ -169,12 +174,12 @@ function SidebarContent({ collapsed, onToggleCollapse, activePath, isMobile }: {
               <p className="text-sm font-semibold text-slate-800 truncate">{profile?.name || 'Pengguna'}</p>
               <p className="text-[11px] text-slate-500 truncate">{role ? roleLabel[role] : '—'}</p>
             </div>
-            <button onClick={handleSignOut} className="p-1 text-slate-400 hover:text-red-500 transition-colors" title="Keluar">
+            <button onClick={() => setShowLogoutModal(true)} className="p-1 text-slate-400 hover:text-red-500 transition-colors" title="Keluar">
               <LogOut size={15} />
             </button>
           </div>
         ) : (
-          <button onClick={handleSignOut}
+          <button onClick={() => setShowLogoutModal(true)}
             className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center text-white text-xs font-bold"
             title="Keluar"
           >
@@ -182,6 +187,13 @@ function SidebarContent({ collapsed, onToggleCollapse, activePath, isMobile }: {
           </button>
         )}
       </div>
+
+      <LogoutConfirmModal 
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={handleSignOut}
+        loading={logoutLoading}
+      />
     </div>
   );
 }
