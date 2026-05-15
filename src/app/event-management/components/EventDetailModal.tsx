@@ -148,29 +148,29 @@ export default function EventDetailModal({
 
             {/* CTA */}
             <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row gap-4">
-              {onRegister && (
-                <button
-                  onClick={() => onRegister(event.id)}
-                  className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all shadow-lg 
-                    ${isRegistered 
-                      ? 'bg-emerald-600 text-white shadow-emerald-200 hover:bg-emerald-700' 
-                      : 'bg-indigo-600 text-white shadow-indigo-200 hover:bg-indigo-700'}`}
-                >
-                  {isRegistered ? <CheckCircle2 size={18} /> : <Plus size={18} />}
-                  {isRegistered ? 'Terdaftar (Batal?)' : 'Daftar Sekarang'}
-                </button>
-              )}
-              
-              {event.link_pendaftaran && (
+              {event.link_pendaftaran ? (
                 <a 
                   href={event.link_pendaftaran} 
                   target="_blank" 
                   rel="noopener noreferrer" 
-                  className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-white border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 transition-all"
+                  className="flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200"
                 >
                   <ExternalLink size={18} />
-                  Link Eksternal
+                  Daftar Sekarang (Eksternal)
                 </a>
+              ) : (
+                onRegister && (
+                  <button
+                    onClick={() => onRegister(event.id)}
+                    className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-2xl font-bold transition-all shadow-lg 
+                      ${isRegistered 
+                        ? 'bg-emerald-600 text-white shadow-emerald-200 hover:bg-emerald-700' 
+                        : 'bg-indigo-600 text-white shadow-indigo-200 hover:bg-indigo-700'}`}
+                  >
+                    {isRegistered ? <CheckCircle2 size={18} /> : <Plus size={18} />}
+                    {isRegistered ? 'Terdaftar (Batal?)' : 'Daftar Sekarang'}
+                  </button>
+                )
               )}
             </div>
           </div>

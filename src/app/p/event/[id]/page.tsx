@@ -263,16 +263,21 @@ export default function PublicEventPage({ params }: { params: Promise<{ id: stri
 
                   <div className="pt-6 border-t border-slate-200">
                     <Link 
-                      href="/event-management" 
+                      href={event.link_pendaftaran || "/event-management"} 
+                      target={event.link_pendaftaran ? "_blank" : undefined}
+                      rel={event.link_pendaftaran ? "noopener noreferrer" : undefined}
                       className={`w-full flex items-center justify-center gap-2 py-3 rounded-xl text-white font-bold transition-all
                         ${isExpired() || isFull
                           ? 'bg-slate-400 cursor-not-allowed hover:bg-slate-400' 
                           : 'bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-200'}`}
                     >
-                      Daftar Event
+                      {event.link_pendaftaran ? 'Daftar Sekarang' : 'Daftar Event'}
+                      {event.link_pendaftaran && <LinkIcon size={16} />}
                     </Link>
                     <p className="text-center text-[11px] text-slate-500 mt-3">
-                      *Akan diarahkan ke sistem akademik (login diperlukan)
+                      {event.link_pendaftaran 
+                        ? '*Pendaftaran melalui platform eksternal' 
+                        : '*Akan diarahkan ke sistem akademik (login diperlukan)'}
                     </p>
                   </div>
                 </div>

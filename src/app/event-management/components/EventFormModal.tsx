@@ -266,6 +266,7 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
                     <div className="col-span-1 sm:col-span-2">
                       <label className="label-text">Link Pendaftaran Eksternal (Jika ada)</label>
                       <input type="url" placeholder="https://..." className="input-field bg-slate-50" {...register('link_pendaftaran')} />
+                      <p className="text-[10px] text-slate-400 mt-1">Jika diisi, tombol pendaftaran di landing page akan mengarah ke link ini.</p>
                     </div>
                   </div>
                   
