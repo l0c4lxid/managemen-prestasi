@@ -69,7 +69,7 @@ export default async function PublicAchievementPage({ params }: { params: Promis
   const { url: targetUrl, buttonText, cleanText: cleanDescription } = extractUrl(achievement.description);
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
+    <div className="flex-1 bg-slate-50 font-sans flex flex-col overflow-x-hidden">
       <LandingNav />
       
       <main className="flex-grow pt-24 pb-20">

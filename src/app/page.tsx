@@ -82,7 +82,7 @@ export default async function RootPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white font-sans transition-colors duration-300">
+    <div className="flex-1 bg-white font-sans transition-colors duration-300 overflow-x-hidden">
       <LandingNav />
       <HeroSection stats={stats} recentAchievements={achievements} />
       <WallOfFame initialData={achievements} />

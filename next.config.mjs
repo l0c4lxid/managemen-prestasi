@@ -9,13 +9,10 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
 
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-
   images: {
     remotePatterns: imageHosts,
     minimumCacheTTL: 60,
+    qualities: [75, 85],
   }
 };
 export default nextConfig;

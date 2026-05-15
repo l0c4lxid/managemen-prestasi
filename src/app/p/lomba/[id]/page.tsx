@@ -76,7 +76,7 @@ export default function PublicLombaPage({ params }: { params: Promise<{ id: stri
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans flex flex-col transition-colors duration-300">
+    <div className="flex-1 bg-slate-50 font-sans flex flex-col transition-colors duration-300 overflow-x-hidden">
       <LandingNav />
       
       <main className="flex-grow pt-28 pb-20">

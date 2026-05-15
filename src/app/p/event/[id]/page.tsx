@@ -80,7 +80,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ id: stri
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 font-sans flex flex-col">
+    <div className="flex-1 bg-slate-50 font-sans flex flex-col overflow-x-hidden">
       <LandingNav />
       
       <main className="flex-grow pt-24 pb-20">
@@ -246,16 +246,28 @@ export default function PublicEventPage({ params }: { params: Promise<{ id: stri
                   )}
 
                   <div>
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Kuota Peserta</p>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-sm font-semibold text-slate-700">
-                        {currentPeserta} / {event.quota || 100}
-                      </span>
-                      {isFull && <span className="text-[10px] font-bold text-red-600 uppercase">Penuh</span>}
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">Status Kuota</p>
+                    <div className="flex items-center gap-2 mb-2">
+                      {isFull ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-100 text-red-700 text-xs font-bold rounded-full border border-red-200">
+                          <Users size={12} />
+                          Kuota Sudah Habis
+                        </span>
+                      ) : fillPct >= 80 ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-700 text-xs font-bold rounded-full border border-amber-200">
+                          <Users size={12} />
+                          Kuota Segera Habis
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-100 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200">
+                          <Users size={12} />
+                          Kuota Masih Tersedia
+                        </span>
+                      )}
                     </div>
-                    <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full rounded-full transition-all duration-500 ${isFull ? 'bg-red-500' : 'bg-indigo-500'}`}
+                        className={`h-full transition-all duration-700 ${isFull ? 'bg-red-500' : fillPct >= 80 ? 'bg-amber-500' : 'bg-emerald-500'}`}
                         style={{ width: `${fillPct}%` }}
                       />
                     </div>

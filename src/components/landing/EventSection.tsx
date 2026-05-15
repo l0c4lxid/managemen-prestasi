@@ -16,8 +16,6 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
     tanggal: e.date ? new Date(e.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : e.tanggal,
     lokasi: e.location || e.lokasi,
     mentor: e.mentor,
-    peserta: e.registered_count || e.peserta || 0,
-    kapasitas: e.quota || e.kapasitas || 100,
     tipe: e.type || e.tipe || 'Event',
     color: e.status === 'done' ? 'bg-slate-500' : 'bg-indigo-600'
   }));
@@ -90,8 +88,7 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {events.map((event) => {
-            const fillPct = Math.min(100, Math.round((event.peserta / (event.kapasitas || 100)) * 100));
-            const isAlmostFull = fillPct >= 80;
+
 
             return (
               <div
@@ -149,22 +146,7 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
                       </div>
                     </div>
 
-                    {/* Capacity bar */}
-                    <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Kapasitas Peserta</span>
-                        <span className={`text-xs font-bold ${isAlmostFull ? 'text-red-600' : 'text-slate-700'}`}>
-                          {event.peserta}/{event.kapasitas}
-                        </span>
-                      </div>
-                      <div className="h-2 bg-slate-100 rounded-full overflow-hidden p-0.5">
-                        <div
-                          className={`h-full rounded-full transition-all duration-700 ${isAlmostFull ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]' : 'bg-indigo-500'}`}
-                          style={{ width: `${fillPct}%` }}
-                        />
-                      </div>
-                      {isAlmostFull && <p className="text-[10px] text-red-500 font-bold mt-1.5 text-right flex items-center justify-end gap-1"><Mic2 size={10} /> Hampir Penuh!</p>}
-                    </div>
+
                   </div>
 
                   <Link 

@@ -5,7 +5,7 @@ const PUBLIC_ROUTES = ['/login', '/register', '/'];
 const DEFAULT_LOGIN = '/login';
 const DEFAULT_DASHBOARD = '/dashboard';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
