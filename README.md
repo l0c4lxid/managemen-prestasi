@@ -32,9 +32,18 @@
 2. **Install dependencies**:
    ```bash
    npm install
+   # atau menggunakan pnpm (direkomendasikan)
+   pnpm install
    ```
 
-3. **Konfigurasi Environment Variables**:
+3. **Konfigurasi Database (Supabase) - Siap Prod / Lokal Baru**:
+   Proyek ini menggunakan Supabase. Untuk setup di environment baru, gunakan skrip SQL yang sudah disiapkan:
+   - Buat project baru di [Supabase](https://supabase.com/).
+   - Masuk ke menu **SQL Editor**.
+   - Copy dan paste seluruh isi file `database/schema.sql` (terdapat di folder database) lalu klik **Run** untuk membuat seluruh enum, tabel, serta relasinya.
+   - *Penting: RLS (Row Level Security) telah diaktifkan secara otomatis. Anda perlu mengatur Policies di menu Authentication -> Policies sesuai hak akses aplikasi.*
+
+4. **Konfigurasi Environment Variables**:
    Buat file `.env` di root directory dan masukkan kredensial Supabase Anda:
    ```env
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -42,9 +51,11 @@
    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
    ```
 
-4. **Jalankan Development Server**:
+5. **Jalankan Development Server**:
    ```bash
    npm run dev
+   # atau
+   pnpm dev
    ```
    Buka [http://localhost:4028](http://localhost:4028) untuk melihat aplikasi.
 
@@ -56,6 +67,7 @@
 - `src/lib/` - Konfigurasi Supabase dan utilitas lainnya.
 - `src/types/` - Definisi TypeScript interfaces.
 - `src/styles/` - Konfigurasi Tailwind dan styling global.
+- `database/schema.sql` - Full SQL DDL untuk inisialisasi database di Supabase (Production/Local setup).
 
 ## 📱 Role & Akses
 
