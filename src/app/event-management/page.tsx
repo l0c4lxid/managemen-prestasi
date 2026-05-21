@@ -11,6 +11,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import EventFormModal from './components/EventFormModal';
 import EventDetailModal from './components/EventDetailModal';
 import EmptyState from '@/components/ui/EmptyState';
+import AppImage from '@/components/ui/AppImage';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -113,7 +114,12 @@ export default function EventManagementPage() {
     setRegLoading(null);
   };
 
-  useEffect(() => { fetchData(); fetchRegistrations(); }, [profile?.id, role]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    Promise.resolve().then(() => {
+      fetchData();
+      fetchRegistrations();
+    });
+  }, [profile?.id, role]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = useMemo(() => {
     let result = [...data];
@@ -270,9 +276,10 @@ export default function EventManagementPage() {
                   {/* Top Image/Icon */}
                   <div className="relative h-44 bg-slate-100 overflow-hidden">
                     {evt.poster_url ? (
-                      <img 
+                      <AppImage 
                         src={evt.poster_url} 
                         alt={evt.title} 
+                        fill
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                       />
                     ) : (

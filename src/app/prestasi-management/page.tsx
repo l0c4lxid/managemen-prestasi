@@ -1,10 +1,11 @@
 'use client';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { Search, Filter, CheckCircle, XCircle, Clock, Eye, ExternalLink, RefreshCw, BarChart3, Trophy, Users, Plus, Edit, Trash2, Image as ImageIcon, Loader2, Globe } from 'lucide-react';
 import AppLayout from '@/components/AppLayout';
+import AppImage from '@/components/ui/AppImage';
 import { useAuth } from '@/contexts/AuthContext';
 import type { Achievement } from '@/types';
 
@@ -17,7 +18,7 @@ const statusCfg = {
 };
 
 export default function PrestasiManagementPage() {
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
   const { role } = useAuth();
   const canVerify = ['super_admin', 'admin_prestasi'].includes(role || '');
   const [data, setData] = useState<Achievement[]>([]);
@@ -31,8 +32,8 @@ export default function PrestasiManagementPage() {
   const [filterLevel, setFilterLevel] = useState('all');
   const [detailItem, setDetailItem] = useState<Achievement | null>(null);
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = React.useCallback(async (isRefresh = false) => {
+    if (isRefresh) setLoading(true);
     const { data: rows, error } = await supabase
       .from('achievements')
       .select('*, users:user_id(name, email, nim), competitions:competition_id(title)')
@@ -40,9 +41,27 @@ export default function PrestasiManagementPage() {
     if (error) toast.error('Gagal memuat data prestasi');
     else setData((rows as unknown as Achievement[]) || []);
     setLoading(false);
-  };
+  }, [supabase]);
 
-  useEffect(() => { fetchData(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    let isMounted = true;
+    
+    const loadData = async () => {
+      const { data: rows, error } = await supabase
+        .from('achievements')
+        .select('*, users:user_id(name, email, nim), competitions:competition_id(title)')
+        .order('created_at', { ascending: false });
+      
+      if (isMounted) {
+        if (error) toast.error('Gagal memuat data prestasi');
+        else setData((rows as unknown as Achievement[]) || []);
+        setLoading(false);
+      }
+    };
+
+    loadData();
+    return () => { isMounted = false; };
+  }, [supabase]);
 
   const filtered = useMemo(() => {
     let r = [...data];
@@ -85,7 +104,7 @@ export default function PrestasiManagementPage() {
     rank: '',
     proof_url: '',
     document_url: '',
-    year: new Date().getFullYear().toString(),
+    year: '',
     status: 'pending' as Achievement['status'],
     isNewStudent: false,
     newName: '',
@@ -96,14 +115,31 @@ export default function PrestasiManagementPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<{id: string, title: string} | null>(null);
   const [usersList, setUsersList] = useState<{id: string, name: string, nim: string}[]>([]);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     const { data } = await supabase.from('users').select('id, name, nim').eq('role', 'mahasiswa').order('name');
     setUsersList(data || []);
-  };
+  }, [supabase]);
 
   const openAddModal = () => {
     setModalMode('add');
-    setModalForm({ id: '', user_id: '', title: '', description: '', category: 'Akademik', competition_level: 'nasional', rank: '', proof_url: '', document_url: '', year: new Date().getFullYear().toString(), status: 'pending', isNewStudent: false, newName: '', newNim: '', newEmail: '', newMajor: '' });
+    setModalForm({ 
+      id: '', 
+      user_id: '', 
+      title: '', 
+      description: '', 
+      category: 'Akademik', 
+      competition_level: 'nasional', 
+      rank: '', 
+      proof_url: '', 
+      document_url: '', 
+      year: new Date().getFullYear().toString(), 
+      status: 'pending', 
+      isNewStudent: false, 
+      newName: '', 
+      newNim: '', 
+      newEmail: '', 
+      newMajor: '' 
+    });
     setModalOpen(true);
     fetchUsers();
     setSelectedFile(null);
@@ -219,8 +255,9 @@ export default function PrestasiManagementPage() {
       }
       setModalOpen(false);
       fetchData();
-    } catch (error: any) {
-      toast.error('Gagal menyimpan data: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error('Gagal menyimpan data: ' + errorMessage);
     } finally {
       setProcessing(null);
       setUploading(false);
@@ -246,7 +283,7 @@ export default function PrestasiManagementPage() {
     rejected: data.filter(d => d.status === 'rejected').length,
   }), [data]);
 
-  const levels = Array.from(new Set(data.map(d => d.competition_level).filter(Boolean)));
+  const levels = useMemo(() => Array.from(new Set(data.map(d => d.competition_level).filter(Boolean))), [data]);
 
   return (
     <AppLayout activePath="/prestasi-management">
@@ -258,7 +295,7 @@ export default function PrestasiManagementPage() {
             <p className="text-slate-500 text-sm mt-1">Tinjau, verifikasi, dan kelola seluruh submisi prestasi mahasiswa.</p>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={fetchData} className="btn-ghost">
+            <button onClick={() => fetchData(true)} className="btn-ghost">
               <RefreshCw size={15} /> Refresh
             </button>
             <button
@@ -353,7 +390,7 @@ export default function PrestasiManagementPage() {
                         <div className="flex items-center gap-3">
                           {item.proof_url && item.proof_url.match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
                             <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-100 flex-shrink-0 bg-slate-50">
-                              <img src={item.proof_url} alt="Prestasi" className="w-full h-full object-cover" />
+                              <AppImage src={item.proof_url} alt="Prestasi" fill className="object-cover" />
                             </div>
                           ) : (
                             <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center text-slate-400 flex-shrink-0">
@@ -422,7 +459,7 @@ export default function PrestasiManagementPage() {
               {/* Image Header */}
               <div className="relative aspect-video bg-slate-100 overflow-hidden">
                 {detailItem.proof_url && detailItem.proof_url.match(/\.(jpeg|jpg|gif|png|webp)$/) ? (
-                  <img src={detailItem.proof_url} alt={detailItem.title} className="w-full h-full object-cover" />
+                  <AppImage src={detailItem.proof_url} alt={detailItem.title} fill className="object-cover" />
                 ) : (
                   <div className="w-full h-full flex flex-col items-center justify-center text-slate-400 bg-gradient-to-br from-slate-50 to-slate-100">
                     <Trophy size={48} className="mb-2 opacity-20" />
@@ -717,7 +754,7 @@ export default function PrestasiManagementPage() {
                     <div className="relative group border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-2xl bg-slate-50 transition-colors overflow-hidden aspect-video flex flex-col items-center justify-center">
                       {previewUrl ? (
                         <div className="absolute inset-0 w-full h-full">
-                          <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+                          <AppImage src={previewUrl} alt="Preview" fill className="object-contain" />
                           <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                             <p className="text-white text-xs font-bold">Klik untuk ganti foto</p>
                           </div>
@@ -796,7 +833,7 @@ export default function PrestasiManagementPage() {
                 </div>
                 <h3 className="text-xl font-bold text-slate-800 mb-2">Hapus Prestasi?</h3>
                 <p className="text-sm text-slate-500 leading-relaxed mb-8">
-                  Apakah Anda yakin ingin menghapus <span className="font-bold text-slate-700 italic">"{deleteConfirm.title}"</span>? Tindakan ini tidak dapat dibatalkan.
+                  Apakah Anda yakin ingin menghapus <span className="font-bold text-slate-700 italic">&quot;{deleteConfirm.title}&quot;</span>? Tindakan ini tidak dapat dibatalkan.
                 </p>
                 <div className="flex flex-col gap-3">
                   <button

@@ -1,10 +1,11 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import AppLayout from '@/components/AppLayout';
 import { User, Mail, Phone, Building, MapPin, Calendar, Camera, Save, CheckCircle, Lock, Eye, EyeOff, Shield, Award, BookOpen, X, Upload, Star, TrendingUp,  } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
+import AppImage from '@/components/ui/AppImage';
 
 interface ProfileForm {
   namaLengkap: string;
@@ -82,8 +83,10 @@ export default function ProfilPage() {
   });
 
   useEffect(() => {
+    let isMounted = true;
+
     if (profile) {
-      setForm({
+      const newForm: ProfileForm = {
         namaLengkap: profile.name || '',
         email: profile.email || '',
         telepon: profile.phone || '',
@@ -96,48 +99,59 @@ export default function ProfilPage() {
         fakultas: profile.faculty || '',
         prodi: profile.major || '',
         angkatan: profile.year || '',
+      };
+      
+      Promise.resolve().then(() => {
+        if (isMounted) {
+          setForm(newForm);
+          if (profile.avatar_url) {
+            setAvatarPreview(profile.avatar_url);
+          }
+        }
       });
-      if (profile.avatar_url) {
-        setAvatarPreview(profile.avatar_url);
-      }
-      fetchStats(profile.id);
+
+      const getStats = async () => {
+        try {
+          // Achievements count
+          const { count: achievementsCount } = await supabase
+            .from('achievements')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', profile.id)
+            .eq('status', 'verified');
+
+          // Competitions count
+          const { count: competitionsCount } = await supabase
+            .from('registrations')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', profile.id)
+            .not('competition_id', 'is', null);
+
+          // Events count
+          const { count: eventsCount } = await supabase
+            .from('registrations')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', profile.id)
+            .not('event_id', 'is', null)
+            .eq('status', 'attended');
+
+          if (isMounted) {
+            setStats({
+              achievements: achievementsCount || 0,
+              competitions: competitionsCount || 0,
+              events: eventsCount || 0,
+              points: (achievementsCount || 0) * 100
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching stats:', error);
+        }
+      };
+
+      getStats();
     }
-  }, [profile]);
 
-  const fetchStats = async (userId: string) => {
-    try {
-      // Achievements count
-      const { count: achievementsCount } = await supabase
-        .from('achievements')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .eq('status', 'verified');
-
-      // Competitions count (from registrations where competition_id is not null)
-      const { count: competitionsCount } = await supabase
-        .from('registrations')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .not('competition_id', 'is', null);
-
-      // Events count (from registrations where event_id is not null)
-      const { count: eventsCount } = await supabase
-        .from('registrations')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', userId)
-        .not('event_id', 'is', null)
-        .eq('status', 'attended');
-
-      setStats({
-        achievements: achievementsCount || 0,
-        competitions: competitionsCount || 0,
-        events: eventsCount || 0,
-        points: (achievementsCount || 0) * 100 // Mock points calculation
-      });
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-    }
-  };
+    return () => { isMounted = false; };
+  }, [profile, supabase]);
 
   const [formLoading, setFormLoading] = useState(false);
   const [formSaved, setFormSaved] = useState(false);
@@ -177,8 +191,9 @@ export default function ProfilPage() {
       setAvatarPreview(publicUrl);
       await refreshProfile();
       toast.success('Foto profil berhasil diperbarui');
-    } catch (error: any) {
-      toast.error('Gagal mengunggah foto: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error('Gagal mengunggah foto: ' + errorMessage);
     } finally {
       setUploadLoading(false);
     }
@@ -212,8 +227,9 @@ export default function ProfilPage() {
       await refreshProfile();
       toast.success('Profil berhasil diperbarui');
       setTimeout(() => setFormSaved(false), 2500);
-    } catch (error: any) {
-      toast.error('Gagal menyimpan profil: ' + error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error('Gagal menyimpan profil: ' + errorMessage);
     } finally {
       setFormLoading(false);
     }
@@ -244,20 +260,23 @@ export default function ProfilPage() {
       setPwForm({ passwordLama: '', passwordBaru: '', konfirmasiPassword: '' });
       toast.success('Password berhasil diperbarui');
       setTimeout(() => setPwSaved(false), 2500);
-    } catch (error: any) {
-      setPwError(error.message);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      setPwError(errorMessage);
       toast.error('Gagal memperbarui password');
     } finally {
       setPwLoading(false);
     }
   };
 
-  const initials = form.namaLengkap
-    .split(' ')
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase();
+  const initials = useMemo(() => {
+    return form.namaLengkap
+      .split(' ')
+      .slice(0, 2)
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  }, [form.namaLengkap]);
 
   return (
     <AppLayout activePath="/profil">
@@ -279,7 +298,7 @@ export default function ProfilPage() {
                 <div className="relative flex-shrink-0">
                   <div className="w-20 h-20 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
                     {avatarPreview ? (
-                      <img src={avatarPreview} alt="Foto profil" className="w-full h-full object-cover" />
+                      <AppImage src={avatarPreview} alt="Foto profil" fill className="object-cover" />
                     ) : (
                       <span className="text-white text-2xl font-bold">{initials}</span>
                     )}

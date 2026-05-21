@@ -2,7 +2,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type Semester = 'Semua' | 'Ganjil' | 'Genap';
+export type Semester = 'Semua' | 'Ganjil' | 'Genap';
 
 interface SettingsContextType {
   academicYear: string;
@@ -24,8 +24,10 @@ export function SettingsProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const savedYear = localStorage.getItem('academicYear');
     const savedSemester = localStorage.getItem('semester');
-    if (savedYear) setAcademicYear(savedYear);
-    if (savedSemester) setSemester(savedSemester as Semester);
+    Promise.resolve().then(() => {
+      if (savedYear) setAcademicYear(savedYear);
+      if (savedSemester) setSemester(savedSemester as Semester);
+    });
   }, []);
 
   useEffect(() => {

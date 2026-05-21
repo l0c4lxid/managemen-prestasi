@@ -28,10 +28,6 @@ export default function PosterManagementPage() {
 
   const supabase = createClient();
 
-  useEffect(() => {
-    fetchPosters();
-  }, []);
-
   const fetchPosters = async () => {
     try {
       const { data, error } = await supabase
@@ -48,6 +44,10 @@ export default function PosterManagementPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPosters();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -71,10 +71,13 @@ export default function PosterManagementPage() {
     try {
       // 1. Upload file to Supabase Storage
       const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+      // Generate fileName inside the effect/handler scope
+      const randomId = Math.random().toString(36).substring(2, 15);
+      const timestamp = Date.now();
+      const fileName = `${randomId}_${timestamp}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      const { error: uploadError, data } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('posters')
         .upload(filePath, selectedFile);
 
@@ -103,7 +106,8 @@ export default function PosterManagementPage() {
       setPreviewUrl(null);
       fetchPosters();
 
-    } catch (error: any) {
+    } catch (err: unknown) {
+      const error = err as Error;
       console.error('Upload error:', error);
       toast.error(error.message || 'Terjadi kesalahan saat mengunggah');
     } finally {
@@ -121,7 +125,8 @@ export default function PosterManagementPage() {
       if (error) throw error;
       setPosters(posters.map(p => p.id === id ? { ...p, is_active: !currentStatus } : p));
       toast.success(`Poster berhasil ${!currentStatus ? 'ditampilkan' : 'disembunyikan'}`);
-    } catch (error) {
+    } catch (err) {
+      console.error('Error toggling status:', err);
       toast.error('Gagal mengubah status poster');
     }
   };
@@ -151,7 +156,8 @@ export default function PosterManagementPage() {
 
       setPosters(posters.filter(p => p.id !== id));
       toast.success('Poster berhasil dihapus');
-    } catch (error) {
+    } catch (err) {
+      console.error('Error deleting poster:', err);
       toast.error('Gagal menghapus poster');
     }
   };

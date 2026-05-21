@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { X, Trophy } from 'lucide-react';
 import type { Prestasi, PrestasiStatus } from './PrestasiTable';
@@ -43,30 +43,34 @@ export default function PrestasiFormModal({ open, onClose, onSave, editItem }: P
     } : { status: 'draft', sertifikat: false },
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (editItem) {
-      reset({
-        nim: editItem.nim, nama: editItem.nama, prodi: editItem.prodi,
-        angkatan: editItem.angkatan, lomba: editItem.lomba,
-        penyelenggara: editItem.penyelenggara, kategori: editItem.kategori,
-        juara: editItem.juara, tingkat: editItem.tingkat, tanggal: editItem.tanggal,
-        sertifikat: editItem.sertifikat, status: editItem.status, catatan: editItem.catatan || '',
+      Promise.resolve().then(() => {
+        reset({
+          nim: editItem.nim, nama: editItem.nama, prodi: editItem.prodi,
+          angkatan: editItem.angkatan, lomba: editItem.lomba,
+          penyelenggara: editItem.penyelenggara, kategori: editItem.kategori,
+          juara: editItem.juara, tingkat: editItem.tingkat, tanggal: editItem.tanggal,
+          sertifikat: editItem.sertifikat, status: editItem.status, catatan: editItem.catatan || '',
+        });
       });
     } else {
-      reset({ status: 'draft', sertifikat: false });
+      Promise.resolve().then(() => {
+        reset({ status: 'draft', sertifikat: false });
+      });
     }
   }, [editItem, reset]);
 
-  const onSubmit = async (data: FormData) => {
-
+  const onSubmit = useCallback(async (data: FormData) => {
     await new Promise((r) => setTimeout(r, 800));
+    const timestamp = Date.now();
     const item: Prestasi = {
-      id: editItem?.id ?? `prs-${Date.now()}`,
+      id: editItem?.id ?? `prs-${timestamp}`,
       ...data,
     };
     onSave(item);
     reset();
-  };
+  }, [editItem, onSave, reset]);
 
   if (!open) return null;
 

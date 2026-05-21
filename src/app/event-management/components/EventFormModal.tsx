@@ -5,7 +5,7 @@ import { X, CalendarDays, UploadCloud, Image as ImageIcon, Loader2 } from 'lucid
 import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import type { EventItem } from '../page';
-import Image from 'next/image';
+import AppImage from '@/components/ui/AppImage';
 
 interface FormData {
   title: string;
@@ -73,22 +73,22 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
         syarat_ketentuan: editItem.syarat_ketentuan || '',
         cara_pendaftaran: editItem.cara_pendaftaran || '',
       });
-      // @ts-ignore: poster_url exists in DB
-      setPreview(editItem.poster_url || null);
+      Promise.resolve().then(() => setPreview(editItem.poster_url || null));
     } else {
       reset({ status: 'upcoming', quota: 50 });
-      setPreview(null);
+      Promise.resolve().then(() => setPreview(null));
     }
   }, [editItem, reset]);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = React.useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     if (file.size > 5 * 1024 * 1024) { toast.error('Ukuran maksimal banner adalah 5MB'); return; }
     
     setUploading(true);
     const ext = file.name.split('.').pop();
-    const fileName = `event-${Date.now()}-${Math.random().toString(36).substring(7)}.${ext}`;
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+    const fileName = `event-${uniqueId}.${ext}`;
     
     const { error } = await supabase.storage.from('posters').upload(fileName, file);
     if (error) {
@@ -98,7 +98,7 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
       setPreview(urlData.publicUrl);
     }
     setUploading(false);
-  };
+  }, [supabase]);
 
   const onSubmit = async (data: FormData) => {
     const payload = {
@@ -188,7 +188,7 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
                     
                     {preview ? (
                       <>
-                        <Image src={preview} alt="Banner Preview" fill className="object-cover z-0" unoptimized />
+                        <AppImage src={preview} alt="Banner Preview" fill className="object-cover z-0" unoptimized />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity z-10 flex items-center justify-center">
                           <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 flex items-center gap-1.5">
                             <UploadCloud size={14} /> Ganti Banner

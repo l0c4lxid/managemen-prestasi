@@ -6,25 +6,36 @@ import { toast } from 'sonner';
 import type { Achievement } from '@/types';
 
 export default function PendingVerifikasiTable() {
-  const supabase = createClient();
+  const supabase = React.useMemo(() => createClient(), []);
   const [items, setItems] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState<string | null>(null);
 
-  const fetchPending = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('achievements')
-      .select('*, users:user_id(name, email, nim), competitions:competition_id(title)')
-      .eq('status', 'pending')
-      .order('created_at', { ascending: false })
-      .limit(10);
-    if (error) toast.error('Gagal memuat data');
-    else setItems((data as unknown as Achievement[]) || []);
-    setLoading(false);
-  };
+  useEffect(() => {
+    let isMounted = true;
+    
+    const fetchData = async () => {
+      // Don't call setLoading(true) here if it's already true by default
+      const { data, error } = await supabase
+        .from('achievements')
+        .select('*, users:user_id(name, email, nim), competitions:competition_id(title)')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false })
+        .limit(10);
+      
+      if (isMounted) {
+        if (error) {
+          toast.error('Gagal memuat data');
+        } else {
+          setItems((data as Achievement[]) || []);
+        }
+        setLoading(false);
+      }
+    };
 
-  useEffect(() => { fetchPending(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    fetchData();
+    return () => { isMounted = false; };
+  }, [supabase]);
 
   const handleVerify = async (id: string, status: 'verified' | 'rejected') => {
     setProcessing(id);

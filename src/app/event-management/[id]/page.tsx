@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowLeft, CalendarDays, Clock, MapPin, Users, Pencil, Trash2, Plus, CheckCircle2, FileText, ClipboardList, ExternalLink, Mic2, Building2 } from 'lucide-react';
@@ -45,7 +45,7 @@ const tipeColors: Record<string, string> = {
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const id = params.id as string;
 
   const [event, setEvent] = useState<EventItem | null>(null);
@@ -58,18 +58,25 @@ export default function EventDetailPage() {
   const [deleteRegTarget, setDeleteRegTarget] = useState<string | null>(null);
   const [deleteRegLoading, setDeleteRegLoading] = useState(false);
 
-  const fetchData = async () => {
-    setLoading(true);
-    const [{ data: evt }, { data: regs }] = await Promise.all([
-      supabase.from('events').select('*').eq('id', id).single(),
-      supabase.from('registrations').select('*, users(name, email, nim)').eq('event_id', id).order('created_at', { ascending: false }),
-    ]);
-    if (evt) setEvent(evt as EventItem);
-    if (regs) setRegistrations(regs as Registration[]);
-    setLoading(false);
-  };
+  useEffect(() => {
+    let isMounted = true;
+    
+    const loadData = async () => {
+      const [{ data: evt }, { data: regs }] = await Promise.all([
+        supabase.from('events').select('*').eq('id', id).single(),
+        supabase.from('registrations').select('*, users(name, email, nim)').eq('event_id', id).order('created_at', { ascending: false }),
+      ]);
 
-  useEffect(() => { fetchData(); }, [id]);
+      if (isMounted) {
+        if (evt) setEvent(evt as EventItem);
+        if (regs) setRegistrations(regs as Registration[]);
+        setLoading(false);
+      }
+    };
+
+    loadData();
+    return () => { isMounted = false; };
+  }, [supabase, id]);
 
   const handleDelete = async () => {
     setDeleteLoading(true);

@@ -15,7 +15,7 @@ export default function LogoutConfirmModal({ isOpen, onClose, onConfirm, loading
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    Promise.resolve().then(() => setMounted(true));
     return () => setMounted(false);
   }, []);
 

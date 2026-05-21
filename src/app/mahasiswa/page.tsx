@@ -12,13 +12,14 @@ import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import UserFormModal from './components/UserFormModal';
+import type { UserRole, AppUser } from '@/types';
 
 interface MahasiswaStats {
   id: string;
   name: string;
   email: string;
   nim?: string;
-  role: string;
+  role: UserRole;
   created_at: string;
   total_prestasi: number;
 }
@@ -42,13 +43,8 @@ function MahasiswaContent() {
   const [editTarget, setEditTarget] = useState<MahasiswaStats | null>(null);
 
   const { role } = useAuth();
-  const isAdmin = role && role !== 'mahasiswa';
   const isSuperAdmin = role === 'super_admin';
   const canManage = role === 'super_admin' || role === 'admin_prestasi';
-
-  useEffect(() => {
-    fetchMahasiswa();
-  }, []);
 
   const fetchMahasiswa = async () => {
     setLoading(true);
@@ -70,7 +66,7 @@ function MahasiswaContent() {
       .from('achievements')
       .select('user_id');
 
-    const counts = (achievements || []).reduce((acc: any, curr) => {
+    const counts = (achievements || []).reduce((acc: Record<string, number>, curr) => {
       acc[curr.user_id] = (acc[curr.user_id] || 0) + 1;
       return acc;
     }, {});
@@ -83,6 +79,10 @@ function MahasiswaContent() {
     setData(enriched);
     setLoading(false);
   };
+
+  useEffect(() => {
+    fetchMahasiswa();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = useMemo(() => {
     let result = [...data];

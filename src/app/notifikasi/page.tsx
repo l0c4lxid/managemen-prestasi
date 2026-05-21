@@ -45,7 +45,9 @@ export default function NotifikasiPage() {
     setLoading(false);
   };
 
-  useEffect(() => { fetchNotifs(); }, [profile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    Promise.resolve().then(() => fetchNotifs());
+  }, [profile?.id, supabase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const markAsRead = async (id: string) => {
     await supabase.from('notifications').update({ is_read: true }).eq('id', id);

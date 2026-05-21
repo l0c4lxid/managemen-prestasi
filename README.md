@@ -1,6 +1,6 @@
-# PrestasiKampus — Universitas BSI Kampus Solo
+# SiBerkas — Universitas BSI Kampus Solo
 
-**PrestasiKampus** adalah platform manajemen prestasi mahasiswa terpadu yang dirancang khusus untuk Universitas BSI Kampus Solo. Sistem ini bertujuan untuk mendokumentasikan, merayakan, dan memverifikasi setiap pencapaian mahasiswa dalam satu wadah profesional yang terintegrasi.
+**SiBerkas** adalah platform manajemen prestasi mahasiswa terpadu yang dirancang khusus untuk Universitas BSI Kampus Solo. Sistem ini bertujuan untuk mendokumentasikan, merayakan, dan memverifikasi setiap pencapaian mahasiswa dalam satu wadah profesional yang terintegrasi.
 
 ## 🚀 Fitur Utama
 
@@ -26,7 +26,7 @@
 1. **Clone repository**:
    ```bash
    git clone <repository-url>
-   cd prestasikampus
+   cd siberkas
    ```
 
 2. **Install dependencies**:

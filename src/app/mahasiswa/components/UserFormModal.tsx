@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { X, Save, Shield, User, Mail, Hash, KeyRound } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
+import type { AppUser } from '@/types';
 
 interface UserFormModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  editData?: any | null;
+  editData?: AppUser | null;
 }
 
 export default function UserFormModal({ isOpen, onClose, onSuccess, editData }: UserFormModalProps) {
@@ -25,21 +26,25 @@ export default function UserFormModal({ isOpen, onClose, onSuccess, editData }: 
 
   useEffect(() => {
     if (isOpen) {
-      if (isEdit) {
-        setFormData({
-          name: editData.name || '',
-          email: editData.email || '',
-          nim: editData.nim || '',
-          role: editData.role || 'mahasiswa',
-          password: '', // blank password for edit means don't change
+      if (isEdit && editData) {
+        Promise.resolve().then(() => {
+          setFormData({
+            name: editData.name || '',
+            email: editData.email || '',
+            nim: editData.nim || '',
+            role: editData.role || 'mahasiswa',
+            password: '', // blank password for edit means don't change
+          });
         });
       } else {
-        setFormData({
-          name: '',
-          email: '',
-          nim: '',
-          role: 'mahasiswa',
-          password: '',
+        Promise.resolve().then(() => {
+          setFormData({
+            name: '',
+            email: '',
+            nim: '',
+            role: 'mahasiswa',
+            password: '',
+          });
         });
       }
     }
@@ -68,8 +73,8 @@ export default function UserFormModal({ isOpen, onClose, onSuccess, editData }: 
           nim: formData.nim || null,
         });
 
-        if (error || data?.error) {
-          throw new Error(error?.message || data?.error || 'Gagal membuat pengguna');
+        if (error || (data as { error?: string })?.error) {
+          throw new Error(error?.message || (data as { error?: string })?.error || 'Gagal membuat pengguna');
         }
 
         toast.success('Pengguna berhasil ditambahkan!');
@@ -83,20 +88,20 @@ export default function UserFormModal({ isOpen, onClose, onSuccess, editData }: 
             role: formData.role,
             nim: formData.nim || null,
           })
-          .eq('id', editData.id);
+          .eq('id', editData?.id || '');
 
         if (publicError) throw publicError;
 
         // If email or password changed, call RPC to update auth
-        if ((formData.email !== editData.email) || formData.password) {
+        if ((formData.email !== editData?.email) || formData.password) {
           const { data, error: authError } = await supabase.rpc('admin_update_user_auth', {
-            target_user_id: editData.id,
-            new_email: formData.email !== editData.email ? formData.email : null,
+            target_user_id: editData?.id || '',
+            new_email: formData.email !== editData?.email ? formData.email : null,
             new_password: formData.password || null,
           });
 
-          if (authError || data?.error) {
-            toast.error('Data profil diperbarui, tetapi gagal memperbarui Auth (Email/Password). ' + (authError?.message || data?.error));
+          if (authError || (data as { error?: string })?.error) {
+            toast.error('Data profil diperbarui, tetapi gagal memperbarui Auth (Email/Password). ' + (authError?.message || (data as { error?: string })?.error));
           } else {
             toast.success('Data profil dan kredensial berhasil diperbarui!');
           }
@@ -107,9 +112,10 @@ export default function UserFormModal({ isOpen, onClose, onSuccess, editData }: 
 
       onSuccess();
       onClose();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      toast.error(err.message || 'Terjadi kesalahan sistem');
+      const errorMessage = err instanceof Error ? err.message : 'Terjadi kesalahan sistem';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

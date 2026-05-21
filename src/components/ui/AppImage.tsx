@@ -116,6 +116,11 @@ const AppImage = memo(function AppImage({
             width={width || 400}
             height={height || 300}
             sizes={sizes}
+            style={{ 
+                width: props.style?.width || (props.style?.height ? 'auto' : undefined),
+                height: props.style?.height || (props.style?.width ? 'auto' : undefined),
+                ...props.style 
+            }}
             {...props}
         />
     );

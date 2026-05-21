@@ -2,12 +2,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { Search, Plus, Filter, RefreshCw, Swords, Clock, Trophy, Tag, Globe, Pencil, Trash2, Eye, LayoutGrid, List, Bookmark, BookmarkCheck, Users, BarChart3 } from 'lucide-react';
+import { Search, Plus, Filter, RefreshCw, Swords, Clock, Trophy, Pencil, Trash2, Eye, LayoutGrid, List, Bookmark, BookmarkCheck, Users, BarChart3 } from 'lucide-react';
 import AppLayout from '@/components/AppLayout';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import EmptyState from '@/components/ui/EmptyState';
 import LombaFormModal from './components/LombaFormModal';
 import LombaDetailModal from './components/LombaDetailModal';
+import AppImage from '@/components/ui/AppImage';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -40,7 +41,6 @@ const tingkatColors: Record<string, string> = {
 };
 
 export default function LombaManagementPage() {
-  const router = useRouter();
   const supabase = createClient();
   const { role, profile } = useAuth();
   const isAdmin = role && role !== 'mahasiswa';
@@ -85,7 +85,13 @@ export default function LombaManagementPage() {
     }
   };
 
-  useEffect(() => { fetchData(); fetchBookmarks(); fetchParticipation(); }, [profile?.id, role]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    Promise.resolve().then(() => {
+      fetchData();
+      fetchBookmarks();
+      fetchParticipation();
+    });
+  }, [profile?.id, role]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleBookmark = async (lombaId: string) => {
     if (!profile?.id) return;
@@ -240,9 +246,10 @@ export default function LombaManagementPage() {
                   {/* Top Image/Icon */}
                   <div className="relative h-44 bg-slate-100 overflow-hidden">
                     {lomba.poster_url ? (
-                      <img 
+                      <AppImage 
                         src={lomba.poster_url} 
                         alt={lomba.title} 
+                        fill
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                       />
                     ) : (

@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 import { toast } from 'sonner';
 import LogoutConfirmModal from './modals/LogoutConfirmModal';
-import { useSettings } from '@/contexts/SettingsContext';
+import { useSettings, type Semester } from '@/contexts/SettingsContext';
 
 interface DashboardTopbarProps {
   onMobileMenuToggle: () => void;
@@ -48,7 +48,7 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
       setUnreadCount(count || 0);
     };
     fetchUnread();
-  }, [profile?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [profile?.id, supabase]);
 
   const handleSignOut = async () => {
     setLogoutLoading(true);
@@ -80,8 +80,10 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
 
   useEffect(() => {
     if (!searchQuery.trim()) {
-      setSearchResults([]);
-      setShowResults(false);
+      Promise.resolve().then(() => {
+        setSearchResults([]);
+        setShowResults(false);
+      });
       return;
     }
 
@@ -157,7 +159,7 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
                 </div>
               ) : (
                 <div className="px-4 py-3 text-sm text-slate-500 text-center">
-                  Tidak ditemukan hasil untuk "{searchQuery}"
+                  Tidak ditemukan hasil untuk &quot;{searchQuery}&quot;
                 </div>
               )}
             </div>
@@ -187,7 +189,7 @@ export default function DashboardTopbar({ onMobileMenuToggle }: DashboardTopbarP
           </select>
           <select 
             value={semester} 
-            onChange={(e) => setSemester(e.target.value as any)}
+            onChange={(e) => setSemester(e.target.value as Semester)}
             className="px-2 py-1 rounded-lg bg-white border border-slate-200 text-[10px] font-bold text-indigo-700 focus:outline-none focus:ring-1 focus:ring-indigo-300"
           >
             <option value="Semua">Semua</option>

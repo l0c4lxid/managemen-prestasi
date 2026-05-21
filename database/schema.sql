@@ -1,5 +1,5 @@
 -- ==========================================
--- PrestasiKampus - Full Database Schema
+-- SiBerkas - Full Database Schema
 -- ==========================================
 -- Gunakan script ini di SQL Editor Supabase 
 -- untuk setup database baru (Production/Local)

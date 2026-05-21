@@ -19,7 +19,14 @@ interface KategoriData {
   count: number;
 }
 
-const CustomTooltipArea = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) => {
+interface TooltipPayloadItem {
+  name: string;
+  value: number;
+  color: string;
+  payload: TrendData | KategoriData;
+}
+
+const CustomTooltipArea = ({ active, payload, label }: { active?: boolean; payload?: TooltipPayloadItem[]; label?: string }) => {
   if (!active || !payload) return null;
   return (
     <div className="bg-white rounded-xl border border-slate-100 shadow-soft p-3 text-xs">
@@ -35,7 +42,7 @@ const CustomTooltipArea = ({ active, payload, label }: { active?: boolean; paylo
   );
 };
 
-const CustomTooltipBar = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) => {
+const CustomTooltipBar = ({ active, payload, label }: { active?: boolean; payload?: TooltipPayloadItem[]; label?: string }) => {
   if (!active || !payload) return null;
   return (
     <div className="bg-white rounded-xl border border-slate-100 shadow-soft p-3 text-xs">
@@ -132,6 +139,15 @@ export default function DashboardCharts() {
 
     fetchData();
   }, [academicYear, semester]);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="xl:col-span-2 card p-6 h-[340px] animate-pulse bg-slate-50/50" />
+        <div className="card p-6 h-[340px] animate-pulse bg-slate-50/50" />
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
