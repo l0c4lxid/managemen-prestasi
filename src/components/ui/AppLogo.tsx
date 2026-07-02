@@ -27,6 +27,20 @@ const AppLogo = memo(function AppLogo({
     return classes.join(' ');
   }, [onClick, className]);
 
+  // Calculate correct dimensions to preserve aspect ratio (app_logo.png is 543x585)
+  const dimensions = useMemo(() => {
+    if (src === '/assets/images/app_logo.png') {
+      return {
+        width: Math.round(size * (543 / 585)),
+        height: size,
+      };
+    }
+    return {
+      width: size,
+      height: size,
+    };
+  }, [src, size]);
+
   return (
     <div className={containerClassName} onClick={onClick}>
       {/* Show image if src provided, otherwise show icon */}
@@ -34,10 +48,9 @@ const AppLogo = memo(function AppLogo({
         <AppImage
           src={src}
           alt="Logo" 
-          width={size}
-          height={size}
+          width={dimensions.width}
+          height={dimensions.height}
           className="flex-shrink-0"
-          style={{ width: 'auto', height: `${size}px` }}
           priority={true}
           unoptimized={src.endsWith('.svg')}
         />
