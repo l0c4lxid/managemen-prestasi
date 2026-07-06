@@ -293,17 +293,22 @@ export default function PublicLombaPage({ params }: { params: Promise<{ slug?: s
 
                   {lomba.link && (
                     <div className="pt-2">
-                      <a 
-                        href={isExpired() || lomba.status !== 'active' ? undefined : (lomba.link.startsWith('http') ? lomba.link : `https://${lomba.link}`)}
-                        target={isExpired() || lomba.status !== 'active' ? undefined : "_blank"}
-                        rel={isExpired() || lomba.status !== 'active' ? undefined : "noopener noreferrer"}
-                        className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-sm font-black uppercase tracking-[0.15em] transition-all
-                          ${isExpired() || lomba.status !== 'active' 
-                            ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
-                            : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-600/30 hover:-translate-y-1 active:scale-95'}`}
-                      >
-                        Daftar Sekarang
-                      </a>
+                      {isExpired() || lomba.status !== 'active' ? (
+                        <div
+                          className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-sm font-black uppercase tracking-[0.15em] bg-slate-300 text-slate-500 cursor-not-allowed"
+                        >
+                          Lomba Sudah Tutup
+                        </div>
+                      ) : (
+                        <a 
+                          href={lomba.link.startsWith('http') ? lomba.link : `https://${lomba.link}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-sm font-black uppercase tracking-[0.15em] bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-600/30 hover:-translate-y-1 active:scale-95 transition-all"
+                        >
+                          Daftar Sekarang
+                        </a>
+                      )}
                     </div>
                   )}
                 </div>
