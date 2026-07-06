@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { CalendarDays, MapPin, Users, ArrowRight, Mic2, Maximize2, Zap } from 'lucide-react';
+import { CalendarDays, MapPin, Users, ArrowRight, Mic2, Maximize2, Zap, ExternalLink } from 'lucide-react';
 import AppImage from '@/components/ui/AppImage';
 import Lightbox from '@/components/ui/Lightbox';
 
@@ -17,7 +17,8 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
     lokasi: e.location || e.lokasi,
     mentor: e.mentor,
     tipe: e.type || e.tipe || 'Event',
-    color: e.status === 'done' ? 'bg-slate-500' : 'bg-indigo-600'
+    color: e.status === 'done' ? 'bg-slate-500' : 'bg-indigo-600',
+    link_pendaftaran: e.link_pendaftaran || null
   }));
 
   // Use real data or premium fallback data
@@ -32,7 +33,8 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
       peserta: 142,
       kapasitas: 200,
       tipe: 'Seminar',
-      color: 'bg-indigo-600'
+      color: 'bg-indigo-600',
+      link_pendaftaran: null
     },
     {
       id: 'e2',
@@ -44,7 +46,8 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
       peserta: 45,
       kapasitas: 50,
       tipe: 'Workshop',
-      color: 'bg-cyan-600'
+      color: 'bg-cyan-600',
+      link_pendaftaran: null
     },
     {
       id: 'e3',
@@ -56,7 +59,8 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
       peserta: 89,
       kapasitas: 100,
       tipe: 'Bootcamp',
-      color: 'bg-emerald-600'
+      color: 'bg-emerald-600',
+      link_pendaftaran: null
     }
   ];
 
@@ -150,11 +154,13 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
                   </div>
 
                   <Link 
-                    href={`/p/event/${event.id}`}
+                    href={event.link_pendaftaran || `/p/event/${event.id}`}
+                    target={event.link_pendaftaran ? "_blank" : undefined}
+                    rel={event.link_pendaftaran ? "noopener noreferrer" : undefined}
                     className="mt-8 w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-slate-900 text-white text-sm font-bold hover:bg-indigo-600 active:scale-95 transition-all shadow-lg hover:shadow-indigo-200"
                   >
-                    Daftar Sekarang
-                    <ArrowRight size={16} />
+                    {event.link_pendaftaran ? 'Daftar Sekarang' : 'Daftar Event'}
+                    {event.link_pendaftaran ? <ExternalLink size={16} /> : <ArrowRight size={16} />}
                   </Link>
                 </div>
               </div>
