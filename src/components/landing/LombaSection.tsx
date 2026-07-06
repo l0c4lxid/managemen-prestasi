@@ -8,7 +8,12 @@ import Lightbox from '@/components/ui/Lightbox';
 function daysLeft(deadline: string): number {
   const now = new Date();
   const d = new Date(deadline);
-  return Math.max(0, Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+  const nowOnlyDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dOnlyDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  
+  const diffTime = dOnlyDate.getTime() - nowOnlyDate.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays;
 }
 
 export default function LombaSection({ initialData = [] }: { initialData?: any[] }) {
@@ -24,7 +29,8 @@ export default function LombaSection({ initialData = [] }: { initialData?: any[]
     deadline: item.deadline,
     hadiah: item.prize || 'Sertifikat',
     img: item.poster_url || "https://img.rocket.new/generatedImages/rocket_gen_img_1c76a5ca9-1763300171126.png",
-    color: item.category === 'Non-Akademik' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-indigo-50 text-indigo-700 border-indigo-100'
+    color: item.category === 'Non-Akademik' ? 'bg-amber-50 text-amber-700 border-amber-100' : 'bg-indigo-50 text-indigo-700 border-indigo-100',
+    slug: item.slug || null
   }));
 
   const toggleBookmark = (id: string) => {
@@ -53,7 +59,7 @@ export default function LombaSection({ initialData = [] }: { initialData?: any[]
               Daftar kompetisi bergengsi dari berbagai kategori untuk mengasah bakat dan meraih prestasi di tingkat nasional maupun internasional.
             </p>
           </div>
-          <Link href="/lomba-management" className="btn-outline">
+          <Link href="/p/lomba" className="btn-outline">
             Lihat Semua Lomba
           </Link>
         </div>
@@ -63,7 +69,8 @@ export default function LombaSection({ initialData = [] }: { initialData?: any[]
           {mappedData.map((lomba) => {
             const days = daysLeft(lomba.deadline);
             const isBookmarked = bookmarked.has(lomba.id);
-            const isUrgent = days <= 3;
+            const isPast = days < 0;
+            const isUrgent = !isPast && days <= 3;
 
             return (
               <div
@@ -73,7 +80,7 @@ export default function LombaSection({ initialData = [] }: { initialData?: any[]
                 {/* Image container */}
                 <div 
                   className="relative h-56 overflow-hidden cursor-pointer bg-slate-50"
-                  onClick={() => setSelectedImage({ src: lomba.img, alt: lomba.nama, title: lomba.nama, id: lomba.id })}
+                  onClick={() => setSelectedImage({ src: lomba.img, alt: lomba.nama, title: lomba.nama, id: lomba.slug || lomba.id })}
                 >
                   <AppImage 
                     src={lomba.img} 
@@ -110,7 +117,7 @@ export default function LombaSection({ initialData = [] }: { initialData?: any[]
 
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex-1">
-                    <Link href={`/p/lomba/${lomba.id}`}>
+                    <Link href={`/p/lomba/${lomba.slug || lomba.id}`}>
                       <h3 className="text-base font-bold text-slate-800 leading-snug mb-2 line-clamp-2 hover:text-indigo-600 transition-colors cursor-pointer">
                         {lomba.nama}
                       </h3>
@@ -132,12 +139,12 @@ export default function LombaSection({ initialData = [] }: { initialData?: any[]
                   {/* Footer */}
                   <div className="flex items-center justify-between pt-4 border-t border-slate-100">
                     <div className={`flex items-center gap-1.5 text-xs font-bold
-                      ${isUrgent ? 'text-rose-600' : 'text-slate-500'}`}>
+                      ${isPast ? 'text-slate-400' : isUrgent ? 'text-rose-600' : 'text-slate-500'}`}>
                       <Clock size={14} className={isUrgent ? 'animate-pulse' : ''} />
-                      {days === 0 ? 'Hari ini!' : `${days} hari lagi`}
+                      {isPast ? 'Sudah lewat' : days === 0 ? 'Hari ini!' : `${days} hari lagi`}
                     </div>
                     <Link
-                      href={`/p/lomba/${lomba.id}`}
+                      href={`/p/lomba/${lomba.slug || lomba.id}`}
                       className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-indigo-600 transition-colors"
                     >
                       Detail

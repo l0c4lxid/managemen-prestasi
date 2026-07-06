@@ -48,6 +48,7 @@ CREATE TABLE public.competitions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
     organizer TEXT,
     prize TEXT,
+    slug TEXT UNIQUE,
     syarat_ketentuan TEXT,
     cara_pendaftaran TEXT,
     tingkat TEXT,
@@ -120,7 +121,8 @@ CREATE TABLE public.events (
     cara_pendaftaran TEXT,
     link_pendaftaran TEXT,
     institusi_narasumber TEXT,
-    status TEXT DEFAULT 'upcoming'
+    status TEXT DEFAULT 'upcoming',
+    slug TEXT UNIQUE
 );
 
 -- 8. Create Registrations Table

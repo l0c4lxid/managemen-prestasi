@@ -49,6 +49,7 @@ export interface Competition {
   kategori?: string | null;
   tanggal_mulai?: string | null;
   hadiah_detail?: string | null;
+  slug?: string | null;
 }
 
 // ─── Achievements ─────────────────────────────────────────────────────────────
@@ -106,6 +107,7 @@ export interface Event {
   link_pendaftaran?: string | null;
   institusi_narasumber?: string | null;
   status?: string | null;
+  slug?: string | null;
 }
 
 // ─── Registrations ───────────────────────────────────────────────────────────

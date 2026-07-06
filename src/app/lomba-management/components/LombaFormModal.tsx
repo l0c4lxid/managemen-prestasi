@@ -98,7 +98,7 @@ export default function LombaFormModal({ open, onClose, onSave, editItem }: Prop
   };
 
   const onSubmit = async (data: FormData) => {
-    const payload = {
+    const payload: any = {
       title: data.title,
       organizer: data.organizer,
       kategori: data.kategori,
@@ -115,6 +115,15 @@ export default function LombaFormModal({ open, onClose, onSave, editItem }: Prop
       level: (data.tingkat || 'nasional').toLowerCase() as 'kampus' | 'nasional' | 'internasional',
       poster_url: preview,
     };
+
+    if (!editItem) {
+      const slugSuffix = Math.random().toString(36).substring(2, 8);
+      payload.slug = `${data.title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')}-${slugSuffix}`;
+    }
 
     if (editItem) {
       const { data: updated, error } = await supabase

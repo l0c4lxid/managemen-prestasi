@@ -18,7 +18,8 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
     mentor: e.mentor,
     tipe: e.type || e.tipe || 'Event',
     color: e.status === 'done' ? 'bg-slate-500' : 'bg-indigo-600',
-    link_pendaftaran: e.link_pendaftaran || null
+    link_pendaftaran: e.link_pendaftaran || null,
+    slug: e.slug || null
   }));
 
   // Use real data or premium fallback data
@@ -34,7 +35,8 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
       kapasitas: 200,
       tipe: 'Seminar',
       color: 'bg-indigo-600',
-      link_pendaftaran: null
+      link_pendaftaran: null,
+      slug: null
     },
     {
       id: 'e2',
@@ -47,7 +49,8 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
       kapasitas: 50,
       tipe: 'Workshop',
       color: 'bg-cyan-600',
-      link_pendaftaran: null
+      link_pendaftaran: null,
+      slug: null
     },
     {
       id: 'e3',
@@ -60,7 +63,8 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
       kapasitas: 100,
       tipe: 'Bootcamp',
       color: 'bg-emerald-600',
-      link_pendaftaran: null
+      link_pendaftaran: null,
+      slug: null
     }
   ];
 
@@ -84,7 +88,7 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
               Ikuti berbagai event eksklusif mulai dari seminar teknologi hingga bootcamp intensif bersama para ahli.
             </p>
           </div>
-          <Link href="/event" className="group flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+          <Link href="/p/event" className="group flex items-center gap-2 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
             Lihat Semua Event 
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </Link>
@@ -102,7 +106,7 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
                 {/* Banner image */}
                 <div 
                   className="relative h-56 overflow-hidden cursor-pointer"
-                  onClick={() => setSelectedImage({ src: event.img, alt: event.nama, title: event.nama, id: event.id })}
+                  onClick={() => setSelectedImage({ src: event.img, alt: event.nama, title: event.nama, id: event.slug || event.id })}
                 >
                   <AppImage
                     src={event.img}
@@ -133,7 +137,7 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
                 {/* Content */}
                 <div className="p-8 flex flex-col flex-1">
                   <div className="flex-1 space-y-5">
-                    <Link href={`/p/event/${event.id}`}>
+                    <Link href={`/p/event/${event.slug || event.id}`}>
                       <h3 className="text-xl font-bold text-slate-800 leading-tight line-clamp-2 hover:text-indigo-600 transition-colors cursor-pointer">
                         {event.nama}
                       </h3>
@@ -154,7 +158,7 @@ export default function EventSection({ initialData = [] }: { initialData?: any[]
                   </div>
 
                   <Link 
-                    href={event.link_pendaftaran || `/p/event/${event.id}`}
+                    href={event.link_pendaftaran || `/p/event/${event.slug || event.id}`}
                     target={event.link_pendaftaran ? "_blank" : undefined}
                     rel={event.link_pendaftaran ? "noopener noreferrer" : undefined}
                     className="mt-8 w-full flex items-center justify-center gap-2 py-4 rounded-2xl bg-slate-900 text-white text-sm font-bold hover:bg-indigo-600 active:scale-95 transition-all shadow-lg hover:shadow-indigo-200"

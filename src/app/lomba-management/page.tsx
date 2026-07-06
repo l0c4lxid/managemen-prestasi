@@ -21,6 +21,7 @@ export interface Lomba {
   syarat_ketentuan: string | null; cara_pendaftaran: string | null;
   tanggal_mulai: string | null; created_at: string;
   poster_url?: string | null;
+  slug: string | null;
 }
 
 const statusConfig: Record<string, { label: string; color: string; dot: string }> = {

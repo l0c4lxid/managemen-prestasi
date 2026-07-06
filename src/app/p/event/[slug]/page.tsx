@@ -9,7 +9,7 @@ import LandingFooter from '@/components/landing/LandingFooter';
 import Lightbox from '@/components/ui/Lightbox';
 import { ArrowLeft, CalendarDays, MapPin, Users, Clock, UserCheck, Link as LinkIcon, Mic2, Maximize2 } from 'lucide-react';
 
-export default function PublicEventPage({ params }: { params: Promise<{ id: string }> }) {
+export default function PublicEventPage({ params }: { params: Promise<{ slug?: string; id?: string }> }) {
   const [event, setEvent] = useState<any>(null);
   const [currentPeserta, setCurrentPeserta] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -17,14 +17,28 @@ export default function PublicEventPage({ params }: { params: Promise<{ id: stri
 
   useEffect(() => {
     const fetchData = async () => {
-      const { id } = await params;
+      const { slug, id } = await params;
+      const slugOrId = slug || id;
+      if (!slugOrId) {
+        setEvent(null);
+        setLoading(false);
+        return;
+      }
       const supabase = createClient();
       
-      const { data: eventData, error: eventError } = await supabase
-        .from('events')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const isUUID = (str: string) => {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        return uuidRegex.test(str);
+      };
+
+      const query = supabase.from('events').select('*');
+      if (isUUID(slugOrId)) {
+        query.eq('id', slugOrId);
+      } else {
+        query.eq('slug', slugOrId);
+      }
+      
+      const { data: eventData, error: eventError } = await query.single();
       
       if (eventError || !eventData) {
         setEvent(null);
@@ -37,7 +51,7 @@ export default function PublicEventPage({ params }: { params: Promise<{ id: stri
       const { count: registeredCount } = await supabase
         .from('registrations')
         .select('*', { count: 'exact', head: true })
-        .eq('event_id', id);
+        .eq('event_id', eventData.id);
 
       setCurrentPeserta(registeredCount || 0);
       setLoading(false);

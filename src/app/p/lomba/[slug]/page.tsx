@@ -9,20 +9,35 @@ import LandingFooter from '@/components/landing/LandingFooter';
 import Lightbox from '@/components/ui/Lightbox';
 import { ArrowLeft, Swords, Clock, Calendar, Trophy, Tag, Link as LinkIcon, AlertCircle, Maximize2 } from 'lucide-react';
 
-export default function PublicLombaPage({ params }: { params: Promise<{ id: string }> }) {
+export default function PublicLombaPage({ params }: { params: Promise<{ slug?: string; id?: string }> }) {
   const [lomba, setLomba] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   
   useEffect(() => {
     const fetchData = async () => {
-      const { id } = await params;
+      const { slug, id } = await params;
+      const slugOrId = slug || id;
+      if (!slugOrId) {
+        setLomba(null);
+        setLoading(false);
+        return;
+      }
       const supabase = createClient();
-      const { data, error } = await supabase
-        .from('competitions')
-        .select('*')
-        .eq('id', id)
-        .single();
+      
+      const isUUID = (str: string) => {
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        return uuidRegex.test(str);
+      };
+
+      const query = supabase.from('competitions').select('*');
+      if (isUUID(slugOrId)) {
+        query.eq('id', slugOrId);
+      } else {
+        query.eq('slug', slugOrId);
+      }
+
+      const { data, error } = await query.single();
       
       if (error || !data) {
         setLomba(null);
@@ -276,20 +291,21 @@ export default function PublicLombaPage({ params }: { params: Promise<{ id: stri
                     </div>
                   )}
 
-                  <div className="pt-2">
-                    <Link 
-                      href="/lomba-management" 
-                      className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-sm font-black uppercase tracking-[0.15em] transition-all
-                        ${isExpired() || lomba.status !== 'active' 
-                          ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
-                          : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-600/30 hover:-translate-y-1 active:scale-95'}`}
-                    >
-                      Daftar Sekarang
-                    </Link>
-                    <p className="text-center text-[10px] font-bold text-slate-400 mt-4 uppercase tracking-widest leading-loose">
-                      Login diperlukan untuk akses sistem pendaftaran
-                    </p>
-                  </div>
+                  {lomba.link && (
+                    <div className="pt-2">
+                      <a 
+                        href={isExpired() || lomba.status !== 'active' ? undefined : (lomba.link.startsWith('http') ? lomba.link : `https://${lomba.link}`)}
+                        target={isExpired() || lomba.status !== 'active' ? undefined : "_blank"}
+                        rel={isExpired() || lomba.status !== 'active' ? undefined : "noopener noreferrer"}
+                        className={`w-full flex items-center justify-center gap-3 py-4 rounded-2xl text-sm font-black uppercase tracking-[0.15em] transition-all
+                          ${isExpired() || lomba.status !== 'active' 
+                            ? 'bg-slate-300 text-slate-500 cursor-not-allowed' 
+                            : 'bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-600/30 hover:-translate-y-1 active:scale-95'}`}
+                      >
+                        Daftar Sekarang
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
 

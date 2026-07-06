@@ -101,7 +101,7 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
   }, [supabase]);
 
   const onSubmit = async (data: FormData) => {
-    const payload = {
+    const payload: any = {
       title: data.title,
       type: data.type,
       date: data.date ? new Date(data.date).toISOString() : null,
@@ -118,6 +118,15 @@ export default function EventFormModal({ open, onClose, onSave, editItem }: Prop
       cara_pendaftaran: data.cara_pendaftaran,
       poster_url: preview,
     };
+
+    if (!editItem) {
+      const slugSuffix = Math.random().toString(36).substring(2, 8);
+      payload.slug = `${data.title
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .trim()
+        .replace(/\s+/g, '-')}-${slugSuffix}`;
+    }
 
     if (editItem) {
       const { data: updated, error } = await supabase

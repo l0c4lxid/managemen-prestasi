@@ -34,6 +34,7 @@ export interface EventItem {
   cara_pendaftaran: string | null;
   created_at: string;
   poster_url?: string | null;
+  slug: string | null;
 }
 
 const statusConfig: Record<string, { label: string; color: string; dot: string }> = {

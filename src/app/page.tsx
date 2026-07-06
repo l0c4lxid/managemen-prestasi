@@ -59,7 +59,7 @@ export default async function RootPage() {
       supabase.from('events')
         .select('*')
         .order('date', { ascending: false })
-        .limit(8)
+        .limit(6)
     ]);
 
     const [achStat, userStat, compStat] = statsRes;
