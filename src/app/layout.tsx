@@ -18,6 +18,13 @@ export const metadata: Metadata = {
   description:
     'SIBERKAS — Sistem Informasi Basis Evaluasi Rekap Kegiatan dan Arsip prestasi mahasiswa Indonesia.',
   icons: { icon: [{ url: '/favicon.ico', type: 'image/x-icon' }] },
+  openGraph: {
+    title: 'SiBerkas — Sistem Informasi Arsip Prestasi Mahasiswa',
+    description: 'SIBERKAS — Sistem Informasi Basis Evaluasi Rekap Kegiatan dan Arsip prestasi mahasiswa Indonesia.',
+    siteName: 'SiBerkas',
+    locale: 'id_ID',
+    type: 'website',
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

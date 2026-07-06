@@ -1,6 +1,8 @@
 import { Metadata } from 'next';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
+export const dynamic = 'force-dynamic';
+
 const isUUID = (str: string) => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   return uuidRegex.test(str);
@@ -13,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug?: st
   
   const supabase = await createServerSupabaseClient();
   
-  const query = supabase.from('competitions').select('title');
+  const query = supabase.from('competitions').select('title, description, poster_url');
   if (isUUID(slugOrId)) {
     query.eq('id', slugOrId);
   } else {
@@ -21,8 +23,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug?: st
   }
   
   const { data } = await query.single();
+  const title = data?.title || 'Detail Lomba';
+  const description = data?.description ? data.description.substring(0, 160) : 'Ikuti kompetisi menarik di SiBerkas.';
+  const imageUrl = data?.poster_url || '';
+
   return {
-    title: data?.title || 'Detail Lomba',
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: imageUrl ? [{ url: imageUrl }] : [],
+      type: 'website',
+    },
   };
 }
 

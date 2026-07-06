@@ -7,12 +7,19 @@ import AppImage from '@/components/ui/AppImage';
 import LandingNav from '@/components/landing/LandingNav';
 import LandingFooter from '@/components/landing/LandingFooter';
 import Lightbox from '@/components/ui/Lightbox';
-import { ArrowLeft, Swords, Clock, Calendar, Trophy, Tag, Link as LinkIcon, AlertCircle, Maximize2 } from 'lucide-react';
+import { ArrowLeft, Swords, Clock, Calendar, Trophy, Tag, Link as LinkIcon, AlertCircle, Maximize2, Share2, Check } from 'lucide-react';
 
 export default function PublicLombaPage({ params }: { params: Promise<{ slug?: string; id?: string }> }) {
   const [lomba, setLomba] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
   
   useEffect(() => {
     const fetchData = async () => {
@@ -311,6 +318,25 @@ export default function PublicLombaPage({ params }: { params: Promise<{ slug?: s
                       )}
                     </div>
                   )}
+
+                  <div className="pt-4 border-t border-slate-200 mt-4">
+                    <button
+                      onClick={handleCopyLink}
+                      className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 active:scale-95 transition-all text-sm"
+                    >
+                      {copied ? (
+                        <>
+                          <Check size={16} className="text-emerald-500" />
+                          Link Tersalin!
+                        </>
+                      ) : (
+                        <>
+                          <Share2 size={16} />
+                          Bagikan Lomba
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
 
